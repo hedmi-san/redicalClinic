@@ -1,0 +1,131 @@
+/* ============================================================
+   Cabinet Nour El Islam — Dashboard Stylesheet
+   Theme: Dark Teal (#003030) with warm white accents
+   ============================================================ */
+
+/* ---- Root -------------------------------------------------- */
+.root-pane {
+    -fx-background-color: #f0f4f4;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* ---- Window Controls (Title Bar) --------------------------- */
+.title-bar {
+    -fx-background-color: #e5ebeb;
+    -fx-padding: 0;
+    -fx-pref-height: 30px;
+}
+
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #003030;
+    -fx-font-size: 12px;
+    -fx-pref-width: 45px;
+    -fx-pref-height: 30px;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+}
+
+.window-btn:hover {
+    -fx-background-color: #d0dcdc;
+}
+
+.close-btn:hover {
+    -fx-background-color: #e81123;
+    -fx-text-fill: white;
+}
+
+/* ---- Sidebar ----------------------------------------------- */
+.sidebar {
+    -fx-background-color: #003030;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
+}
+
+.sidebar-brand {
+    -fx-padding: 30 15 40 15;
+    -fx-border-color: transparent transparent #004d4d transparent;
+    -fx-border-width: 1px;
+    -fx-margin-bottom: 20px;
+}
+
+.brand-icon {
+    -fx-font-size: 42px;
+}
+
+.brand-text-top {
+    -fx-text-fill: #80d8cc;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
+}
+
+.brand-text-bottom {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* ---- Navigation Menu --------------------------------------- */
+.nav-menu {
+    -fx-padding: 20 0 0 0;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #aad4cc;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 15 20 15 30;
+    -fx-cursor: hand;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #004040;
+    -fx-text-fill: white;
+}
+
+.nav-btn-active {
+    -fx-background-color: #004d4d;
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent transparent #80d8cc;
+    -fx-border-width: 0 0 0 5;
+}
+
+/* ---- Logout Button ----------------------------------------- */
+.logout-container {
+    -fx-padding: 0 0 20 0;
+}
+
+.logout-btn {
+    -fx-text-fill: #e07b7b;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #4a1f1f;
+    -fx-text-fill: #ffb3b3;
+}
+
+/* ---- Content Area ------------------------------------------ */
+.content-area {
+    -fx-padding: 20;
+    -fx-background-color: #f0f4f4;
+}
+
+/* ---- Sub-page Titles & Cards (Used in the modular FXMLs) --- */
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #003030;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6b8a88;
+}
+
+.content-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 5);
+}

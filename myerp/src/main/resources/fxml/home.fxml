@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" prefWidth="1200.0" 
+            styleClass="root-pane" 
+            xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.HomeController">
+
+    <!-- TOP TITLE BAR FOR WINDOW CONTROLS -->
+    <top>
+        <HBox fx:id="titleBar" alignment="CENTER_RIGHT" spacing="5" styleClass="title-bar" BorderPane.alignment="CENTER">
+            <!-- Spacer to push buttons to the right (also serves as drag area) -->
+            <HBox HBox.hgrow="ALWAYS" />
+            
+            <Button text="—" styleClass="window-btn" onAction="#handleMinimize" />
+            <Button text="🗖" styleClass="window-btn" onAction="#handleMaximize" />
+            <Button text="✕" styleClass="window-btn, close-btn" onAction="#handleClose" />
+        </HBox>
+    </top>
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="250.0" BorderPane.alignment="CENTER">
+            
+            <!-- Branding Area -->
+            <VBox alignment="CENTER" spacing="5" styleClass="sidebar-brand">
+                <Label text="🏥" styleClass="brand-icon"/>
+                <Label text="Cabinet" styleClass="brand-text-top"/>
+                <Label text="Nour El Islam" styleClass="brand-text-bottom"/>
+            </VBox>
+
+            <!-- Navigation Buttons -->
+            <VBox spacing="2" styleClass="nav-menu">
+                <Button fx:id="btnAccueil" text="🏠 Accueil" styleClass="nav-btn" onAction="#handleNavAccueil" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnPatients" text="👥 Patients" styleClass="nav-btn" onAction="#handleNavPatients" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnSessions" text="🩺 Séances" styleClass="nav-btn" onAction="#handleNavSessions" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnWorkers" text="👨‍⚕️ Employés" styleClass="nav-btn" onAction="#handleNavWorkers" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnBills" text="💰 Factures" styleClass="nav-btn" onAction="#handleNavBills" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS" /> <!-- Spacer -->
+
+            <!-- Logout Button -->
+            <VBox styleClass="logout-container">
+                <Button text="🚪 Déconnecter" styleClass="nav-btn, logout-btn" onAction="#handleLogout" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+            </VBox>
+
+        </VBox>
+    </left>
+
+    <!-- CENTER CONTENT AREA -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER">
+            <!-- Dynamic pages will be loaded here -->
+        </StackPane>
+    </center>
+
+</BorderPane>

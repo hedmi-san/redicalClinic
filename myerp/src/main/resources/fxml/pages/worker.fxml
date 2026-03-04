@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.WorkerController">
+    <VBox alignment="CENTER" spacing="10" styleClass="content-card" maxWidth="600" maxHeight="300">
+        <Label text="👨‍⚕️ Gestion des Employés" styleClass="page-title"/>
+        <Label text="Gérer le personnel et les médecins de la clinique" styleClass="page-subtitle"/>
+    </VBox>
+</StackPane>
