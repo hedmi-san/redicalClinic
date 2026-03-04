@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+    prefHeight="420.0" prefWidth="680.0"
+    xmlns="http://javafx.com/javafx/17"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="controller.LoginController"
+    styleClass="root-pane">
+
+    <!-- LEFT: Clinic branding panel -->
+    <left>
+        <VBox alignment="CENTER" spacing="12" styleClass="brand-panel"
+              BorderPane.alignment="CENTER">
+            <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
+            <Label text="🏥" styleClass="clinic-icon"/>
+            <Label text="Cabinet" styleClass="clinic-name-top"/>
+            <Label text="Nour El Islam" styleClass="clinic-name-bottom"/>
+            <Label text="Système de Gestion" styleClass="clinic-subtitle"/>
+        </VBox>
+    </left>
+
+    <!-- RIGHT: Login form -->
+    <right>
+        <AnchorPane styleClass="login-panel" BorderPane.alignment="CENTER">
+            <VBox spacing="20" AnchorPane.topAnchor="50"
+                  AnchorPane.bottomAnchor="50"
+                  AnchorPane.leftAnchor="40"
+                  AnchorPane.rightAnchor="40"
+                  alignment="CENTER">
+
+                <Label text="Connexion" styleClass="login-title"/>
+                <Label text="Connectez-vous à votre compte" styleClass="login-subtitle"/>
+
+                <!-- Username -->
+                <VBox spacing="6">
+                    <Label text="Nom d'utilisateur" styleClass="field-label"/>
+                    <TextField fx:id="userNameField"
+                               promptText="Entrez votre nom d'utilisateur"
+                               styleClass="login-field"/>
+                </VBox>
+
+                <!-- Password -->
+                <VBox spacing="6">
+                    <Label text="Mot de passe" styleClass="field-label"/>
+                    <PasswordField fx:id="passwordField"
+                                  promptText="Entrez votre mot de passe"
+                                  styleClass="login-field"/>
+                </VBox>
+
+                <!-- Login button -->
+                <Button fx:id="loginButton"
+                        text="Se connecter"
+                        onAction="#handleLogin"
+                        prefWidth="260"
+                        prefHeight="42"
+                        styleClass="login-btn"/>
+
+            </VBox>
+        </AnchorPane>
+    </right>
+
+</BorderPane>

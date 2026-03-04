@@ -1,0 +1,103 @@
+/* ============================================================
+   Cabinet Nour El Islam — Global Stylesheet
+   Theme: Dark Teal (#003030) with warm white accents
+   ============================================================ */
+
+.root-pane {
+    -fx-background-color: #f0f4f4;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.brand-panel {
+    -fx-background-color: #003030;
+    -fx-min-width: 280px;
+    -fx-pref-width: 300px;
+}
+
+.clinic-icon {
+    -fx-font-size: 52px;
+    -fx-foreground-color : red;
+}
+
+.clinic-name-top {
+    -fx-text-fill: #80d8cc;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 2;
+}
+
+.clinic-name-bottom {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.clinic-subtitle {
+    -fx-text-fill: #aad4cc;
+    -fx-font-size: 12px;
+    -fx-padding: 10 0 0 0;
+    -fx-letter-spacing: 1;
+}
+
+/* ---- Login panel (right side) ------------------------------ */
+.login-panel {
+    -fx-background-color: white;
+    -fx-pref-width: 380px;
+    -fx-min-width: 340px;
+}
+
+.login-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #003030;
+}
+
+.login-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b8a88;
+    -fx-padding: 0 0 10 0;
+}
+
+/* ---- Field labels ------------------------------------------ */
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #003030;
+}
+
+/* ---- Text / Password fields -------------------------------- */
+.login-field {
+    -fx-background-color: #f4f9f9;
+    -fx-border-color: #b0d0cc;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 260px;
+    -fx-font-size: 13px;
+    -fx-padding: 0 12 0 12;
+}
+
+.login-field:focused {
+    -fx-border-color: #006060;
+    -fx-background-color: #edf7f5;
+}
+
+/* ---- Login button ------------------------------------------ */
+.login-btn {
+    -fx-background-color: #003030;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0 10 0;
+}
+
+.login-btn:hover {
+    -fx-background-color: #005050;
+}
+
+.login-btn:pressed {
+    -fx-background-color: #001a1a;
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+
+    <!-- Run button → mvn javafx:run (handles module path automatically) -->
+    <action>
+        <actionName>run</actionName>
+        <goals>
+            <goal>javafx:run</goal>
+        </goals>
+    </action>
+
+    <!-- Debug button → mvn javafx:run with JPDA agent -->
+    <action>
+        <actionName>debug</actionName>
+        <goals>
+            <goal>javafx:run</goal>
+        </goals>
+        <properties>
+            <javafx.options>-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=${jpda.address}</javafx.options>
+        </properties>
+    </action>
+
+</actions>
