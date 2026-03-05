@@ -10,57 +10,51 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.User;
 
-import javafx.fxml.Initializable;
-
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController {
 
     @FXML
     private TextField userNameField;
     @FXML
     private PasswordField passwordField;
     @FXML
-    private Button loginButton;
+    private TextField passwordTextField;
     @FXML
-    private HBox titleBar;
+    private Button togglePasswordBtn;
+    @FXML
+    private Button loginButton;
 
     private double x = 0;
     private double y = 0;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Setup window dragging on the title bar
-        if (titleBar != null) {
-            titleBar.setOnMousePressed((MouseEvent event) -> {
-                x = event.getSceneX();
-                y = event.getSceneY();
-            });
-            titleBar.setOnMouseDragged((MouseEvent event) -> {
-                Stage stage = (Stage) titleBar.getScene().getWindow();
-                stage.setX(event.getScreenX() - x);
-                stage.setY(event.getScreenY() - y);
-            });
+    @FXML
+    public void initialize() {
+        // Sync text between the hidden TextField and the PasswordField
+        if (passwordField != null && passwordTextField != null) {
+            passwordTextField.textProperty().bindBidirectional(passwordField.textProperty());
         }
     }
 
     @FXML
-    private void handleMinimize() {
-        Stage stage = (Stage) titleBar.getScene().getWindow();
-        stage.setIconified(true);
-    }
-
-    @FXML
-    private void handleClose() {
-        Stage stage = (Stage) titleBar.getScene().getWindow();
-        stage.close();
+    private void togglePasswordVisibility() {
+        if (passwordTextField.isVisible()) {
+            // Hide text, show dots
+            passwordTextField.setVisible(false);
+            passwordTextField.setManaged(false);
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+        } else {
+            // Show text, hide dots
+            passwordTextField.setVisible(true);
+            passwordTextField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+        }
     }
 
     @FXML
@@ -81,6 +75,7 @@ public class LoginController implements Initializable {
             // showAlert(Alert.AlertType.INFORMATION,
             // "Connexion réussie",
             // "Bienvenue, " + user.getFullName());
+            // TODO: close login window and open Dashboard
             loginButton.getScene().getWindow().hide();
             try {
                 Parent root = FXMLLoader.load(getClass().getResource("/fxml/home.fxml"));

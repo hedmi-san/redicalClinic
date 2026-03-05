@@ -16,7 +16,7 @@
 
 .clinic-icon {
     -fx-font-size: 52px;
-    -fx-foreground-color : red;
+    -fx-foreground-color: red;
 }
 
 .clinic-name-top {
@@ -81,6 +81,23 @@
 .login-field:focused {
     -fx-border-color: #006060;
     -fx-background-color: #edf7f5;
+}
+
+/* ---- Password toggle --------------------------------------- */
+.toggle-password-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+    -fx-padding: 0 10 0 0;
+}
+
+.toggle-password-btn:hover {
+    -fx-text-fill: #003030;
+}
+
+.password-field-padded {
+    -fx-padding: 0 35 0 12;
 }
 
 /* ---- Login button ------------------------------------------ */
