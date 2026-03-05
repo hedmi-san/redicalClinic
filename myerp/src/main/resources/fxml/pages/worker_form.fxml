@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.WorkerFormController"
+      spacing="15" style="-fx-padding: 20;">
+
+    <Label fx:id="lblTitle" text="Détails de l'Employé" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+    <GridPane hgap="10" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="150" />
+            <ColumnConstraints minWidth="200" hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <Label text="Nom et Prénom:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <TextField fx:id="txtName" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label text="Date de Naissance:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <TextField fx:id="txtBirthDate" promptText="AAAA-MM-JJ" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+        <Label text="Lieu de Naissance:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <TextField fx:id="txtBirthPlace" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+        <Label text="Numéro de Téléphone:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+        <TextField fx:id="txtPhone" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+        <Label text="N° Carte d'Identité:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+        <TextField fx:id="txtIdCard" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+        <Label text="Fonction:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+        <TextField fx:id="txtFunction" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+        <Label text="Situation Familiale:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+        <TextField fx:id="txtFamilySituation" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button text="Annuler" onAction="#handleCancel" />
+        <Button text="Enregistrer" styleClass="primary-button" onAction="#handleSave" />
+    </HBox>
+
+</VBox>

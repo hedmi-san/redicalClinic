@@ -9,4 +9,7 @@ module com.myerp {
     // Open packages to JavaFX for reflection (FXML loading + CSS)
     opens com.myerp to javafx.graphics;
     opens controller to javafx.fxml;
+
+    // Open model package for TableView PropertyValueFactory bindings
+    opens model to javafx.base;
 }

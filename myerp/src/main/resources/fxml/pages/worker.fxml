@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.WorkerController">
-    <VBox alignment="CENTER" spacing="10" styleClass="content-card" maxWidth="600" maxHeight="300">
-        <Label text="👨‍⚕️ Gestion des Employés" styleClass="page-title"/>
-        <Label text="Gérer le personnel et les médecins de la clinique" styleClass="page-subtitle"/>
-    </VBox>
-</StackPane>
+<VBox fx:id="mainContainer" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.WorkerController"
+      spacing="15" style="-fx-padding: 20;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Rechercher par nom..." prefWidth="300" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnAdd" text="Ajouter" styleClass="action-button, primary-button" onAction="#handleAddAction"/>
+        <Button fx:id="btnEdit" text="Modifier" styleClass="action-button, secondary-button" onAction="#handleEditAction"/>
+        <Button fx:id="btnDelete" text="Supprimer" styleClass="action-button, danger-button" onAction="#handleDeleteAction"/>
+    </HBox>
+
+    <TableView fx:id="workerTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+        <columns>
+            <TableColumn fx:id="colName" text="Nom" prefWidth="250" />
+            <TableColumn fx:id="colAge" text="Âge" prefWidth="100" />
+            <TableColumn fx:id="colFunction" text="Fonction" prefWidth="200" />
+            <TableColumn fx:id="colPhone" text="Numéro de Téléphone" prefWidth="150" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+</VBox>
