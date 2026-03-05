@@ -103,7 +103,8 @@
 
 .modern-table .table-cell {
     -fx-padding: 12px 10px;
-    -fx-border-width: 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 1px 0 0;
     -fx-text-fill: #334155;
     -fx-font-size: 13px;
 }

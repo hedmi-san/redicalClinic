@@ -65,6 +65,12 @@ public class WorkerController implements Initializable {
         colFunction.setCellValueFactory(new PropertyValueFactory<>("function"));
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
 
+        // Disable column reordering
+        colName.setReorderable(false);
+        colAge.setReorderable(false);
+        colFunction.setReorderable(false);
+        colPhone.setReorderable(false);
+
         workerTable.setItems(workerList);
 
         // Search listener
