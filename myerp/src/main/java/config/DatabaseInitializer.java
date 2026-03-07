@@ -31,32 +31,20 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 2. Salary Record
-            // ----------------------------------------------------------------
-            stmt.execute("""
-                        CREATE TABLE IF NOT EXISTS salaryRecord (
-                            id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                            workerId        INTEGER NOT NULL REFERENCES worker(id)  ON DELETE CASCADE,
-                            totalEarned     REAL,
-                            totalPaid       REAL
-                        );
-                    """);
-
-            // ----------------------------------------------------------------
-            // 3. Payment Check
+            // 2. Payment Check
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS paymentCheck (
                             id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                            salaryRecordId      INTEGER NOT NULL REFERENCES salaryRecord(id)  ON DELETE CASCADE,
+                            workerId      INTEGER NOT NULL REFERENCES worker(id)  ON DELETE CASCADE,
                             paymentDate     TEXT DEFAULT (datetime('now')),
-                            salary      REAL,
-                            paidAmount REAL
+                            paidAmount REAL,
+                            note TEXT
                         );
                     """);
 
             // ----------------------------------------------------------------
-            // 4. Bill
+            // 3. Bill
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS bill (
@@ -68,7 +56,7 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 5. Bill Item
+            // 4. Bill Item
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS billItem (
@@ -81,7 +69,7 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 6. User
+            // 5. User
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS Users (
@@ -94,7 +82,7 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 7. Patient
+            // 6. Patient
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS patient (
@@ -107,7 +95,7 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 8. Session
+            // 7. Session
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS session (

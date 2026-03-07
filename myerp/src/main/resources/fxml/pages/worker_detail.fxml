@@ -2,13 +2,116 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.WorkerDetailController"
-      spacing="15" style="-fx-padding: 30;" alignment="CENTER">
+<ScrollPane fitToWidth="true" styleClass="root-pane" stylesheets="@../../css/pages/worker_detail.css" 
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.WorkerDetailController">
+    <VBox spacing="20" styleClass="main-container">
+        <padding>
+            <Insets top="20" right="30" bottom="20" left="30"/>
+        </padding>
 
-    <Label text="Espace Profil de l'Employé" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-    <Label text="Cette boîte de dialogue contiendra des vues détaillées du profil plus tard." />
+        <!-- Header Section -->
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="profile-header">
+            <StackPane styleClass="avatar-container">
+                <Circle radius="30" styleClass="avatar-circle"/>
+                <Label fx:id="avatarLabel" text="W" styleClass="avatar-text"/>
+            </StackPane>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label fx:id="nameLabel" text="Worker Name" styleClass="worker-name"/>
+                <Label fx:id="functionLabel" text="Function" styleClass="worker-function"/>
+            </VBox>
+            <Label fx:id="statusBadge" text="Active" styleClass="status-badge"/>
+        </HBox>
 
-</VBox>
+        <!-- Tabs Section -->
+        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane">
+            <tabs>
+                <!-- Information Tab -->
+                <Tab text="Information">
+                    <VBox spacing="20" styleClass="tab-content">
+                        <padding>
+                            <Insets top="25" right="0" bottom="0" left="0"/>
+                        </padding>
+                        <Label text="DETAILS PERSONNELS" styleClass="section-label"/>
+                        <GridPane hgap="20" vgap="15">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <children>
+                                <VBox styleClass="info-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label text="NOM COMPLET" styleClass="info-label"/>
+                                    <Label fx:id="detailName" text="-" styleClass="info-value"/>
+                                </VBox>
+                                <VBox styleClass="info-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label text="DATE DE NAISSANCE" styleClass="info-label"/>
+                                    <Label fx:id="detailBirthDate" text="-" styleClass="info-value"/>
+                                </VBox>
+                                <VBox styleClass="info-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label text="LIEU DE NAISSANCE" styleClass="info-label"/>
+                                    <Label fx:id="detailBirthPlace" text="-" styleClass="info-value"/>
+                                </VBox>
+                                <VBox styleClass="info-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label text="NUMÉRO DE TÉLÉPHONE" styleClass="info-label"/>
+                                    <Label fx:id="detailPhone" text="-" styleClass="info-value"/>
+                                </VBox>
+                                <VBox styleClass="info-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <Label text="CARTE D'IDENTITÉ" styleClass="info-label"/>
+                                    <Label fx:id="detailIdCard" text="-" styleClass="info-value"/>
+                                </VBox>
+                                <VBox styleClass="info-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <Label text="SITUATION FAMILIALE" styleClass="info-label"/>
+                                    <Label fx:id="detailFamily" text="-" styleClass="info-value"/>
+                                </VBox>
+                            </children>
+                        </GridPane>
+                    </VBox>
+                </Tab>
+
+                <!-- Payment History Tab -->
+                <Tab text="Historique des paiements">
+                    <VBox spacing="20" styleClass="tab-content">
+                        <padding>
+                            <Insets top="25" right="0" bottom="0" left="0"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT" spacing="15">
+                            <Label text="HISTORIQUE DES PAIEMENTS" styleClass="section-label" HBox.hgrow="ALWAYS"/>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <ComboBox fx:id="monthSelector" prefWidth="130" promptText="Mois"/>
+                                <ComboBox fx:id="yearSelector" prefWidth="90" promptText="Année"/>
+                            </HBox>
+                            <Button text="Ajouter un paiement" onAction="#handleAddPayment" styleClass="btn-primary"/>
+                        </HBox>
+
+                        <HBox spacing="15" styleClass="summary-container">
+                            <VBox styleClass="summary-card" HBox.hgrow="ALWAYS">
+                                <Label text="SALAIRE MENSUEL" styleClass="s-label"/>
+                                <Label fx:id="monthlySalaryLabel" text="0.00 DZD" styleClass="s-value, blue"/>
+                            </VBox>
+                            <VBox styleClass="summary-card" HBox.hgrow="ALWAYS">
+                                <Label text="GAINS TOTAUX" styleClass="s-label"/>
+                                <Label fx:id="totalEarningLabel" text="0.00 DZD" styleClass="s-value, green"/>
+                            </VBox>
+                        </HBox>
+
+                        <TableView fx:id="paymentTable" VBox.vgrow="ALWAYS" prefHeight="250">
+                            <columns>
+                                <TableColumn fx:id="dateColumn" text="Date" prefWidth="120" reorderable="false"/>
+                                <TableColumn fx:id="noteColumn" text="Note" prefWidth="250" reorderable="false"/>
+                                <TableColumn fx:id="amountColumn" text="Montant (DZD)" prefWidth="150" style="-fx-alignment: CENTER-RIGHT;" reorderable="false"/>
+                                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="120" style="-fx-alignment: CENTER;" reorderable="false"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="Aucun paiement enregistré." />
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </VBox>
+</ScrollPane>

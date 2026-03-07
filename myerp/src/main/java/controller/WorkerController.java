@@ -170,10 +170,8 @@ public class WorkerController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/worker_detail.fxml"));
             Parent root = loader.load();
 
-            // We can pass the worker object to the detail controller when it's fully
-            // implemented.
-            // WorkerDetailController controller = loader.getController();
-            // controller.setWorker(worker);
+            WorkerDetailController controller = loader.getController();
+            controller.setWorker(worker);
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(worker.getName() + " - Profil");

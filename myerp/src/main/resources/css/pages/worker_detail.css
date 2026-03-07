@@ -1,0 +1,245 @@
+/* ============================================================
+   Worker Detail Stylesheet
+   Theme: Light Mode - Dark Teal (#003030) with warm white accents
+   ============================================================ */
+
+.root-pane {
+    -fx-background-color: #f0f4f4;
+}
+
+.main-container {
+    -fx-max-width: 900px;
+}
+
+/* ---- Header ---------------------------------------------- */
+.profile-header {
+    -fx-padding: 0 0 20 0;
+    -fx-border-color: transparent transparent #e0e5e5 transparent;
+    -fx-border-width: 1px;
+}
+
+.avatar-container {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 48, 48, 0.15), 10, 0, 0, 0);
+}
+
+.avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, #003030, #004d4d);
+}
+
+.avatar-text {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI Semibold";
+}
+
+.worker-name {
+    -fx-text-fill: #003030;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.worker-function {
+    -fx-text-fill: #006060;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1;
+    -fx-text-transform: uppercase;
+}
+
+.status-badge {
+    -fx-background-color: #e6f4f1;
+    -fx-text-fill: #008080;
+    -fx-padding: 6 14;
+    -fx-background-radius: 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-border-color: #b3d9d9;
+    -fx-border-radius: 20;
+}
+
+/* ---- Tabs ------------------------------------------------ */
+.custom-tab-pane .tab-header-area {
+    -fx-padding: 0;
+}
+
+.custom-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.custom-tab-pane .tab-label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.custom-tab-pane .tab:selected {
+    -fx-border-color: transparent transparent #003030 transparent;
+    -fx-border-width: 0 0 3 0;
+}
+
+.custom-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #003030;
+}
+
+/* ---- Info Grid Cards ------------------------------------- */
+.section-label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1.5;
+}
+
+.info-card {
+    -fx-background-color: white;
+    -fx-padding: 10 15;
+    -fx-background-radius: 10;
+    -fx-border-color: #e0e5e5;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.02), 5, 0, 0, 1);
+}
+
+.info-card:hover {
+    -fx-border-color: #80d8cc;
+}
+
+/* ---- Action Buttons (Table) ------------------------------ */
+.btn-action-edit,
+.btn-action-delete {
+    -fx-background-color: rgba(0, 48, 48, 0.05);
+    -fx-background-radius: 50;
+    /* Perfect circle */
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-max-width: 32;
+    -fx-max-height: 32;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 50;
+    -fx-transition: all 0.3s ease;
+}
+
+.btn-action-edit {
+    -fx-border-color: rgba(0, 96, 176, 0.2);
+}
+
+.btn-action-edit:hover {
+    -fx-background-color: rgba(0, 96, 176, 0.1);
+    -fx-border-color: #0060b0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 96, 176, 0.2), 5, 0, 0, 0);
+}
+
+.btn-action-delete {
+    -fx-border-color: rgba(211, 47, 47, 0.2);
+}
+
+.btn-action-delete:hover {
+    -fx-background-color: rgba(211, 47, 47, 0.1);
+    -fx-border-color: #d32f2f;
+    -fx-effect: dropshadow(three-pass-box, rgba(211, 47, 47, 0.2), 5, 0, 0, 0);
+}
+
+.info-label {
+    -fx-text-fill: #8b9ea0;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+.info-value {
+    -fx-text-fill: #003030;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+/* ---- Payment Summary Cards ------------------------------- */
+.summary-container {
+    -fx-padding: 10 0;
+}
+
+.summary-card {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 12;
+    -fx-border-color: #e0e5e5;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 8, 0, 0, 3);
+}
+
+.s-label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+.s-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.s-value.blue {
+    -fx-text-fill: #0060b0;
+}
+
+.s-value.green {
+    -fx-text-fill: #008a4a;
+}
+
+/* ---- Buttons --------------------------------------------- */
+.btn-primary {
+    -fx-background-color: #003030;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #005050;
+}
+
+/* ---- Table View ------------------------------------------ */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e0e5e5;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8fafa;
+    -fx-padding: 5 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #e0e5e5 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #f0f4f4 transparent;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #f4f9f9;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #003030;
+    -fx-font-size: 13px;
+    -fx-padding: 10;
+}
