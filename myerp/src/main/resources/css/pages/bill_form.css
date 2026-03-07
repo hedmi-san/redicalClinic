@@ -1,0 +1,119 @@
+/* ============================================================
+   Bill Form Stylesheet
+   Theme: Light Mode - Dark Teal (#003030) with warm white accents
+   ============================================================ */
+
+.form-container {
+    -fx-background-color: white;
+}
+
+.section-title {
+    -fx-text-fill: #003030;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.form-label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* ---- Buttons --------------------------------------------- */
+.btn-primary {
+    -fx-background-color: #003030;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #005050;
+}
+
+.btn-secondary-sm {
+    -fx-background-color: #e6f4f1;
+    -fx-text-fill: #008080;
+    -fx-font-weight: bold;
+    -fx-padding: 5 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.btn-secondary-sm:hover {
+    -fx-background-color: #d1e9e4;
+}
+
+.btn-cancel {
+    -fx-background-color: #f4f7f7;
+    -fx-text-fill: #6b8a88;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #e0e5e5;
+}
+
+/* ---- Table in Form --------------------------------------- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #e0e5e5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8fafa;
+}
+
+.table-view .table-cell {
+    -fx-padding: 8;
+    -fx-font-size: 13px;
+}
+
+/* ---- Total Section --------------------------------------- */
+.footer-section {
+    -fx-padding: 20 0 0 0;
+    -fx-border-color: #e0e5e5 transparent transparent transparent;
+    -fx-border-width: 1px;
+}
+
+.total-label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.total-amount {
+    -fx-text-fill: #003030;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* ---- Action Buttons (SVG) -------------------------------- */
+.btn-action-delete {
+    -fx-background-color: rgba(211, 47, 47, 0.05);
+    -fx-background-radius: 50;
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+    -fx-max-width: 28;
+    -fx-max-height: 28;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-border-width: 1px;
+    -fx-border-color: rgba(211, 47, 47, 0.2);
+    -fx-border-radius: 50;
+}
+
+.btn-action-delete:hover {
+    -fx-background-color: rgba(211, 47, 47, 0.1);
+    -fx-border-color: #d32f2f;
+}

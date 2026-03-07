@@ -50,8 +50,7 @@ public class DatabaseInitializer {
                         CREATE TABLE IF NOT EXISTS bill (
                             id              INTEGER PRIMARY KEY AUTOINCREMENT,
                             billDate        TEXT DEFAULT (datetime('now')),
-                            totalCost       REAL,
-                            paidAmount      REAL
+                            totalCost       REAL
                         );
                     """);
 

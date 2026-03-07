@@ -1,0 +1,120 @@
+/* ============================================================
+   Bill Listing Stylesheet
+   Theme: Light Mode - Dark Teal (#003030) with warm white accents
+   ============================================================ */
+
+.main-container {
+    -fx-background-color: #f0f4f4;
+}
+
+/* ---- Header ---------------------------------------------- */
+.page-header {
+    -fx-padding: 0 0 20 0;
+    -fx-border-color: transparent transparent #e0e5e5 transparent;
+    -fx-border-width: 1px;
+}
+
+.page-title {
+    -fx-text-fill: #003030;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI Semibold";
+}
+
+.page-subtitle {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 14px;
+}
+
+/* ---- Buttons --------------------------------------------- */
+.btn-primary {
+    -fx-background-color: #003030;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #005050;
+}
+
+/* ---- Table Container ------------------------------------- */
+.table-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 10, 0, 0, 5);
+}
+
+/* ---- Table View ------------------------------------------ */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8fafa;
+    -fx-padding: 5 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #e0e5e5 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #6b8a88;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #f4f7f7 transparent;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #f9fbfb;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #003030;
+    -fx-font-size: 14px;
+    -fx-padding: 12;
+}
+
+/* ---- Action Buttons (SVG) -------------------------------- */
+.btn-action-edit,
+.btn-action-delete {
+    -fx-background-color: rgba(0, 48, 48, 0.05);
+    -fx-background-radius: 50;
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-max-width: 32;
+    -fx-max-height: 32;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 50;
+}
+
+.btn-action-edit {
+    -fx-border-color: rgba(0, 96, 176, 0.2);
+}
+
+.btn-action-edit:hover {
+    -fx-background-color: rgba(0, 96, 176, 0.1);
+    -fx-border-color: #0060b0;
+}
+
+.btn-action-delete {
+    -fx-border-color: rgba(211, 47, 47, 0.2);
+}
+
+.btn-action-delete:hover {
+    -fx-background-color: rgba(211, 47, 47, 0.1);
+    -fx-border-color: #d32f2f;
+}

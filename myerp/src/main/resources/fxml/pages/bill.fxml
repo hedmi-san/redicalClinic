@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BillController">
-    <VBox alignment="CENTER" spacing="10" styleClass="content-card" maxWidth="600" maxHeight="300">
-        <Label text="💰 Gestion des Factures" styleClass="page-title"/>
-        <Label text="Suivre les paiements et factures des patients" styleClass="page-subtitle"/>
+<VBox spacing="20" styleClass="main-container" stylesheets="@../../css/pages/bill.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controller.BillController">
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="page-header">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Gestion des Factures" styleClass="page-title"/>
+            <Label text="Suivre les paiements et factures des patients" styleClass="page-subtitle"/>
+        </VBox>
+        <Button text="+ Nouvelle Facture" onAction="#handleNewBill" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- Table Section -->
+    <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
+        <TableView fx:id="billTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" reorderable="false"/>
+                <TableColumn fx:id="dateColumn" text="Date de Facturation" prefWidth="200" reorderable="false"/>
+                <TableColumn fx:id="totalColumn" text="Montant Total (DZD)" prefWidth="180" style="-fx-alignment: CENTER-RIGHT;" reorderable="false"/>
+                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150" style="-fx-alignment: CENTER;" reorderable="false"/>
+            </columns>
+            <placeholder>
+                <Label text="Aucune facture enregistrée." />
+            </placeholder>
+        </TableView>
     </VBox>
-</StackPane>
+</VBox>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.SVGPath?>
+
+<VBox spacing="20" prefWidth="750" styleClass="form-container" stylesheets="@../../css/pages/bill_form.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.BillFormController">
+    <padding>
+        <Insets top="25" right="30" bottom="25" left="30"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="Informations de la Facture" styleClass="section-title"/>
+        <Separator HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <GridPane hgap="20" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="150" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <Label text="Date de Facturation :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+        <DatePicker fx:id="datePicker" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+    </GridPane>
+
+    <!-- Items Section -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="Articles de la Facture" styleClass="section-title"/>
+        <Separator HBox.hgrow="ALWAYS"/>
+        <Button text="+ Ajouter un Article" onAction="#handleAddItem" styleClass="btn-secondary-sm"/>
+    </HBox>
+
+    <TableView fx:id="itemTable" prefHeight="280" VBox.vgrow="ALWAYS" editable="true">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Désignation" prefWidth="350" reorderable="false"/>
+            <TableColumn fx:id="quantityColumn" text="Qté" prefWidth="80" style="-fx-alignment: CENTER;" reorderable="false"/>
+            <TableColumn fx:id="priceColumn" text="Prix Unitaire (DZD)" prefWidth="150" style="-fx-alignment: CENTER-RIGHT;" reorderable="false"/>
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="80" style="-fx-alignment: CENTER;" reorderable="false"/>
+        </columns>
+        <placeholder>
+            <Label text="Aucun article ajouté. Cliquez sur '+ Ajouter un Article'." />
+        </placeholder>
+    </TableView>
+
+    <!-- Footer Section -->
+    <HBox alignment="CENTER_RIGHT" spacing="20" styleClass="footer-section">
+        <VBox alignment="CENTER_RIGHT">
+            <Label text="Total de la Facture" styleClass="total-label"/>
+            <Label fx:id="totalLabel" text="0.00 DZD" styleClass="total-amount"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-cancel"/>
+        <Button text="Enregistrer la Facture" onAction="#handleSave" styleClass="btn-primary"/>
+    </HBox>
+</VBox>
