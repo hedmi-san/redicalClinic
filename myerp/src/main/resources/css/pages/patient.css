@@ -15,6 +15,21 @@
     -fx-padding: 32 24;
 }
 
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused {
+    -fx-border-color: #4dabf7;
+    -fx-effect: dropshadow(three-pass-box, rgba(77, 171, 247, 0.2), 5, 0, 0, 0);
+}
+
 /* --- MODERN TABLE (Sync with Worker Page) --- */
 .modern-table {
     -fx-background-color: transparent;
