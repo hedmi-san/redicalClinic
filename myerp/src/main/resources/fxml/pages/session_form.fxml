@@ -15,6 +15,11 @@
     </HBox>
 
     <VBox spacing="15">
+        <VBox spacing="8">
+            <Label text="SÉLECTIONNER UN PATIENT" styleClass="form-label" />
+            <ComboBox fx:id="patientComboBox" promptText="Choisir un patient..." styleClass="form-control" maxWidth="Infinity" />
+        </VBox>
+
         <HBox spacing="14">
             <VBox spacing="8" HBox.hgrow="ALWAYS">
                 <Label text="DATE DE LA SÉANCE" styleClass="form-label" />

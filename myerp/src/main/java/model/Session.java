@@ -8,6 +8,7 @@ public class Session {
     private String paied; // Status or simple tag
     private double cost;
     private double paidAmount;
+    private String patientName; // Transient field for UI display
 
     public Session() {
     }
@@ -75,6 +76,14 @@ public class Session {
 
     public void setPaidAmount(double paidAmount) {
         this.paidAmount = paidAmount;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
     // Helper for badge logic

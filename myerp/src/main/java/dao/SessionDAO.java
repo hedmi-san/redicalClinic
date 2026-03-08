@@ -28,6 +28,37 @@ public class SessionDAO {
         return sessions;
     }
 
+    public List<Session> getSessionsByDate(String date) {
+        List<Session> sessions = new ArrayList<>();
+        String query = """
+                    SELECT s.*, p.name as patientName
+                    FROM session s
+                    LEFT JOIN patient p ON s.patientId = p.id
+                    WHERE s.sessionDate = ?
+                    ORDER BY s.id DESC
+                """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, date);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Session session = mapResultSetToSession(rs);
+                    try {
+                        session.setPatientName(rs.getString("patientName"));
+                    } catch (SQLException ignored) {
+                        // patientName might not be in the result set if called from other methods
+                    }
+                    sessions.add(session);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching sessions for date " + date + ": " + e.getMessage());
+        }
+        return sessions;
+    }
+
     public boolean addSession(Session session) {
         String query = "INSERT INTO session (patientId, sessionDate, treatment, paied, cost, paidAmount) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -111,6 +142,20 @@ public class SessionDAO {
         session.setPaied(rs.getString("paied"));
         session.setCost(rs.getDouble("cost"));
         session.setPaidAmount(rs.getDouble("paidAmount"));
+
+        // Try to set patientName if available in result set
+        try {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                if ("patientName".equalsIgnoreCase(metaData.getColumnLabel(i))) {
+                    session.setPatientName(rs.getString(i));
+                    break;
+                }
+            }
+        } catch (SQLException ignored) {
+        }
+
         return session;
     }
 }

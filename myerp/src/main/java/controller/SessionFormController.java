@@ -1,17 +1,24 @@
 package controller;
 
+import dao.PatientDAO;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import model.Patient;
 import model.Session;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class SessionFormController {
 
     @FXML
     private Label titleLabel;
+    @FXML
+    private ComboBox<Patient> patientComboBox;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -24,26 +31,68 @@ public class SessionFormController {
     private Button saveBtn;
 
     private Session session;
-    private int patientId;
     private boolean saveClicked = false;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final PatientDAO patientDAO = new PatientDAO();
+
+    @FXML
+    public void initialize() {
+        setupPatientComboBox();
+    }
+
+    private void setupPatientComboBox() {
+        List<Patient> patients = patientDAO.getAllPatients();
+        patientComboBox.setItems(FXCollections.observableArrayList(patients));
+
+        patientComboBox.setConverter(new StringConverter<Patient>() {
+            @Override
+            public String toString(Patient patient) {
+                return patient == null ? "" : patient.getName();
+            }
+
+            @Override
+            public Patient fromString(String string) {
+                return null; // Not needed
+            }
+        });
+    }
 
     public void setSession(Session session, int patientId) {
         this.session = session;
-        this.patientId = patientId;
 
         if (session != null) {
             titleLabel.setText("Modifier la Séance");
             datePicker.setValue(LocalDate.parse(session.getDate(), DATE_FORMATTER));
             treatmentArea.setText(session.getTreatment());
-            costField.setText(String.valueOf(session.getCost()));
-            paidAmountField.setText(String.valueOf(session.getPaidAmount()));
+            costColumnText(session.getCost());
+            paidAmountText(session.getPaidAmount());
+
+            // Set selected patient
+            Patient selectedPatient = patientDAO.getPatientById(session.getPatientId());
+            if (selectedPatient != null) {
+                patientComboBox.getSelectionModel().select(selectedPatient);
+            }
+
             saveBtn.setText("Mettre à jour");
         } else {
             titleLabel.setText("Nouvelle Séance");
             datePicker.setValue(LocalDate.now());
+            if (patientId > 0) {
+                Patient selectedPatient = patientDAO.getPatientById(patientId);
+                if (selectedPatient != null) {
+                    patientComboBox.getSelectionModel().select(selectedPatient);
+                }
+            }
             saveBtn.setText("Enregistrer");
         }
+    }
+
+    private void costColumnText(double value) {
+        costField.setText(String.valueOf(value));
+    }
+
+    private void paidAmountText(double value) {
+        paidAmountField.setText(String.valueOf(value));
     }
 
     public boolean isSaveClicked() {
@@ -53,7 +102,14 @@ public class SessionFormController {
     public Session getSession() {
         if (session == null) {
             session = new Session();
-            session.setPatientId(patientId);
+        }
+        Patient selectedPatient = patientComboBox.getSelectionModel().getSelectedItem();
+        if (selectedPatient != null) {
+            session.setPatientId(selectedPatient.getId());
+            session.setPatientName(selectedPatient.getName());
+        } else {
+            session.setPatientId(0);
+            session.setPatientName(null);
         }
         session.setDate(datePicker.getValue().format(DATE_FORMATTER));
         session.setTreatment(treatmentArea.getText());
