@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SessionFormController" 
+      styleClass="modal" spacing="20" prefWidth="440">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label fx:id="titleLabel" text="Détails de la Séance" styleClass="modal-title" />
+    </HBox>
+
+    <VBox spacing="15">
+        <HBox spacing="14">
+            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                <Label text="DATE DE LA SÉANCE" styleClass="form-label" />
+                <DatePicker fx:id="datePicker" promptText="Sélectionnez la date" styleClass="form-control" maxWidth="Infinity" />
+            </VBox>
+        </HBox>
+
+        <VBox spacing="8">
+            <Label text="TRAITEMENT / NOTES" styleClass="form-label" />
+            <TextArea fx:id="treatmentArea" promptText="Décrivez le traitement..." styleClass="form-control" prefHeight="80" wrapText="true" />
+        </VBox>
+
+        <HBox spacing="14">
+            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                <Label text="COÛT (DH)" styleClass="form-label" />
+                <TextField fx:id="costField" promptText="0.00" styleClass="form-control" />
+            </VBox>
+            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                <Label text="MONTANT PAYÉ (DH)" styleClass="form-label" />
+                <TextField fx:id="paidAmountField" promptText="0.00" styleClass="form-control" />
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-actions">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-ghost" />
+        <Button text="Enregistrer" fx:id="saveBtn" onAction="#handleSave" styleClass="btn-teal" />
+    </HBox>
+</VBox>

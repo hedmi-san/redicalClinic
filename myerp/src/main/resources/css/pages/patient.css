@@ -1,0 +1,384 @@
+/* 
+    Patient Management Styles 
+    Light Theme Edition
+*/
+
+.root {
+    -fx-background-color: #f8fafd;
+    -fx-font-family: "Nunito", "Segoe UI", sans-serif;
+}
+
+/* --- COLORS & VARIABLES --- */
+/* bg: #f8fafd, surface: #ffffff, teal: #0d9488, rose: #e11d48, text: #1e293b, text2: #475569, muted: #94a3b8, border: #e2e8f0 */
+
+.panel-header {
+    -fx-padding: 32 24;
+}
+
+/* --- TABLE VIEW --- */
+.patient-table {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.02), 10, 0, 0, 5);
+}
+
+.patient-table .column-header-background {
+    -fx-background-color: #f8fafd;
+    -fx-background-radius: 16 16 0 0;
+    -fx-padding: 12 0;
+}
+
+.patient-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40;
+}
+
+.patient-table .column-header .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center-left;
+}
+
+.patient-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 0;
+    -fx-cursor: hand;
+}
+
+.patient-table .table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.patient-table .table-row-cell:filled:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.patient-table .table-row-cell:filled:selected {
+    -fx-background-color: rgba(13, 148, 136, 0.08);
+    -fx-text-fill: #0d9488;
+}
+
+.patient-table .table-cell {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 14px;
+    -fx-padding: 0 20;
+    -fx-alignment: center-left;
+}
+
+.patient-table .table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: #0d9488;
+    -fx-font-weight: bold;
+}
+
+.form-section-title {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.5px;
+}
+
+.form-label-small {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.form-control-small {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 10;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 13px;
+}
+
+.form-separator {
+    -fx-background-color: #f1f5f9;
+    -fx-max-height: 1;
+}
+
+.sidebar-eyebrow {
+    -fx-text-fill: #0d9488;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1px;
+}
+
+.sidebar-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.search-field {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-padding: 10 14;
+}
+
+.search-field:focused {
+    -fx-border-color: #0d9488;
+    -fx-background-color: #ffffff;
+}
+
+.patient-list {
+    -fx-background-color: transparent;
+    -fx-padding: 8 16;
+}
+
+.patient-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 6 0;
+}
+
+.patient-list .list-cell:filled:selected {
+    -fx-background-color: rgba(13, 148, 136, 0.08);
+    -fx-background-radius: 12;
+}
+
+.patient-list .list-cell:filled:hover {
+    -fx-background-color: #f8fafd;
+    -fx-background-radius: 12;
+}
+
+/* --- MAIN PANEL --- */
+.main-content {
+    -fx-background-color: transparent;
+}
+
+.hero-header {
+    -fx-padding: 40 48 32 48;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.hero-name {
+    -fx-text-fill: #1e293b;
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.hero-phone {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+}
+
+.profile-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-width: 0;
+}
+
+/* --- PLACEHOLDER --- */
+.placeholder-pane {
+    -fx-background-color: #ffffff;
+}
+
+.placeholder-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.placeholder-subtitle {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+}
+
+.initials-avatar {
+    -fx-background-color: #0d9488;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-alignment: center;
+    -fx-font-size: 20px;
+}
+
+/* --- FINANCIAL CARDS --- */
+.fin-cards-grid {
+    -fx-padding: 32 48;
+    -fx-hgap: 16;
+}
+
+.fin-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 20 24;
+    -fx-min-width: 180;
+    /* Adding subtle depth */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.03), 10, 0, 0, 5);
+}
+
+.fc-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.fc-value {
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.fc-teal {
+    -fx-text-fill: #0d9488;
+}
+
+.fc-amber {
+    -fx-text-fill: #d97706;
+}
+
+.fc-green {
+    -fx-text-fill: #059669;
+}
+
+.fc-rose {
+    -fx-text-fill: #e11d48;
+}
+
+/* --- SESSION LIST --- */
+.sessions-area {
+    -fx-padding: 0 48 40 48;
+}
+
+.section-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 20 0;
+}
+
+.session-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 20 24;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.02), 8, 0, 0, 4);
+}
+
+.session-card:hover {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.08), 12, 0, 0, 6);
+}
+
+.session-date {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.session-note {
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 1.4;
+}
+
+/* --- BADGES --- */
+.badge {
+    -fx-padding: 4 12;
+    -fx-background-radius: 100;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.badge-full {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+}
+
+.badge-partial {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #92400e;
+}
+
+.badge-none {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+}
+
+/* --- BUTTONS --- */
+.btn-teal {
+    -fx-background-color: #0d9488;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-teal:hover {
+    -fx-background-color: #0f766e;
+}
+
+.btn-ghost {
+    -fx-background-color: #f8fafd;
+    -fx-text-fill: #64748b;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 8 16;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #1e293b;
+    -fx-border-color: #94a3b8;
+}
+
+/* --- MODALS --- */
+.modal {
+    -fx-background-color: #ffffff;
+    -fx-padding: 32;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 30, 0, 0, 10);
+}
+
+.modal-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-family: "Cormorant Garamond", "Serif";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.form-label {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.form-control {
+    -fx-background-color: #f8fafd;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10 12;
+    -fx-text-fill: #1e293b;
+}
+
+.form-control:focused {
+    -fx-border-color: #0d9488;
+    -fx-background-color: #ffffff;
+}

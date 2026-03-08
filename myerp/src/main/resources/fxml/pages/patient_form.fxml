@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PatientFormController" 
+      styleClass="modal" spacing="20" prefWidth="400">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label fx:id="titleLabel" text="Informations du Patient" styleClass="modal-title" />
+    </HBox>
+
+    <VBox spacing="15">
+        <VBox spacing="8">
+            <Label text="NOM COMPLET" styleClass="form-label" />
+            <TextField fx:id="nameField" promptText="Entrez le nom du patient" styleClass="form-control" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="NUMÉRO DE TÉLÉPHONE" styleClass="form-label" />
+            <TextField fx:id="phoneField" promptText="ex. 0612345678" styleClass="form-control" />
+        </VBox>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-actions">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-ghost" />
+        <Button text="Enregistrer" fx:id="saveBtn" onAction="#handleSave" styleClass="btn-teal" />
+    </HBox>
+</VBox>

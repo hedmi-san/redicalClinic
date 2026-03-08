@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PatientController">
-    <VBox alignment="CENTER" spacing="10" styleClass="content-card" maxWidth="600" maxHeight="300">
-        <Label text="👥 Gestion des Patients" styleClass="page-title"/>
-        <Label text="Ajouter, modifier ou rechercher un patient" styleClass="page-subtitle"/>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PatientController" 
+      prefHeight="720.0" prefWidth="1200.0" styleClass="main-container" spacing="0">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <!-- Header / Branding & Actions -->
+    <VBox spacing="24" styleClass="panel-header" alignment="TOP_CENTER" VBox.vgrow="NEVER">
+        <HBox alignment="CENTER_LEFT" maxWidth="1000" spacing="20">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="SANTÉ" styleClass="sidebar-eyebrow" />
+                <Label text="Gestion des Patients" styleClass="sidebar-title" />
+            </VBox>
+            <Button text="+ Nouveau Patient" onAction="#handleNewPatient" styleClass="btn-teal" minWidth="180" />
+        </HBox>
+
+        <Separator styleClass="form-separator" maxWidth="1000" />
+
+        <VBox spacing="12" maxWidth="1000" alignment="CENTER_LEFT">
+            <Label text="RECHERCHE ET FILTRAGE (Double-cliquer sur une ligne pour voir le profil)" styleClass="form-section-title" />
+            <TextField fx:id="searchField" promptText="Rechercher par nom ou numéro..." styleClass="search-field" maxWidth="Infinity" />
+        </VBox>
     </VBox>
-</StackPane>
+    
+    <!-- Table View -->
+    <VBox alignment="CENTER" VBox.vgrow="ALWAYS" style="-fx-padding: 0 40 40 40;">
+        <TableView fx:id="patientTable" VBox.vgrow="ALWAYS" styleClass="patient-table" maxWidth="1000">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="NOM COMPLET" prefWidth="400" />
+                <TableColumn fx:id="phoneColumn" text="TÉLÉPHONE" prefWidth="300" />
+                <TableColumn fx:id="balanceColumn" text="SOLDE" prefWidth="250" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+</VBox>
