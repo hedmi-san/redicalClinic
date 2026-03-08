@@ -1,23 +1,33 @@
 package model;
 
-import java.time.LocalDate;
-
 public class Bill {
     private int id;
     private String billDate;
     private double totalCost;
 
-    public int getId() {return id;}
+    public int getId() {
+        return id;
+    }
 
-    public void setId(int id) {this.id = id;}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getBillDate() {return billDate;}
+    public String getBillDate() {
+        return billDate;
+    }
 
-    public void setBillDate(String billDate) {this.billDate = billDate;}
+    public void setBillDate(String billDate) {
+        this.billDate = billDate;
+    }
 
-    public double getTotalCost() {return totalCost;}
+    public double getTotalCost() {
+        return totalCost;
+    }
 
-    public void setTotalCost(double totalCost) {this.totalCost = totalCost;}
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
 
     public Bill() {
     }
