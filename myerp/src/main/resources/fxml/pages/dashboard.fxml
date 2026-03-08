@@ -1,12 +1,125 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<ScrollPane fitToWidth="true" styleClass="root-pane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.DashboardController">
+    <stylesheets>
+        <URL value="@../../css/pages/dashboard.css" />
+    </stylesheets>
+    <VBox spacing="0" styleClass="dashboard-container">
+        
+        <!-- Header & Selectors -->
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="dashboard-header">
+            <VBox HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="🏠 Tableau de Bord" />
+                <Label styleClass="page-subtitle" text="Aperçu des performances de la clinique" />
+            </VBox>
+            
+            <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="selector-container">
+                <ComboBox fx:id="monthSelector" promptText="Mois" />
+                <ComboBox fx:id="yearSelector" promptText="Année" />
+            </HBox>
+        </HBox>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.DashboardController">
-    <VBox alignment="CENTER" spacing="10" styleClass="content-card" maxWidth="600" maxHeight="300">
-        <Label text="🏠 Accueil" styleClass="page-title"/>
-        <Label text="Aperçu des rendez-vous et statistiques de la clinique" styleClass="page-subtitle"/>
+        <!-- Summary Cards Grid -->
+        <FlowPane hgap="25" vgap="25" styleClass="summary-grid">
+            
+            <!-- Sessions Count -->
+            <VBox styleClass="summary-card, card-sessions">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="📅" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Sessions" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="sessionCountLabel" text="0" styleClass="card-value" />
+                        <Label text="Séances" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Expected Profit (Total Cost) -->
+            <VBox styleClass="summary-card, card-expected">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="💰" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Profit Attendu" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="expectedProfitLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Actual Profit (Paid Amount) -->
+            <VBox styleClass="summary-card, card-actual">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="💳" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Profit Réalisé" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="actualProfitLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Balance -->
+            <VBox styleClass="summary-card, card-balance">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="⚖️" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Reste à percevoir" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="balanceLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Worker Payments -->
+            <VBox styleClass="summary-card, card-workers">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="👥" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Paiement Employés" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="workerPaymentsLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Bills -->
+            <VBox styleClass="summary-card, card-bills">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="🧾" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Dépenses / Factures" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="billsLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+        </FlowPane>
     </VBox>
-</StackPane>
+</ScrollPane>

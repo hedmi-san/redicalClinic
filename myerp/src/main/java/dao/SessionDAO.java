@@ -133,6 +133,40 @@ public class SessionDAO {
         }
     }
 
+    public MonthlySummary getMonthlySummary(int month, int year) {
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+        String query = """
+                    SELECT COUNT(*) as sessionCount,
+                           SUM(cost) as totalCost,
+                           SUM(paidAmount) as totalPaid
+                    FROM session
+                    WHERE strftime('%m', sessionDate) = ?
+                    AND strftime('%Y', sessionDate) = ?
+                """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, monthStr);
+            pstmt.setString(2, yearStr);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new MonthlySummary(
+                            rs.getInt("sessionCount"),
+                            rs.getDouble("totalCost"),
+                            rs.getDouble("totalPaid"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching monthly summary: " + e.getMessage());
+        }
+        return new MonthlySummary(0, 0.0, 0.0);
+    }
+
+    public static record MonthlySummary(int count, double totalCost, double totalPaid) {
+    }
+
     private Session mapResultSetToSession(ResultSet rs) throws SQLException {
         Session session = new Session();
         session.setId(rs.getInt("id"));

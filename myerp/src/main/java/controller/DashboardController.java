@@ -1,12 +1,98 @@
 package controller;
 
+import dao.BillDAO;
+import dao.PaymentCheckDAO;
+import dao.SessionDAO;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
 public class DashboardController implements Initializable {
+
+    @FXML
+    private ComboBox<String> monthSelector;
+    @FXML
+    private ComboBox<Integer> yearSelector;
+
+    @FXML
+    private Label sessionCountLabel;
+    @FXML
+    private Label expectedProfitLabel;
+    @FXML
+    private Label actualProfitLabel;
+    @FXML
+    private Label balanceLabel;
+    @FXML
+    private Label workerPaymentsLabel;
+    @FXML
+    private Label billsLabel;
+
+    private final SessionDAO sessionDAO = new SessionDAO();
+    private final BillDAO billDAO = new BillDAO();
+    private final PaymentCheckDAO paymentCheckDAO = new PaymentCheckDAO();
+
+    private final String[] months = {
+            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+    };
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialization logic for the dashboard
+        setupSelectors();
+        loadDashboardData();
+    }
+
+    private void setupSelectors() {
+        monthSelector.setItems(FXCollections.observableArrayList(months));
+
+        int currentYear = LocalDate.now().getYear();
+        yearSelector.setItems(FXCollections.observableArrayList(
+                IntStream.rangeClosed(currentYear - 5, currentYear + 2).boxed().toList()));
+
+        // Set current month/year
+        monthSelector.getSelectionModel().select(LocalDate.now().getMonthValue() - 1);
+        yearSelector.getSelectionModel().select(Integer.valueOf(currentYear));
+
+        // Add listeners
+        monthSelector.setOnAction(e -> loadDashboardData());
+        yearSelector.setOnAction(e -> loadDashboardData());
+    }
+
+    private void loadDashboardData() {
+        int month = monthSelector.getSelectionModel().getSelectedIndex() + 1;
+        Integer year = yearSelector.getValue();
+
+        if (year == null)
+            return;
+
+        // Fetch data from DAOs
+        SessionDAO.MonthlySummary sessionSummary = sessionDAO.getMonthlySummary(month, year);
+        double workerPayments = paymentCheckDAO.getMonthlyTotalForAllWorkers(month, year);
+        double billTotal = billDAO.getMonthlyTotal(month, year);
+
+        // Update UI
+        sessionCountLabel.setText(String.valueOf(sessionSummary.count()));
+        expectedProfitLabel.setText(String.format("%,.2f", sessionSummary.totalCost()));
+        actualProfitLabel.setText(String.format("%,.2f", sessionSummary.totalPaid()));
+
+        double balance = sessionSummary.totalCost() - sessionSummary.totalPaid();
+        balanceLabel.setText(String.format("%,.2f", balance));
+
+        workerPaymentsLabel.setText(String.format("%,.2f", workerPayments));
+        billsLabel.setText(String.format("%,.2f", billTotal));
+
+        // Color balancing - optionally highlight if balance is high or profit is low
+        if (balance > 0) {
+            balanceLabel.setStyle("-fx-text-fill: #f59e0b;"); // Orange warning
+        } else {
+            balanceLabel.setStyle("-fx-text-fill: #14b8a6;"); // Teal healthy
+        }
     }
 }

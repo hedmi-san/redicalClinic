@@ -66,7 +66,33 @@ public class BillDAO {
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating bill total: " + e.getMessage());
-            return false;
         }
+        return false;
+    }
+
+    public double getMonthlyTotal(int month, int year) {
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+        String query = """
+                    SELECT SUM(totalCost)
+                    FROM bill
+                    WHERE strftime('%m', billDate) = ?
+                    AND strftime('%Y', billDate) = ?
+                """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, monthStr);
+            pstmt.setString(2, yearStr);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating monthly bill total: " + e.getMessage());
+        }
+        return 0.0;
     }
 }

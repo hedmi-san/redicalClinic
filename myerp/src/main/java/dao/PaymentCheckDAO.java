@@ -136,6 +136,29 @@ public class PaymentCheckDAO {
         }
     }
 
+    public double getMonthlyTotalForAllWorkers(int month, int year) {
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+
+        String query = "SELECT SUM(paidAmount) FROM paymentCheck WHERE " +
+                "strftime('%m', paymentDate) = ? " +
+                "AND strftime('%Y', paymentDate) = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, monthStr);
+            pstmt.setString(2, yearStr);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error calculating global monthly total: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
     private PaymentCheck mapResultSetToPayment(ResultSet rs) throws SQLException {
         PaymentCheck payment = new PaymentCheck();
         payment.setId(rs.getInt("id"));

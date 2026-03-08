@@ -1,0 +1,175 @@
+/* ============================================================
+   Cabinet Nour El Islam — Dashboard Page Styles
+   ============================================================ */
+
+.dashboard-container {
+    -fx-padding: 20;
+    -fx-background-color: #f0f4f4;
+}
+
+.dashboard-header {
+    -fx-padding: 0 0 30 0;
+}
+
+.selector-container {
+    -fx-background-color: white;
+    -fx-padding: 15 25;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 5);
+}
+
+.combo-box {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-pref-width: 140;
+    -fx-padding: 2;
+}
+
+.combo-box:hover {
+    -fx-border-color: #003030;
+}
+
+/* ---- Summary Cards Layout ---------------------------------- */
+.summary-grid {
+    -fx-hgap: 20;
+    -fx-vgap: 20;
+}
+
+/* ---- Summary Cards ----------------------------------------- */
+.summary-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-pref-width: 260;
+    -fx-pref-height: 140;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 15, 0, 0, 8);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s;
+}
+
+.summary-card:hover {
+    -fx-translate-y: -5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 20, 0, 0, 12);
+}
+
+.card-icon-container {
+    -fx-pref-width: 45;
+    -fx-pref-height: 45;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+}
+
+.card-icon {
+    -fx-font-size: 20;
+}
+
+.card-info {
+    -fx-padding: 10 0 0 0;
+}
+
+.card-title {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.card-value {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 24;
+    -fx-font-weight: 800;
+}
+
+.card-unit {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13;
+    -fx-padding: 5 0 0 4;
+}
+
+/* ---- Card Color Variations --------------------------------- */
+
+/* Sessions - Blue */
+.card-sessions .card-icon-container {
+    -fx-background-color: #e0f2fe;
+}
+
+.card-sessions .card-icon {
+    -fx-text-fill: #0ea5e9;
+}
+
+.card-sessions {
+    -fx-border-color: transparent transparent transparent #0ea5e9;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Expected Profit - Green */
+.card-expected .card-icon-container {
+    -fx-background-color: #dcfce7;
+}
+
+.card-expected .card-icon {
+    -fx-text-fill: #22c55e;
+}
+
+.card-expected {
+    -fx-border-color: transparent transparent transparent #22c55e;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Actual Profit - Teal */
+.card-actual .card-icon-container {
+    -fx-background-color: #ccfbf1;
+}
+
+.card-actual .card-icon {
+    -fx-text-fill: #14b8a6;
+}
+
+.card-actual {
+    -fx-border-color: transparent transparent transparent #14b8a6;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Balance - Orange */
+.card-balance .card-icon-container {
+    -fx-background-color: #ffedd5;
+}
+
+.card-balance .card-icon {
+    -fx-text-fill: #f59e0b;
+}
+
+.card-balance {
+    -fx-border-color: transparent transparent transparent #f59e0b;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Worker Payments - Purple */
+.card-workers .card-icon-container {
+    -fx-background-color: #f3e8ff;
+}
+
+.card-workers .card-icon {
+    -fx-text-fill: #a855f7;
+}
+
+.card-workers {
+    -fx-border-color: transparent transparent transparent #a855f7;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Bills - Rose */
+.card-bills .card-icon-container {
+    -fx-background-color: #ffe4e6;
+}
+
+.card-bills .card-icon {
+    -fx-text-fill: #f43f5e;
+}
+
+.card-bills {
+    -fx-border-color: transparent transparent transparent #f43f5e;
+    -fx-border-width: 0 0 0 4;
+}
