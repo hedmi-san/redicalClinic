@@ -5,7 +5,7 @@
 <?import java.net.URL?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PatientDetailController" 
-      prefWidth="800.0" prefHeight="700.0" styleClass="main-content">
+      prefWidth="800.0" prefHeight="600.0" styleClass="main-content">
     <stylesheets>
         <URL value="@../../css/pages/patient.css" />
     </stylesheets>
@@ -30,15 +30,15 @@
             <HBox spacing="20" styleClass="fin-cards-grid">
                 <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
                     <Label text="COÛT TOTAL" styleClass="fc-label" />
-                    <Label fx:id="totalCostLabel" text="0.00 DH" styleClass="fc-value" />
+                    <Label fx:id="totalCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
                 </VBox>
                 <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
                     <Label text="TOTAL PAYÉ" styleClass="fc-label" />
-                    <Label fx:id="totalPaidLabel" text="0.00 DH" styleClass="fc-value, fc-green" />
+                    <Label fx:id="totalPaidLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
                 </VBox>
                 <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
                     <Label text="SOLDE" styleClass="fc-label" />
-                    <Label fx:id="balanceLabel" text="0.00 DH" styleClass="fc-value, fc-rose" />
+                    <Label fx:id="balanceLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
                 </VBox>
             </HBox>
 

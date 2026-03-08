@@ -7,9 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Locale;
+
 public class Myerp extends Application {
 
     public static void main(String[] args) {
+        Locale.setDefault(Locale.FRENCH);
         DatabaseInitializer.initializeDatabase();
         launch(args); // starts the JavaFX lifecycle → calls start()
     }

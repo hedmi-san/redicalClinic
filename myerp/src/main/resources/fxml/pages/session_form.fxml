@@ -29,11 +29,11 @@
 
         <HBox spacing="14">
             <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="COÛT (DH)" styleClass="form-label" />
+                <Label text="COÛT (DZD)" styleClass="form-label" />
                 <TextField fx:id="costField" promptText="0.00" styleClass="form-control" />
             </VBox>
             <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="MONTANT PAYÉ (DH)" styleClass="form-label" />
+                <Label text="MONTANT PAYÉ (DZD)" styleClass="form-label" />
                 <TextField fx:id="paidAmountField" promptText="0.00" styleClass="form-control" />
             </VBox>
         </HBox>

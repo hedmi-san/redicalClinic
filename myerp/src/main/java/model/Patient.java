@@ -7,6 +7,8 @@ public class Patient {
     private int id;
     private String name;
     private String phone;
+    private double totalCost;
+    private double totalPaid;
     private List<Session> sessions = new ArrayList<>();
 
     public Patient() {
@@ -51,15 +53,23 @@ public class Patient {
     }
 
     public double getTotalCost() {
-        return sessions.stream().mapToDouble(Session::getCost).sum();
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
     }
 
     public double getTotalPaid() {
-        return sessions.stream().mapToDouble(Session::getPaidAmount).sum();
+        return totalPaid;
+    }
+
+    public void setTotalPaid(double totalPaid) {
+        this.totalPaid = totalPaid;
     }
 
     public double getBalance() {
-        return getTotalCost() - getTotalPaid();
+        return totalCost - totalPaid;
     }
 
     public int getSessionCount() {

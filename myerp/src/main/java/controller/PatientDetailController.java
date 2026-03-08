@@ -64,12 +64,22 @@ public class PatientDetailController {
         heroPhone.setText(patient.getPhone() != null ? patient.getPhone() : "Aucun numéro");
         heroInitials.setText(getInitials(patient.getName()));
 
-        List<Session> sessions = sessionDAO.getSessionsByPatientId(patient.getId());
-        patient.setSessions(sessions);
+        List<Session> sessions = sessionDAO.getSessionsByPatientId(this.patient.getId());
+        this.patient.setSessions(sessions);
 
-        totalCostLabel.setText(String.format("%.2f DH", patient.getTotalCost()));
-        totalPaidLabel.setText(String.format("%.2f DH", patient.getTotalPaid()));
-        balanceLabel.setText(String.format("%.2f DH", patient.getBalance()));
+        // Explicitly calculate totals to ensure sync
+        double totalCost = 0;
+        double totalPaid = 0;
+        for (Session s : sessions) {
+            totalCost += s.getCost();
+            totalPaid += s.getPaidAmount();
+        }
+        this.patient.setTotalCost(totalCost);
+        this.patient.setTotalPaid(totalPaid);
+
+        totalCostLabel.setText(String.format("%.2f DZD", totalCost));
+        totalPaidLabel.setText(String.format("%.2f DZD", totalPaid));
+        balanceLabel.setText(String.format("%.2f DZD", totalCost - totalPaid));
 
         sessionsContainer.getChildren().clear();
         for (Session session : sessions) {
@@ -220,7 +230,7 @@ public class PatientDetailController {
         noteLabel.setWrapText(true);
 
         Label costPaidLabel = new Label(
-                String.format("Coût: %.2f DH | Payé: %.2f DH", session.getCost(), session.getPaidAmount()));
+                String.format("Coût: %.2f DZD | Payé: %.2f DZD", session.getCost(), session.getPaidAmount()));
         costPaidLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 13px;");
 
         card.getChildren().addAll(topRow, noteLabel, costPaidLabel);

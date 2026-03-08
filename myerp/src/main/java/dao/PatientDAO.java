@@ -125,8 +125,8 @@ public class PatientDAO {
     public void updatePatientTotals(int patientId) {
         String query = """
                     UPDATE patient
-                    SET totalCost = (SELECT ifnull(SUM(cost), 0) FROM session WHERE patientId = ?),
-                        totalPaid = (SELECT ifnull(SUM(paidAmount), 0) FROM session WHERE patientId = ?)
+                    SET totalCost = (SELECT COALESCE(SUM(cost), 0) FROM session WHERE patientId = ?),
+                        totalPaid = (SELECT COALESCE(SUM(paidAmount), 0) FROM session WHERE patientId = ?)
                     WHERE id = ?
                 """;
 
@@ -147,10 +147,8 @@ public class PatientDAO {
         patient.setId(rs.getInt("id"));
         patient.setName(rs.getString("name"));
         patient.setPhone(rs.getString("phone"));
-        // Note: totalCost and totalPaid are properties in Patient model computed from
-        // sessions list
-        // but here we can keep it simple and just use the properties if we want to
-        // avoid extra joins in list
+        patient.setTotalCost(rs.getDouble("totalCost"));
+        patient.setTotalPaid(rs.getDouble("totalPaid"));
         return patient;
     }
 }

@@ -2,10 +2,11 @@ package controller;
 
 import dao.PatientDAO;
 import dao.SessionDAO;
+import model.Patient;
+import model.Session;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,10 +14,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.Patient;
-import model.Session;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +26,8 @@ import java.util.ResourceBundle;
 
 public class PatientController implements Initializable {
 
+    @FXML
+    private VBox mainContainer;
     @FXML
     private TextField searchField;
     @FXML
@@ -36,96 +39,96 @@ public class PatientController implements Initializable {
     @FXML
     private TableColumn<Patient, String> balanceColumn;
 
-    private PatientDAO patientDAO = new PatientDAO();
-    private SessionDAO sessionDAO = new SessionDAO();
-    private ObservableList<Patient> masterPatientList = FXCollections.observableArrayList();
-    private FilteredList<Patient> filteredPatientList;
+    private PatientDAO patientDAO;
+    private SessionDAO sessionDAO;
+    private ObservableList<Patient> patientList;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        setupTable();
-        setupSearch();
-        loadPatients();
-    }
+        // Load CSS programmatically like WorkerController
+        String cssPath = getClass().getResource("/css/pages/patient.css").toExternalForm();
+        if (cssPath != null) {
+            mainContainer.getStylesheets().add(cssPath);
+        }
 
-    private void setupTable() {
+        patientDAO = new PatientDAO();
+        sessionDAO = new SessionDAO();
+        patientList = FXCollections.observableArrayList();
+
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
         balanceColumn.setCellValueFactory(cellData -> {
             Patient p = cellData.getValue();
-            // We need to load sessions to calculate balance for the table if we want it
-            // displayed here
-            // Or use the value from DB if DAO maps it. For now, let's load it.
             List<Session> sessions = sessionDAO.getSessionsByPatientId(p.getId());
-            p.setSessions(sessions);
-            return new SimpleStringProperty(String.format("%.2f DH", p.getBalance()));
+            double totalCost = 0;
+            double totalPaid = 0;
+            for (Session s : sessions) {
+                totalCost += s.getCost();
+                totalPaid += s.getPaidAmount();
+            }
+            p.setTotalCost(totalCost);
+            p.setTotalPaid(totalPaid);
+            return new SimpleStringProperty(String.format("%.2f DZD", p.getBalance()));
         });
 
-        filteredPatientList = new FilteredList<>(masterPatientList, p -> true);
-        patientTable.setItems(filteredPatientList);
+        // Disable column reordering for consistency
+        nameColumn.setReorderable(false);
+        phoneColumn.setReorderable(false);
+        balanceColumn.setReorderable(false);
 
-        // Double click to open detail
-        patientTable.setRowFactory(tv -> {
-            TableRow<Patient> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    openPatientDetailPopup(row.getItem());
-                }
-            });
-            return row;
+        patientTable.setItems(patientList);
+
+        // Search listener
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            loadPatients(newValue);
         });
+
+        // Double click listener for profile popup
+        patientTable.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() == 2 && patientTable.getSelectionModel().getSelectedItem() != null) {
+                openPatientDetailPopup(patientTable.getSelectionModel().getSelectedItem());
+            }
+        });
+
+        loadPatients("");
     }
 
-    private void setupSearch() {
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            filteredPatientList.setPredicate(patient -> {
-                if (newVal == null || newVal.isEmpty())
-                    return true;
-                String lowerCaseFilter = newVal.toLowerCase();
-                if (patient.getName().toLowerCase().contains(lowerCaseFilter))
-                    return true;
-                if (patient.getPhone() != null && patient.getPhone().contains(lowerCaseFilter))
-                    return true;
-                return false;
-            });
-        });
-    }
-
-    private void loadPatients() {
-        masterPatientList.setAll(patientDAO.getAllPatients());
+    private void loadPatients(String query) {
+        patientList.clear();
+        List<Patient> patients;
+        if (query == null || query.trim().isEmpty()) {
+            patients = patientDAO.getAllPatients();
+        } else {
+            patients = patientDAO.searchPatients(query.trim());
+        }
+        patientList.addAll(patients);
     }
 
     @FXML
     private void handleNewPatient() {
-        showPatientDialog(null);
-    }
-
-    private void showPatientDialog(Patient patient) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/patient_form.fxml"));
             Parent root = loader.load();
 
             PatientFormController controller = loader.getController();
-            controller.setPatient(patient);
+            controller.setPatient(null);
 
-            Stage stage = new Stage();
-            stage.setTitle(patient == null ? "Ajouter un Patient" : "Modifier le Patient");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Ajouter un Patient");
+            dialogStage.setScene(new Scene(root));
+
+            dialogStage.showAndWait();
 
             if (controller.isSaveClicked()) {
-                Patient p = controller.getPatient();
-                if (patient == null) {
-                    patientDAO.addPatient(p);
-                } else {
-                    patientDAO.updatePatient(p);
-                }
-                loadPatients();
+                patientDAO.addPatient(controller.getPatient());
+                loadPatients(searchField.getText());
             }
+
         } catch (IOException e) {
             e.printStackTrace();
+            showAlert("Erreur", "Échec de l'ouverture du formulaire.", Alert.AlertType.ERROR);
         }
     }
 
@@ -135,7 +138,7 @@ public class PatientController implements Initializable {
             Parent root = loader.load();
 
             PatientDetailController controller = loader.getController();
-            controller.setPatient(patient, this::loadPatients);
+            controller.setPatient(patient, () -> loadPatients(searchField.getText()));
 
             Stage stage = new Stage();
             stage.setTitle("Profil de " + patient.getName());
@@ -143,9 +146,18 @@ public class PatientController implements Initializable {
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            loadPatients(); // Refresh list after popup closes
+            loadPatients(searchField.getText());
         } catch (IOException e) {
             e.printStackTrace();
+            showAlert("Erreur", "Échec de l'ouverture du profil.", Alert.AlertType.ERROR);
         }
+    }
+
+    private void showAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
