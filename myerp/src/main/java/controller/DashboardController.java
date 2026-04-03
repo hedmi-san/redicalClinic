@@ -3,6 +3,7 @@ package controller;
 import dao.BillDAO;
 import dao.PaymentCheckDAO;
 import dao.SessionDAO;
+import dao.SoldDAO;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,10 +34,13 @@ public class DashboardController implements Initializable {
     private Label workerPaymentsLabel;
     @FXML
     private Label billsLabel;
+    @FXML
+    private Label salesLabel;
 
     private final SessionDAO sessionDAO = new SessionDAO();
     private final BillDAO billDAO = new BillDAO();
     private final PaymentCheckDAO paymentCheckDAO = new PaymentCheckDAO();
+    private final SoldDAO soldDAO = new SoldDAO();
 
     private final String[] months = {
             "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -76,6 +80,7 @@ public class DashboardController implements Initializable {
         SessionDAO.MonthlySummary sessionSummary = sessionDAO.getMonthlySummary(month, year);
         double workerPayments = paymentCheckDAO.getMonthlyTotalForAllWorkers(month, year);
         double billTotal = billDAO.getMonthlyTotal(month, year);
+        SoldDAO.MonthlySummary soldSummary = soldDAO.getMonthlySummary(month, year);
 
         // Update UI
         sessionCountLabel.setText(String.valueOf(sessionSummary.count()));
@@ -87,6 +92,7 @@ public class DashboardController implements Initializable {
 
         workerPaymentsLabel.setText(String.format("%,.2f", workerPayments));
         billsLabel.setText(String.format("%,.2f", billTotal));
+        salesLabel.setText(String.format("%,.2f", soldSummary.totalRevenue()));
 
         // Color balancing - optionally highlight if balance is high or profit is low
         if (balance > 0) {

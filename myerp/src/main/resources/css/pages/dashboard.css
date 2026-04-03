@@ -173,3 +173,17 @@
     -fx-border-color: transparent transparent transparent #f43f5e;
     -fx-border-width: 0 0 0 4;
 }
+
+/* Sales - Indigo */
+.card-sales .card-icon-container {
+    -fx-background-color: #e0e7ff;
+}
+
+.card-sales .card-icon {
+    -fx-text-fill: #4f46e5;
+}
+
+.card-sales {
+    -fx-border-color: transparent transparent transparent #4f46e5;
+    -fx-border-width: 0 0 0 4;
+}

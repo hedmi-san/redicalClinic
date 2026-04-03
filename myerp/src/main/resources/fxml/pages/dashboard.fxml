@@ -120,6 +120,22 @@
                 </VBox>
             </VBox>
 
+            <!-- Sales -->
+            <VBox styleClass="summary-card, card-sales">
+                <HBox alignment="TOP_RIGHT">
+                     <StackPane styleClass="card-icon-container">
+                        <Label text="🛒" styleClass="card-icon"/>
+                    </StackPane>
+                </HBox>
+                <VBox styleClass="card-info">
+                    <Label text="Revenus Ventes" styleClass="card-title" />
+                    <HBox alignment="BASELINE_LEFT">
+                        <Label fx:id="salesLabel" text="0.00" styleClass="card-value" />
+                        <Label text="DZD" styleClass="card-unit" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
         </FlowPane>
     </VBox>
 </ScrollPane>
