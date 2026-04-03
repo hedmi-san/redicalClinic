@@ -14,7 +14,7 @@
     <!-- Hero Header -->
     <HBox styleClass="hero-header" alignment="CENTER_LEFT" spacing="24">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="🩺 Gestion des Séances" styleClass="hero-name" />
+            <Label text="Gestion des Séances" styleClass="hero-name" />
             <Label text="Planifier et suivre les séances médicales quotidiennes" styleClass="hero-phone" />
         </VBox>
         <HBox alignment="CENTER" spacing="12">

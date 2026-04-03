@@ -18,6 +18,8 @@ public class SessionFormController {
     @FXML
     private Label titleLabel;
     @FXML
+    private TextField patientSearchField;
+    @FXML
     private ComboBox<Patient> patientComboBox;
     @FXML
     private DatePicker datePicker;
@@ -34,6 +36,7 @@ public class SessionFormController {
     private boolean saveClicked = false;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final PatientDAO patientDAO = new PatientDAO();
+    private List<Patient> allPatients;
 
     @FXML
     public void initialize() {
@@ -41,8 +44,8 @@ public class SessionFormController {
     }
 
     private void setupPatientComboBox() {
-        List<Patient> patients = patientDAO.getAllPatients();
-        patientComboBox.setItems(FXCollections.observableArrayList(patients));
+        allPatients = patientDAO.getAllPatients();
+        patientComboBox.setItems(FXCollections.observableArrayList(allPatients));
 
         patientComboBox.setConverter(new StringConverter<Patient>() {
             @Override
@@ -55,6 +58,25 @@ public class SessionFormController {
                 return null; // Not needed
             }
         });
+
+        // Add logical filter
+        if (patientSearchField != null) {
+            patientSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue == null || newValue.trim().isEmpty()) {
+                    patientComboBox.setItems(FXCollections.observableArrayList(allPatients));
+                } else {
+                    String lowerCaseFilter = newValue.trim().toLowerCase();
+                    List<Patient> filtered = allPatients.stream()
+                            .filter(p -> p.getName() != null && p.getName().toLowerCase().contains(lowerCaseFilter))
+                            .toList();
+                    patientComboBox.setItems(FXCollections.observableArrayList(filtered));
+                    patientComboBox.getSelectionModel().clearSelection();
+                    if (!filtered.isEmpty()) {
+                        patientComboBox.show();
+                    }
+                }
+            });
+        }
     }
 
     public void setSession(Session session, int patientId) {
