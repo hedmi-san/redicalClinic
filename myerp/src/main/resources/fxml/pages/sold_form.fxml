@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SoldFormController" spacing="20" style="-fx-background-color: white;">
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <Label fx:id="titleLabel" text="Nouvelle Vente" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+
+    <GridPane vgap="15" hgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+        </columnConstraints>
+
+        <Label text="Nom de l'article:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+        <TextField fx:id="itemNameField" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-padding: 8; -fx-background-radius: 4; -fx-border-color: #cbd5e1; -fx-border-radius: 4;"/>
+
+        <Label text="Date de Vente:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+        <DatePicker fx:id="datePicker" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" style="-fx-padding: 4;"/>
+
+        <Label text="Prix Unitaire (DZD):" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+        <TextField fx:id="priceField" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-padding: 8; -fx-background-radius: 4; -fx-border-color: #cbd5e1; -fx-border-radius: 4;"/>
+
+        <Label text="Quantité:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+        <TextField fx:id="quantityField" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-padding: 8; -fx-background-radius: 4; -fx-border-color: #cbd5e1; -fx-border-radius: 4;"/>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 20 0 0 0;">
+        <Button text="Annuler" onAction="#handleCancel" style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-text-fill: #475569; -fx-padding: 8 16; -fx-cursor: hand;"/>
+        <Button text="Enregistrer" onAction="#handleSave" style="-fx-background-color: #0d9488; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

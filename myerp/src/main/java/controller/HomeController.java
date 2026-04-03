@@ -35,6 +35,8 @@ public class HomeController implements Initializable {
     private Button btnWorkers;
     @FXML
     private Button btnBills;
+    @FXML
+    private Button btnSolds;
 
     private Button activeButton;
     private double x = 0;
@@ -105,6 +107,12 @@ public class HomeController implements Initializable {
     private void handleNavBills(ActionEvent event) {
         loadPage("/fxml/pages/bill.fxml");
         setActiveButton(btnBills);
+    }
+
+    @FXML
+    private void handleNavSolds(ActionEvent event){
+        loadPage("/fxml/pages/sold.fxml");
+        setActiveButton(btnSolds);
     }
 
     @FXML

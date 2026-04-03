@@ -44,6 +44,7 @@
                 <Button fx:id="btnSessions" text="🩺 Séances" styleClass="nav-btn" onAction="#handleNavSessions" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button fx:id="btnWorkers" text="👨‍⚕️ Employés" styleClass="nav-btn" onAction="#handleNavWorkers" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button fx:id="btnBills" text="💰 Factures" styleClass="nav-btn" onAction="#handleNavBills" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnSolds" text="💰 Ventes" styleClass="nav-btn" onAction="#handleNavSolds" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
             </VBox>
 
             <VBox VBox.vgrow="ALWAYS" /> <!-- Spacer -->

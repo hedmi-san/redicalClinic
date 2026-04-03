@@ -61,7 +61,7 @@ public class DatabaseInitializer {
                         CREATE TABLE IF NOT EXISTS billItem (
                             id              INTEGER PRIMARY KEY AUTOINCREMENT,
                             billId          INTEGER NOT NULL REFERENCES bill(id)  ON DELETE CASCADE,
-                            itemName        VARCHAR(15),
+                            itemName        VARCHAR(25),
                             quantity        INTEGER,
                             unitPrice       REAL
                         );
@@ -108,6 +108,18 @@ public class DatabaseInitializer {
                         );
                     """);
 
+            // ----------------------------------------------------------------
+            // 8. Sold
+            // ----------------------------------------------------------------
+            stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS sold (
+                            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                            itemName        VARCHAR(25),
+                            soldDate     TEXT DEFAULT (datetime('now')),
+                            soldPrice      REAL,
+                            quantity       REAL
+                        );
+                    """);
             System.out.println("Database initialized successfully.");
 
             // Seed a default admin user if none exists yet

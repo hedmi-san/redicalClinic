@@ -1,0 +1,209 @@
+/* =========================================================================
+   Sales (Ventes) Page Stylesheet
+   ========================================================================= */
+
+.main-content {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 0;
+}
+
+/* Hero Header */
+.hero-header {
+    -fx-background-color: white;
+    -fx-padding: 30 40;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 2);
+}
+
+.hero-name {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+}
+
+.hero-phone {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 15px;
+    -fx-text-fill: #64748b;
+}
+
+/* Scroll Pane Area */
+.profile-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 30 40;
+}
+
+.profile-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Filter Section */
+.filter-section {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-margin: 0 0 20 0;
+}
+
+.form-label {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.form-control {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.form-control:focused {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.2), 4, 0, 0, 0);
+}
+
+/* Summary Cards */
+.fin-cards-grid {
+    -fx-padding: 0 0 24 0;
+}
+
+.fin-card {
+    -fx-background-color: white;
+    -fx-padding: 24;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 8, 0, 0, 4);
+}
+
+.fc-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #64748b;
+    -fx-padding: 0 0 8 0;
+}
+
+.fc-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+}
+
+.fc-blue { -fx-text-fill: #0284c7; }
+.fc-green { -fx-text-fill: #059669; }
+
+/* Section Titles */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+/* Core Buttons reused from other pages (ensure they match) */
+.btn-teal {
+    -fx-background-color: #0d9488;
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-padding: 10 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-teal:hover {
+    -fx-background-color: #0f766e;
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: #0d9488;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+}
+
+/* Modern Data Table */
+.modern-table {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-border-width: 1;
+}
+
+.modern-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12 12 0 0;
+    -fx-padding: 5 0;
+}
+
+.modern-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 1;
+    -fx-padding: 10 15;
+}
+
+.modern-table .column-header .label {
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+    -fx-alignment: center-left;
+}
+
+.modern-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 1;
+    -fx-cell-size: 50px;
+}
+
+.modern-table .table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.modern-table .table-row-cell:selected {
+    -fx-background-color: #f0fdfa;
+    -fx-background-insets: 0;
+}
+
+.modern-table .table-cell {
+    -fx-padding: 0 15;
+    -fx-alignment: center-left;
+    -fx-text-fill: #334155;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent;
+}
