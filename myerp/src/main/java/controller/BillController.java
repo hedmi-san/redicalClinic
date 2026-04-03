@@ -35,6 +35,16 @@ public class BillController implements Initializable {
     private TableColumn<Bill, Double> totalColumn;
     @FXML
     private TableColumn<Bill, Void> actionsColumn;
+    
+    @FXML
+    private ComboBox<String> monthComboBox;
+    @FXML
+    private ComboBox<Integer> yearComboBox;
+
+    private final String[] MONTHS_FR = {
+            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+    };
 
     private final BillDAO billDAO = new BillDAO();
     private final ObservableList<Bill> billList = FXCollections.observableArrayList();
@@ -42,8 +52,24 @@ public class BillController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        setupFilters();
         setupTable();
         loadBills();
+    }
+
+    private void setupFilters() {
+        monthComboBox.getItems().addAll(MONTHS_FR);
+        int currentMonth = java.time.LocalDate.now().getMonthValue();
+        monthComboBox.getSelectionModel().select(currentMonth - 1);
+
+        int currentYear = java.time.LocalDate.now().getYear();
+        for (int i = currentYear - 5; i <= currentYear + 5; i++) {
+            yearComboBox.getItems().add(i);
+        }
+        yearComboBox.getSelectionModel().select(Integer.valueOf(currentYear));
+
+        monthComboBox.setOnAction(e -> loadBills());
+        yearComboBox.setOnAction(e -> loadBills());
     }
 
     private void setupTable() {
@@ -113,7 +139,17 @@ public class BillController implements Initializable {
     }
 
     private void loadBills() {
-        billList.setAll(billDAO.getAllBills());
+        if (monthComboBox != null && yearComboBox != null) {
+            int month = monthComboBox.getSelectionModel().getSelectedIndex() + 1;
+            Integer year = yearComboBox.getValue();
+            if (year != null) {
+                billList.setAll(billDAO.getBillsByMonthAndYear(month, year));
+            } else {
+                billList.setAll(billDAO.getAllBills());
+            }
+        } else {
+            billList.setAll(billDAO.getAllBills());
+        }
         billTable.setItems(billList);
     }
 

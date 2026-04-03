@@ -14,7 +14,7 @@
     <!-- Hero Header -->
     <HBox styleClass="hero-header" alignment="CENTER_LEFT" spacing="24">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="💰 Gestion des Ventes" styleClass="hero-name" />
+            <Label text="Gestion des Ventes" styleClass="hero-name" />
             <Label text="Suivre les ventes d'articles et de produits" styleClass="hero-phone" />
         </VBox>
         <Button onAction="#handleNewSold" text="+ Nouvelle Vente" styleClass="btn-teal" />

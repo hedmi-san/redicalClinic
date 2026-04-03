@@ -27,6 +27,30 @@ public class BillDAO {
         return bills;
     }
 
+    public List<Bill> getBillsByMonthAndYear(int month, int year) {
+        List<Bill> bills = new ArrayList<>();
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+        String query = "SELECT * FROM bill WHERE strftime('%m', billDate) = ? AND strftime('%Y', billDate) = ? ORDER BY billDate DESC";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, monthStr);
+            pstmt.setString(2, yearStr);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    bills.add(new Bill(
+                            rs.getInt("id"),
+                            rs.getString("billDate"),
+                            rs.getDouble("totalCost")));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching bills: " + e.getMessage());
+        }
+        return bills;
+    }
+
+
     public int addBill(Bill bill) {
         String query = "INSERT INTO bill (billDate, totalCost) VALUES (?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();

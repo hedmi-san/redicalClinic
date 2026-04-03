@@ -17,6 +17,10 @@
             <Label text="Gestion des Factures" styleClass="page-title"/>
             <Label text="Suivre les paiements et factures des patients" styleClass="page-subtitle"/>
         </VBox>
+        <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="selector-container">
+            <ComboBox fx:id="monthComboBox" promptText="Mois" styleClass="combo-box"/>
+            <ComboBox fx:id="yearComboBox" promptText="Année" styleClass="combo-box"/>
+        </HBox>
         <Button text="+ Nouvelle Facture" onAction="#handleNewBill" styleClass="btn-primary"/>
     </HBox>
 

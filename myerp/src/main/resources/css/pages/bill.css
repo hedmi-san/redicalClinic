@@ -26,6 +26,27 @@
     -fx-font-size: 14px;
 }
 
+/* ---- Selectors ------------------------------------------- */
+.selector-container {
+    -fx-background-color: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 5);
+}
+
+.combo-box {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-pref-width: 140;
+    -fx-padding: 2;
+}
+
+.combo-box:hover {
+    -fx-border-color: #003030;
+}
+
 /* ---- Buttons --------------------------------------------- */
 .btn-primary {
     -fx-background-color: #003030;
