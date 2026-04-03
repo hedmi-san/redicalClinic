@@ -122,6 +122,33 @@ public class PatientDAO {
         return null;
     }
 
+    public boolean patientExists(String name, String phone, int excludeId) {
+        String query;
+        if (phone == null || phone.trim().isEmpty()) {
+            query = "SELECT COUNT(*) FROM patient WHERE LOWER(name) = LOWER(?) AND (phone IS NULL OR phone = '') AND id != ?";
+        } else {
+            query = "SELECT COUNT(*) FROM patient WHERE LOWER(name) = LOWER(?) AND phone = ? AND id != ?";
+        }
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, name.trim());
+            if (phone == null || phone.trim().isEmpty()) {
+                pstmt.setInt(2, excludeId);
+            } else {
+                pstmt.setString(2, phone.trim());
+                pstmt.setInt(3, excludeId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if patient exists: " + e.getMessage());
+        }
+        return false;
+    }
+
     public void updatePatientTotals(int patientId) {
         String query = """
                     UPDATE patient

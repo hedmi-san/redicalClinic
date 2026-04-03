@@ -74,6 +74,14 @@ public class PatientFormController {
         if (phoneField.getText() != null && !phoneField.getText().isEmpty() && !phoneField.getText().matches("\\d+")) {
             errorMessage += "Le téléphone ne doit contenir que des chiffres !\n";
         }
+        
+        if (errorMessage.isEmpty()) {
+            dao.PatientDAO dao = new dao.PatientDAO();
+            int currentId = (patient != null && patient.getId() != 0) ? patient.getId() : -1;
+            if (dao.patientExists(nameField.getText(), phoneField.getText(), currentId)) {
+                errorMessage += "Un patient avec ce nom et ce numéro de téléphone existe déjà !\n";
+            }
+        }
 
         if (errorMessage.isEmpty()) {
             return true;
