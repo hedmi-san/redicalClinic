@@ -6,10 +6,18 @@ import dao.SessionDAO;
 import dao.SoldDAO;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -36,6 +44,10 @@ public class DashboardController implements Initializable {
     private Label billsLabel;
     @FXML
     private Label salesLabel;
+    @FXML
+    private VBox expectedProfitCard;
+    @FXML
+    private VBox actualProfitCard;
 
     private final SessionDAO sessionDAO = new SessionDAO();
     private final BillDAO billDAO = new BillDAO();
@@ -50,6 +62,7 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setupSelectors();
+        setupCardClickHandlers();
         loadDashboardData();
     }
 
@@ -99,6 +112,35 @@ public class DashboardController implements Initializable {
             balanceLabel.setStyle("-fx-text-fill: #f59e0b;"); // Orange warning
         } else {
             balanceLabel.setStyle("-fx-text-fill: #14b8a6;"); // Teal healthy
+        }
+    }
+
+    private void setupCardClickHandlers() {
+        expectedProfitCard.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() == 2) {
+                openProfitDialog("/fxml/pages/expected_profit_form.fxml", "Profit Attendu - Détails");
+            }
+        });
+
+        actualProfitCard.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() == 2) {
+                openProfitDialog("/fxml/pages/actual_profit_form.fxml", "Profit Réalisé - Détails");
+            }
+        });
+    }
+
+    private void openProfitDialog(String fxmlPath, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle(title);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

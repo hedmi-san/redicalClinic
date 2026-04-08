@@ -41,7 +41,7 @@
             </VBox>
 
             <!-- Expected Profit (Total Cost) -->
-            <VBox styleClass="summary-card, card-expected">
+            <VBox fx:id="expectedProfitCard" styleClass="summary-card, card-expected">
                 <HBox alignment="TOP_RIGHT">
                      <StackPane styleClass="card-icon-container">
                         <Label text="💰" styleClass="card-icon"/>
@@ -57,7 +57,7 @@
             </VBox>
 
             <!-- Actual Profit (Paid Amount) -->
-            <VBox styleClass="summary-card, card-actual">
+            <VBox fx:id="actualProfitCard" styleClass="summary-card, card-actual">
                 <HBox alignment="TOP_RIGHT">
                      <StackPane styleClass="card-icon-container">
                         <Label text="💳" styleClass="card-icon"/>

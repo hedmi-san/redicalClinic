@@ -167,6 +167,45 @@ public class SessionDAO {
     public static record MonthlySummary(int count, double totalCost, double totalPaid) {
     }
 
+    /**
+     * Fetches sessions joined with patient data, filtered by date and optionally gender.
+     * @param date session date (yyyy-MM-dd)
+     * @param gender "Male", "Female", or null/empty/"All" for no gender filter
+     */
+    public List<Session> getSessionsWithPatientInfo(String date, String gender) {
+        List<Session> sessions = new ArrayList<>();
+        boolean filterGender = gender != null && !gender.isEmpty() && !gender.equalsIgnoreCase("Tout");
+
+        String query = """
+                    SELECT s.*, p.name as patientName, p.gender as patientGender
+                    FROM session s
+                    LEFT JOIN patient p ON s.patientId = p.id
+                    WHERE s.sessionDate = ?
+                """ + (filterGender ? " AND LOWER(p.gender) = LOWER(?)" : "") + """
+                    
+                    ORDER BY s.id DESC
+                """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, date);
+            if (filterGender) {
+                pstmt.setString(2, gender);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Session session = mapResultSetToSession(rs);
+                    sessions.add(session);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching sessions with patient info: " + e.getMessage());
+        }
+        return sessions;
+    }
+
     private Session mapResultSetToSession(ResultSet rs) throws SQLException {
         Session session = new Session();
         session.setId(rs.getInt("id"));
