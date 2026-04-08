@@ -49,15 +49,16 @@ public class PatientDAO {
     }
 
     public boolean addPatient(Patient patient) {
-        String query = "INSERT INTO patient (name, phone, totalCost, totalPaid) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO patient (name, gender, phone, totalCost, totalPaid) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, patient.getName());
-            pstmt.setString(2, patient.getPhone());
-            pstmt.setDouble(3, 0.0);
+            pstmt.setString(2, patient.getGender());
+            pstmt.setString(3, patient.getPhone());
             pstmt.setDouble(4, 0.0);
+            pstmt.setDouble(5, 0.0);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -76,14 +77,15 @@ public class PatientDAO {
     }
 
     public boolean updatePatient(Patient patient) {
-        String query = "UPDATE patient SET name = ?, phone = ? WHERE id = ?";
+        String query = "UPDATE patient SET name = ?, gender = ?, phone = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, patient.getName());
-            pstmt.setString(2, patient.getPhone());
-            pstmt.setInt(3, patient.getId());
+            pstmt.setString(2, patient.getGender());
+            pstmt.setString(3, patient.getPhone());
+            pstmt.setInt(4, patient.getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -173,6 +175,7 @@ public class PatientDAO {
         Patient patient = new Patient();
         patient.setId(rs.getInt("id"));
         patient.setName(rs.getString("name"));
+        patient.setGender(rs.getString("gender"));
         patient.setPhone(rs.getString("phone"));
         patient.setTotalCost(rs.getDouble("totalCost"));
         patient.setTotalPaid(rs.getDouble("totalPaid"));

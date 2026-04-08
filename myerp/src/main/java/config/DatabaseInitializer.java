@@ -87,6 +87,7 @@ public class DatabaseInitializer {
                         CREATE TABLE IF NOT EXISTS patient (
                             id          INTEGER PRIMARY KEY AUTOINCREMENT,
                             name        TEXT NOT NULL,
+                            gender      VARCHAR(10),
                             phone       VARCHAR(10),
                             totalCost       REAL,
                             totalPaid       REAL

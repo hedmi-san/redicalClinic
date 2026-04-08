@@ -18,8 +18,6 @@ public class SessionFormController {
     @FXML
     private Label titleLabel;
     @FXML
-    private TextField patientSearchField;
-    @FXML
     private ComboBox<Patient> patientComboBox;
     @FXML
     private DatePicker datePicker;
@@ -44,8 +42,8 @@ public class SessionFormController {
     }
 
     private void setupPatientComboBox() {
-        allPatients = patientDAO.getAllPatients();
-        patientComboBox.setItems(FXCollections.observableArrayList(allPatients));
+        List<Patient> patients = patientDAO.getAllPatients();
+        patientComboBox.setItems(FXCollections.observableArrayList(patients));
 
         patientComboBox.setConverter(new StringConverter<Patient>() {
             @Override
@@ -59,24 +57,6 @@ public class SessionFormController {
             }
         });
 
-        // Add logical filter
-        if (patientSearchField != null) {
-            patientSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue == null || newValue.trim().isEmpty()) {
-                    patientComboBox.setItems(FXCollections.observableArrayList(allPatients));
-                } else {
-                    String lowerCaseFilter = newValue.trim().toLowerCase();
-                    List<Patient> filtered = allPatients.stream()
-                            .filter(p -> p.getName() != null && p.getName().toLowerCase().contains(lowerCaseFilter))
-                            .toList();
-                    patientComboBox.setItems(FXCollections.observableArrayList(filtered));
-                    patientComboBox.getSelectionModel().clearSelection();
-                    if (!filtered.isEmpty()) {
-                        patientComboBox.show();
-                    }
-                }
-            });
-        }
     }
 
     public void setSession(Session session, int patientId) {

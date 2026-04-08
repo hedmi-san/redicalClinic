@@ -6,6 +6,7 @@ import java.util.List;
 public class Patient {
     private int id;
     private String name;
+    private String gender;
     private String phone;
     private double totalCost;
     private double totalPaid;
@@ -35,6 +36,10 @@ public class Patient {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getGender() {return gender;}
+
+    public void setGender(String gender) {this.gender = gender;}
 
     public String getPhone() {
         return phone;

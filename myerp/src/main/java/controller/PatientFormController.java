@@ -1,18 +1,25 @@
 package controller;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.Patient;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class PatientFormController {
+public class PatientFormController implements Initializable {
 
     @FXML
     private Label titleLabel;
     @FXML
     private TextField nameField;
+    @FXML
+    private ComboBox<String> genderComboBox;
     @FXML
     private TextField phoneField;
     @FXML
@@ -21,11 +28,17 @@ public class PatientFormController {
     private Patient patient;
     private boolean saveClicked = false;
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        genderComboBox.setItems(FXCollections.observableArrayList("Male", "Female"));
+    }
+
     public void setPatient(Patient patient) {
         this.patient = patient;
         if (patient != null) {
             titleLabel.setText("Modifier le Patient");
             nameField.setText(patient.getName());
+            genderComboBox.setValue(patient.getGender());
             phoneField.setText(patient.getPhone());
             saveBtn.setText("Mettre à jour");
         } else {
@@ -43,6 +56,7 @@ public class PatientFormController {
             patient = new Patient();
         }
         patient.setName(nameField.getText());
+        patient.setGender(genderComboBox.getValue());
         patient.setPhone(phoneField.getText());
         return patient;
     }
@@ -70,6 +84,9 @@ public class PatientFormController {
 
         if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
             errorMessage += "Nom invalide !\n";
+        }
+        if (genderComboBox.getValue() == null || genderComboBox.getValue().trim().isEmpty()) {
+            errorMessage += "Veuillez sélectionner le sexe !\n";
         }
         if (phoneField.getText() != null && !phoneField.getText().isEmpty() && !phoneField.getText().matches("\\d+")) {
             errorMessage += "Le téléphone ne doit contenir que des chiffres !\n";

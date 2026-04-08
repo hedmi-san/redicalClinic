@@ -21,6 +21,11 @@
         </VBox>
 
         <VBox spacing="8">
+            <Label text="SEXE" styleClass="form-label" />
+            <ComboBox fx:id="genderComboBox" promptText="Sélectionnez le sexe" styleClass="form-control" maxWidth="Infinity" />
+        </VBox>
+
+        <VBox spacing="8">
             <Label text="NUMÉRO DE TÉLÉPHONE" styleClass="form-label" />
             <TextField fx:id="phoneField" promptText="ex. 0612345678" styleClass="form-control" />
         </VBox>
