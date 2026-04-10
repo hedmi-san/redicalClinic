@@ -11,10 +11,10 @@ public class TherapyPlanDAO {
 
     public List<TherapyPlan> getTherapyPlansByPatientId(int patientId) {
         List<TherapyPlan> plans = new ArrayList<>();
-        String query = "SELECT * FROM therapy_plan WHERE patientId = ? ORDER BY date DESC";
+        String query = "SELECT * FROM therapyPlan WHERE patientId = ? ORDER BY date DESC";
 
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, patientId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -29,10 +29,10 @@ public class TherapyPlanDAO {
     }
 
     public boolean addTherapyPlan(TherapyPlan plan) {
-        String query = "INSERT INTO therapy_plan (patientId, date, cost) VALUES (?, ?, ?)";
+        String query = "INSERT INTO therapyPlan (patientId, date, cost) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setInt(1, plan.getPatientId());
             pstmt.setString(2, plan.getDate());
@@ -55,10 +55,10 @@ public class TherapyPlanDAO {
     }
 
     public boolean updateTherapyPlan(TherapyPlan plan) {
-        String query = "UPDATE therapy_plan SET date = ?, cost = ? WHERE id = ?";
+        String query = "UPDATE therapyPlan SET date = ?, cost = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, plan.getDate());
             pstmt.setDouble(2, plan.getCost());
@@ -74,7 +74,7 @@ public class TherapyPlanDAO {
     public boolean deleteTherapyPlan(int id) {
         // Delete associated sessions first, then the plan
         String deleteSessionsQuery = "DELETE FROM session WHERE therapyPlanId = ?";
-        String deletePlanQuery = "DELETE FROM therapy_plan WHERE id = ?";
+        String deletePlanQuery = "DELETE FROM therapyPlan WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection()) {
             conn.setAutoCommit(false);

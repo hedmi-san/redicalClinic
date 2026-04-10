@@ -113,7 +113,7 @@ public class DatabaseInitializer {
                         CREATE TABLE IF NOT EXISTS session (
                             id              INTEGER PRIMARY KEY AUTOINCREMENT,
                             patientId       INTEGER REFERENCES patient(id)  ON DELETE CASCADE,
-                            therapyPlanId   INTEGER REFERENCES therapyPlan(id) ON DELETE CASADE,
+                            therapyPlanId   INTEGER REFERENCES therapyPlan(id) ON DELETE CASCADE,
                             sessionDate     TEXT DEFAULT (datetime('now')),
                             treatment       TEXT,
                             paied      VARCHAR(10),
