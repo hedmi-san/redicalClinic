@@ -95,12 +95,25 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 7. Session
+            // 7. TherapyPlan
+            // ----------------------------------------------------------------
+            stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS therapyPlan (
+                            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                            patientId       INTEGER REFERENCES patient(id)  ON DELETE CASCADE,
+                            date     TEXT DEFAULT (datetime('now')),
+                            cost        REAL
+                        );
+                    """);
+
+            // ----------------------------------------------------------------
+            // 8. Session
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS session (
                             id              INTEGER PRIMARY KEY AUTOINCREMENT,
                             patientId       INTEGER REFERENCES patient(id)  ON DELETE CASCADE,
+                            therapyPlanId   INTEGER REFERENCES therapyPlan(id) ON DELETE CASADE,
                             sessionDate     TEXT DEFAULT (datetime('now')),
                             treatment       TEXT,
                             paied      VARCHAR(10),
@@ -110,7 +123,7 @@ public class DatabaseInitializer {
                     """);
 
             // ----------------------------------------------------------------
-            // 8. Sold
+            // 9. Sold
             // ----------------------------------------------------------------
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS sold (

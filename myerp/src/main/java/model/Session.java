@@ -3,6 +3,7 @@ package model;
 public class Session {
     private int id;
     private int patientId;
+    private Integer therapyPlanId; // Nullable — null means normal session
     private String date; // Using String to match DB TEXT format
     private String treatment;
     private String paied; // Status or simple tag
@@ -84,6 +85,14 @@ public class Session {
 
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    public Integer getTherapyPlanId() {
+        return therapyPlanId;
+    }
+
+    public void setTherapyPlanId(Integer therapyPlanId) {
+        this.therapyPlanId = therapyPlanId;
     }
 
     // Helper for badge logic

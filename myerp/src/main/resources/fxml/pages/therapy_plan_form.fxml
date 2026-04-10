@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.TherapyPlanFormController"
+      styleClass="modal" spacing="20" prefWidth="400">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label fx:id="titleLabel" text="Nouveau Plan Thérapeutique" styleClass="modal-title" />
+    </HBox>
+
+    <VBox spacing="15">
+        <VBox spacing="8">
+            <Label text="DATE" styleClass="form-label" />
+            <DatePicker fx:id="datePicker" promptText="Sélectionnez la date" styleClass="form-control" maxWidth="Infinity" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="COÛT DU PLAN (DZD)" styleClass="form-label" />
+            <TextField fx:id="costField" promptText="0.00" styleClass="form-control" />
+        </VBox>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-actions">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-ghost" />
+        <Button fx:id="saveBtn" text="Enregistrer" onAction="#handleSave" styleClass="btn-teal" />
+    </HBox>
+</VBox>

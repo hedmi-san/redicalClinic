@@ -2,12 +2,14 @@ package controller;
 
 import dao.PatientDAO;
 import dao.SessionDAO;
+import dao.TherapyPlanDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -17,6 +19,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Patient;
 import model.Session;
+import model.TherapyPlan;
 import service.InvoiceService;
 
 import java.io.File;
@@ -41,9 +44,12 @@ public class PatientDetailController {
 
     @FXML
     private VBox sessionsContainer;
+    @FXML
+    private VBox therapyPlansContainer;
 
     private PatientDAO patientDAO = new PatientDAO();
     private SessionDAO sessionDAO = new SessionDAO();
+    private TherapyPlanDAO therapyPlanDAO = new TherapyPlanDAO();
     private Patient patient;
     private Runnable onUpdateListener;
 
@@ -67,6 +73,7 @@ public class PatientDetailController {
         heroPhone.setText(patient.getPhone() != null ? patient.getPhone() : "Aucun numéro");
         heroInitials.setText(getInitials(patient.getName()));
 
+        // Normal sessions (therapyPlanId IS NULL)
         List<Session> sessions = sessionDAO.getSessionsByPatientId(this.patient.getId());
         this.patient.setSessions(sessions);
 
@@ -87,6 +94,17 @@ public class PatientDetailController {
         sessionsContainer.getChildren().clear();
         for (Session session : sessions) {
             sessionsContainer.getChildren().add(createSessionCard(session));
+        }
+
+        // Therapy plans
+        refreshTherapyPlans();
+    }
+
+    private void refreshTherapyPlans() {
+        therapyPlansContainer.getChildren().clear();
+        List<TherapyPlan> plans = therapyPlanDAO.getTherapyPlansByPatientId(patient.getId());
+        for (TherapyPlan plan : plans) {
+            therapyPlansContainer.getChildren().add(createTherapyPlanCard(plan));
         }
     }
 
@@ -243,6 +261,118 @@ public class PatientDetailController {
             errorAlert.showAndWait();
         }
     }
+
+    // ======================== THERAPY PLAN ========================
+
+    @FXML
+    private void handleAddTherapyPlan() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/therapy_plan_form.fxml"));
+            Parent root = loader.load();
+
+            TherapyPlanFormController controller = loader.getController();
+            controller.setTherapyPlan(null);
+
+            Stage stage = new Stage();
+            stage.setTitle("Nouveau Plan Thérapeutique");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                TherapyPlan plan = controller.getTherapyPlan();
+                plan.setPatientId(patient.getId());
+                therapyPlanDAO.addTherapyPlan(plan);
+                refreshTherapyPlans();
+                if (onUpdateListener != null)
+                    onUpdateListener.run();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showTherapyPlanDetail(TherapyPlan plan) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/therapy_plan_detail.fxml"));
+            Parent root = loader.load();
+
+            TherapyPlanDetailController controller = loader.getController();
+            controller.setTherapyPlan(plan);
+
+            Stage stage = new Stage();
+            stage.setTitle("Détail du Plan");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            // Refresh if data changed
+            if (controller.isDataChanged()) {
+                refreshTherapyPlans();
+                if (onUpdateListener != null)
+                    onUpdateListener.run();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private VBox createTherapyPlanCard(TherapyPlan plan) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("session-card");
+
+        // Double-click to open detail
+        card.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                showTherapyPlanDetail(plan);
+            }
+        });
+
+        HBox topRow = new HBox(12);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label dateLabel = new Label(plan.getDate());
+        dateLabel.getStyleClass().add("session-date");
+        dateLabel.setMinWidth(120);
+
+        // Calculate sessions total for this plan
+        List<Session> planSessions = sessionDAO.getSessionsByTherapyPlanId(plan.getId());
+        double sessionsTotal = planSessions.stream().mapToDouble(Session::getCost).sum();
+        double remaining = plan.getCost() - sessionsTotal;
+
+        Label costLabel = new Label(String.format("Coût: %.2f DZD", plan.getCost()));
+        costLabel.setStyle("-fx-text-fill: #0d9488; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+        // Badge for status
+        String badgeText;
+        String badgeClass;
+        if (remaining <= 0) {
+            badgeText = "COMPLET";
+            badgeClass = "badge-full";
+        } else if (sessionsTotal > 0) {
+            badgeText = String.format("RESTE: %.2f", remaining);
+            badgeClass = "badge-partial";
+        } else {
+            badgeText = "AUCUNE SÉANCE";
+            badgeClass = "badge-none";
+        }
+
+        Label badge = new Label(badgeText);
+        badge.getStyleClass().addAll("badge", badgeClass);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label hintLabel = new Label("Double-cliquer pour ouvrir");
+        hintLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-style: italic;");
+
+        topRow.getChildren().addAll(dateLabel, costLabel, badge, spacer, hintLabel);
+
+        card.getChildren().add(topRow);
+        return card;
+    }
+
+    // ======================== NORMAL SESSIONS ========================
 
     private VBox createSessionCard(Session session) {
         VBox card = new VBox(12);

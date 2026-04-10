@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.TherapyPlanDetailController"
+      prefWidth="700" prefHeight="550" styleClass="modal" spacing="20">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <!-- Title -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label fx:id="titleLabel" text="Plan Thérapeutique" styleClass="modal-title" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="Modifier" onAction="#handleEditPlan" styleClass="btn-ghost" />
+        <Button text="Supprimer" onAction="#handleDeletePlan" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
+    </HBox>
+
+    <!-- Financial Cards -->
+    <HBox spacing="16">
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="COÛT DU PLAN" styleClass="fc-label" />
+            <Label fx:id="planCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
+        </VBox>
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="TOTAL SÉANCES" styleClass="fc-label" />
+            <Label fx:id="sessionsTotalLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
+        </VBox>
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="RESTE" styleClass="fc-label" />
+            <Label fx:id="remainingLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
+        </VBox>
+    </HBox>
+
+    <!-- Sessions Header -->
+    <HBox alignment="CENTER_LEFT">
+        <Label text="Séances du plan" styleClass="section-title" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="+ Ajouter une séance" onAction="#handleAddSession" styleClass="btn-teal" />
+    </HBox>
+
+    <!-- Sessions List -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
+        <VBox fx:id="sessionsContainer" spacing="12" />
+    </ScrollPane>
+
+    <!-- Close Button -->
+    <HBox alignment="CENTER_RIGHT" styleClass="modal-actions">
+        <Button text="Fermer" onAction="#handleClose" styleClass="btn-ghost" />
+    </HBox>
+</VBox>

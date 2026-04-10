@@ -11,7 +11,7 @@ public class SessionDAO {
 
     public List<Session> getSessionsByPatientId(int patientId) {
         List<Session> sessions = new ArrayList<>();
-        String query = "SELECT * FROM session WHERE patientId = ? ORDER BY sessionDate DESC";
+        String query = "SELECT * FROM session WHERE patientId = ? AND therapyPlanId IS NULL ORDER BY sessionDate DESC";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -60,7 +60,7 @@ public class SessionDAO {
     }
 
     public boolean addSession(Session session) {
-        String query = "INSERT INTO session (patientId, sessionDate, treatment, paied, cost, paidAmount) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO session (patientId, sessionDate, treatment, paied, cost, paidAmount, therapyPlanId) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -71,6 +71,11 @@ public class SessionDAO {
             pstmt.setString(4, session.getPaied());
             pstmt.setDouble(5, session.getCost());
             pstmt.setDouble(6, session.getPaidAmount());
+            if (session.getTherapyPlanId() != null) {
+                pstmt.setInt(7, session.getTherapyPlanId());
+            } else {
+                pstmt.setNull(7, java.sql.Types.INTEGER);
+            }
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -206,6 +211,31 @@ public class SessionDAO {
         return sessions;
     }
 
+    public List<Session> getSessionsByTherapyPlanId(int therapyPlanId) {
+        List<Session> sessions = new ArrayList<>();
+        String query = "SELECT * FROM session WHERE therapyPlanId = ? ORDER BY sessionDate DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, therapyPlanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    sessions.add(mapResultSetToSession(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching sessions for therapy plan " + therapyPlanId + ": " + e.getMessage());
+        }
+        return sessions;
+    }
+
+    public boolean addTherapySession(Session session) {
+        // For therapy sessions, paidAmount always equals cost
+        session.setPaidAmount(session.getCost());
+        return addSession(session);
+    }
+
     private Session mapResultSetToSession(ResultSet rs) throws SQLException {
         Session session = new Session();
         session.setId(rs.getInt("id"));
@@ -215,6 +245,10 @@ public class SessionDAO {
         session.setPaied(rs.getString("paied"));
         session.setCost(rs.getDouble("cost"));
         session.setPaidAmount(rs.getDouble("paidAmount"));
+
+        // Map therapyPlanId (nullable)
+        int tpId = rs.getInt("therapyPlanId");
+        session.setTherapyPlanId(rs.wasNull() ? null : tpId);
 
         // Try to set patientName if available in result set
         try {

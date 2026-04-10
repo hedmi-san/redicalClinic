@@ -18,40 +18,62 @@
             <Label fx:id="heroPhone" text="Téléphone" styleClass="hero-phone" />
         </VBox>
         <HBox spacing="12" alignment="CENTER_RIGHT">
-            <Button text="Imprimer La facture" onAction="#printPatientBill" styleClass="btn-ghost"/>
+            <Button text="Imprimer La Facture" onAction="#printPatientBill" styleClass="btn-ghost"/>
             <Button text="Modifier Infos" onAction="#handleEditPatient" styleClass="btn-ghost" />
             <Button text="Supprimer Patient" onAction="#handleDeletePatient" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
         </HBox>
     </HBox>
+    <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane">
+        <tabs>
+        <!-- Normal Session -->
+            <Tab text="Session Normale">
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
+                    <VBox spacing="0">
+                        <!-- Financial Stats -->
+                        <HBox spacing="20" styleClass="fin-cards-grid">
+                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+                                <Label text="COÛT TOTAL" styleClass="fc-label" />
+                                <Label fx:id="totalCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
+                            </VBox>
+                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+                                <Label text="TOTAL PAYÉ" styleClass="fc-label" />
+                                <Label fx:id="totalPaidLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
+                            </VBox>
+                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+                                <Label text="SOLDE" styleClass="fc-label" />
+                                <Label fx:id="balanceLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
+                            </VBox>
+                        </HBox>
 
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
-        <VBox spacing="0">
-            <!-- Financial Stats -->
-            <HBox spacing="20" styleClass="fin-cards-grid">
-                <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                    <Label text="COÛT TOTAL" styleClass="fc-label" />
-                    <Label fx:id="totalCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
-                </VBox>
-                <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                    <Label text="TOTAL PAYÉ" styleClass="fc-label" />
-                    <Label fx:id="totalPaidLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
-                </VBox>
-                <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                    <Label text="SOLDE" styleClass="fc-label" />
-                    <Label fx:id="balanceLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
-                </VBox>
-            </HBox>
+                        <!-- Session History -->
+                        <VBox styleClass="sessions-area" spacing="24">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Historique des séances" styleClass="section-title" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button text="+ Ajouter une séance" onAction="#handleAddSession" styleClass="btn-teal" />
+                            </HBox>
 
-            <!-- Session History -->
-            <VBox styleClass="sessions-area" spacing="24">
-                <HBox alignment="CENTER_LEFT">
-                    <Label text="Historique des séances" styleClass="section-title" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button text="+ Ajouter une séance" onAction="#handleAddSession" styleClass="btn-teal" />
-                </HBox>
-                
-                <VBox fx:id="sessionsContainer" spacing="16" />
-            </VBox>
-        </VBox>
-    </ScrollPane>
+                            <VBox fx:id="sessionsContainer" spacing="16" />
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+        <!-- Advanced Therapy plan -->
+            <Tab text="Versement">
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
+                    <VBox spacing="0">
+                        <VBox styleClass="sessions-area" spacing="24">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Plans Thérapeutiques" styleClass="section-title" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button text="+ Ajouter un plan" onAction="#handleAddTherapyPlan" styleClass="btn-teal" />
+                            </HBox>
+
+                            <VBox fx:id="therapyPlansContainer" spacing="16" />
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+        </tabs>
+    </TabPane>
 </VBox>
