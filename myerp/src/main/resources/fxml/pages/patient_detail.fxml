@@ -20,7 +20,6 @@
         <HBox spacing="12" alignment="CENTER_RIGHT">
             <Button text="Modifier Infos" onAction="#handleEditPatient" styleClass="btn-ghost" />
             <Button text="Supprimer Patient" onAction="#handleDeletePatient" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
-            <Button text="Fermer" onAction="#handleClose" styleClass="btn-teal" />
         </HBox>
     </HBox>
 
