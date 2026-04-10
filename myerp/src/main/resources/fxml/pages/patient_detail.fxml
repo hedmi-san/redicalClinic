@@ -18,6 +18,7 @@
             <Label fx:id="heroPhone" text="Téléphone" styleClass="hero-phone" />
         </VBox>
         <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Imprimer La facture" onAction="#printPatientBill" styleClass="btn-ghost"/>
             <Button text="Modifier Infos" onAction="#handleEditPatient" styleClass="btn-ghost" />
             <Button text="Supprimer Patient" onAction="#handleDeletePatient" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
         </HBox>

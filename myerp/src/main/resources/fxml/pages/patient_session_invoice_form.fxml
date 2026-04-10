@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.PatientSessionInvoiceFormController"
+      styleClass="modal" spacing="20" prefWidth="750" prefHeight="500">
+    <stylesheets>
+        <URL value="@../../css/pages/patient.css" />
+    </stylesheets>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label text="🧾 Sélectionner les séances pour la facture" styleClass="modal-title" />
+    </HBox>
+
+    <!-- Select All -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <CheckBox fx:id="selectAllCheckBox" text="Tout sélectionner" />
+    </HBox>
+
+    <!-- Sessions Table -->
+    <TableView fx:id="sessionTable" VBox.vgrow="ALWAYS" styleClass="modern-table" editable="true">
+        <columns>
+            <TableColumn fx:id="selectColumn" text="" prefWidth="50" sortable="false" />
+            <TableColumn fx:id="dateColumn" text="Date" prefWidth="120" />
+            <TableColumn fx:id="treatmentColumn" text="Traitement" prefWidth="280" />
+            <TableColumn fx:id="costColumn" text="Coût (DZD)" prefWidth="120" />
+            <TableColumn fx:id="paidColumn" text="Payé (DZD)" prefWidth="120" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="modal-actions">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-ghost" />
+        <Button text="OK" onAction="#handleOk" styleClass="btn-teal" />
+    </HBox>
+</VBox>

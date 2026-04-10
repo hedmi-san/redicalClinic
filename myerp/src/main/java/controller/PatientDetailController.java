@@ -12,11 +12,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Patient;
 import model.Session;
+import service.InvoiceService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -169,6 +172,76 @@ public class PatientDetailController {
     private void handleClose() {
         Stage stage = (Stage) heroName.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void printPatientBill() {
+        try {
+            // 1. Load the session selection dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/patient_session_invoice_form.fxml"));
+            Parent root = loader.load();
+
+            PatientSessionInvoiceFormController controller = loader.getController();
+
+            // Pass current patient's sessions to the dialog
+            List<Session> sessions = sessionDAO.getSessionsByPatientId(patient.getId());
+            controller.setSessions(sessions);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Sélectionner les séances");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+
+            // 2. Check if user confirmed and selected sessions
+            if (!controller.isConfirmed()) {
+                return;
+            }
+
+            List<Session> selectedSessions = controller.getSelectedSessions();
+            if (selectedSessions.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Aucune séance");
+                alert.setHeaderText(null);
+                alert.setContentText("Veuillez sélectionner au moins une séance pour générer la facture.");
+                alert.showAndWait();
+                return;
+            }
+
+            // 3. File chooser to select save location
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer la facture PDF");
+            fileChooser.setInitialFileName("Facture_" + patient.getName().replaceAll("\\s+", "_") + ".pdf");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+            );
+
+            Stage ownerStage = (Stage) heroName.getScene().getWindow();
+            File file = fileChooser.showSaveDialog(ownerStage);
+
+            if (file == null) {
+                return; // user cancelled
+            }
+
+            // 4. Generate the PDF
+            InvoiceService invoiceService = new InvoiceService();
+            invoiceService.generateInvoice(patient, selectedSessions, file);
+
+            // 5. Success alert
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Facture générée");
+            successAlert.setHeaderText(null);
+            successAlert.setContentText("La facture a été enregistrée avec succès:\n" + file.getAbsolutePath());
+            successAlert.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+            errorAlert.setTitle("Erreur");
+            errorAlert.setHeaderText(null);
+            errorAlert.setContentText("Une erreur est survenue lors de la génération de la facture:\n" + e.getMessage());
+            errorAlert.showAndWait();
+        }
     }
 
     private VBox createSessionCard(Session session) {
