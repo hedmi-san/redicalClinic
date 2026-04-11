@@ -148,6 +148,7 @@ public class SessionDAO {
                     FROM session
                     WHERE strftime('%m', sessionDate) = ?
                     AND strftime('%Y', sessionDate) = ?
+                    AND therapyPlanId IS NULL
                 """;
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -185,7 +186,7 @@ public class SessionDAO {
                     SELECT s.*, p.name as patientName, p.gender as patientGender
                     FROM session s
                     LEFT JOIN patient p ON s.patientId = p.id
-                    WHERE s.sessionDate = ?
+                    WHERE s.sessionDate = ? AND s.therapyPlanId IS NULL
                 """ + (filterGender ? " AND LOWER(p.gender) = LOWER(?)" : "") + """
                     
                     ORDER BY s.id DESC

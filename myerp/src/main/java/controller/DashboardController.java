@@ -53,6 +53,7 @@ public class DashboardController implements Initializable {
     private final BillDAO billDAO = new BillDAO();
     private final PaymentCheckDAO paymentCheckDAO = new PaymentCheckDAO();
     private final SoldDAO soldDAO = new SoldDAO();
+    private final dao.TherapyPlanDAO therapyPlanDAO = new dao.TherapyPlanDAO();
 
     private final String[] months = {
             "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -94,13 +95,18 @@ public class DashboardController implements Initializable {
         double workerPayments = paymentCheckDAO.getMonthlyTotalForAllWorkers(month, year);
         double billTotal = billDAO.getMonthlyTotal(month, year);
         SoldDAO.MonthlySummary soldSummary = soldDAO.getMonthlySummary(month, year);
+        double therapyPlanTotal = therapyPlanDAO.getMonthlyTotalCost(month, year);
 
         // Update UI
         sessionCountLabel.setText(String.valueOf(sessionSummary.count()));
-        expectedProfitLabel.setText(String.format("%,.2f", sessionSummary.totalCost()));
-        actualProfitLabel.setText(String.format("%,.2f", sessionSummary.totalPaid()));
+        
+        double totalExpectedProfit = sessionSummary.totalCost() + therapyPlanTotal;
+        double totalActualProfit = sessionSummary.totalPaid() + therapyPlanTotal;
 
-        double balance = sessionSummary.totalCost() - sessionSummary.totalPaid();
+        expectedProfitLabel.setText(String.format("%,.2f", totalExpectedProfit));
+        actualProfitLabel.setText(String.format("%,.2f", totalActualProfit));
+
+        double balance = totalExpectedProfit - totalActualProfit;
         balanceLabel.setText(String.format("%,.2f", balance));
 
         workerPaymentsLabel.setText(String.format("%,.2f", workerPayments));

@@ -1,7 +1,9 @@
 package controller;
 
 import dao.SessionDAO;
+import dao.TherapyPlanDAO;
 import model.Session;
+import model.TherapyPlan;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,8 +35,17 @@ public class ExpectedProfitFormController implements Initializable {
     @FXML
     private TableColumn<Session, String> costColumn;
 
+    @FXML
+    private TableView<TherapyPlan> therapyPlanTable;
+    @FXML
+    private TableColumn<TherapyPlan, String> tpPatientNameColumn;
+    @FXML
+    private TableColumn<TherapyPlan, String> tpCostColumn;
+
     private final SessionDAO sessionDAO = new SessionDAO();
+    private final TherapyPlanDAO therapyPlanDAO = new TherapyPlanDAO();
     private final ObservableList<Session> sessionList = FXCollections.observableArrayList();
+    private final ObservableList<TherapyPlan> planList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -55,6 +66,17 @@ public class ExpectedProfitFormController implements Initializable {
 
         resultTable.setItems(sessionList);
 
+        // Setup therapy plan table columns
+        tpPatientNameColumn.setCellValueFactory(new PropertyValueFactory<>("patientName"));
+        tpCostColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(String.format("%.2f", cellData.getValue().getCost())));
+
+        // Disable therapy column reordering
+        tpPatientNameColumn.setReorderable(false);
+        tpCostColumn.setReorderable(false);
+
+        therapyPlanTable.setItems(planList);
+
         // Set default date to today
         datePicker.setValue(LocalDate.now());
 
@@ -68,6 +90,7 @@ public class ExpectedProfitFormController implements Initializable {
 
     private void loadData() {
         sessionList.clear();
+        planList.clear();
 
         LocalDate date = datePicker.getValue();
         if (date == null) return;
@@ -78,9 +101,13 @@ public class ExpectedProfitFormController implements Initializable {
         List<Session> sessions = sessionDAO.getSessionsWithPatientInfo(dateStr, gender);
         sessionList.addAll(sessions);
 
+        List<TherapyPlan> plans = therapyPlanDAO.getTherapyPlansWithPatientInfo(dateStr, gender);
+        planList.addAll(plans);
+
         // Calculate total cost
-        double total = sessions.stream().mapToDouble(Session::getCost).sum();
-        totalLabel.setText(String.format("%,.2f DZD", total));
+        double totalSessions = sessions.stream().mapToDouble(Session::getCost).sum();
+        double totalPlans = plans.stream().mapToDouble(TherapyPlan::getCost).sum();
+        totalLabel.setText(String.format("%,.2f DZD", totalSessions + totalPlans));
     }
 
     @FXML

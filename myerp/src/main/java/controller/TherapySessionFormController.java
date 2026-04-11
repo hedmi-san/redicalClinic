@@ -15,6 +15,8 @@ public class TherapySessionFormController {
     @FXML
     private DatePicker datePicker;
     @FXML
+    private TextArea treatmentArea;
+    @FXML
     private TextField costField;
     @FXML
     private Button saveBtn;
@@ -33,6 +35,7 @@ public class TherapySessionFormController {
         if (session != null) {
             titleLabel.setText("Modifier la Séance");
             datePicker.setValue(LocalDate.parse(session.getDate(), DATE_FORMATTER));
+            treatmentArea.setText(session.getTreatment());
             costField.setText(String.valueOf(session.getCost()));
             saveBtn.setText("Mettre à jour");
         } else {
@@ -53,6 +56,7 @@ public class TherapySessionFormController {
         session.setPatientId(patientId);
         session.setTherapyPlanId(therapyPlanId);
         session.setDate(datePicker.getValue().format(DATE_FORMATTER));
+        session.setTreatment(treatmentArea.getText());
         session.setCost(Double.parseDouble(costField.getText()));
         session.setPaidAmount(session.getCost()); // paidAmount = cost for therapy sessions
         return session;

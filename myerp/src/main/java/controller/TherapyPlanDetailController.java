@@ -135,7 +135,7 @@ public class TherapyPlanDetailController {
         alert.setHeaderText(null);
         alert.showAndWait().ifPresent(res -> {
             if (res == ButtonType.YES) {
-                therapyPlanDAO.deleteTherapyPlan(plan.getId());
+                therapyPlanDAO.deleteTherapyPlan(plan.getId(), plan.getPatientId());
                 planDeleted = true;
                 dataChanged = true;
                 handleClose();

@@ -5,6 +5,7 @@ public class TherapyPlan {
     private int patientId;
     private String date;
     private double cost;
+    private String patientName; // Transient field for UI display
 
     public TherapyPlan() {
     }
@@ -31,4 +32,8 @@ public class TherapyPlan {
     public double getCost() {return cost;}
 
     public void setCost(double cost) {this.cost = cost;}
+
+    public String getPatientName() {return patientName;}
+
+    public void setPatientName(String patientName) {this.patientName = patientName;}
 }

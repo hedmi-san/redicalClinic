@@ -47,8 +47,4 @@
         <VBox fx:id="sessionsContainer" spacing="12" />
     </ScrollPane>
 
-    <!-- Close Button -->
-    <HBox alignment="CENTER_RIGHT" styleClass="modal-actions">
-        <Button text="Fermer" onAction="#handleClose" styleClass="btn-ghost" />
-    </HBox>
 </VBox>

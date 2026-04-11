@@ -154,8 +154,10 @@ public class PatientDAO {
     public void updatePatientTotals(int patientId) {
         String query = """
                     UPDATE patient
-                    SET totalCost = (SELECT COALESCE(SUM(cost), 0) FROM session WHERE patientId = ?),
-                        totalPaid = (SELECT COALESCE(SUM(paidAmount), 0) FROM session WHERE patientId = ?)
+                    SET totalCost = (SELECT COALESCE(SUM(cost), 0) FROM session WHERE patientId = ? AND therapyPlanId IS NULL) +
+                                    (SELECT COALESCE(SUM(cost), 0) FROM therapyPlan WHERE patientId = ?),
+                        totalPaid = (SELECT COALESCE(SUM(paidAmount), 0) FROM session WHERE patientId = ? AND therapyPlanId IS NULL) +
+                                    (SELECT COALESCE(SUM(cost), 0) FROM therapyPlan WHERE patientId = ?)
                     WHERE id = ?
                 """;
 
@@ -165,6 +167,8 @@ public class PatientDAO {
             pstmt.setInt(1, patientId);
             pstmt.setInt(2, patientId);
             pstmt.setInt(3, patientId);
+            pstmt.setInt(4, patientId);
+            pstmt.setInt(5, patientId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error updating patient totals: " + e.getMessage());

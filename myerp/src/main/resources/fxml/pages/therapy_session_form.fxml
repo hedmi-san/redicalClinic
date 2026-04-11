@@ -22,6 +22,11 @@
         </VBox>
 
         <VBox spacing="8">
+            <Label text="TRAITEMENT / NOTES" styleClass="form-label" />
+            <TextArea fx:id="treatmentArea" promptText="Décrivez le traitement..." styleClass="form-control" prefHeight="80" wrapText="true" />
+        </VBox>
+
+        <VBox spacing="8">
             <Label text="MONTANT (DZD)" styleClass="form-label" />
             <TextField fx:id="costField" promptText="0.00" styleClass="form-control" />
         </VBox>

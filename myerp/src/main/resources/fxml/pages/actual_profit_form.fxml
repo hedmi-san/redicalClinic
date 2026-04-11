@@ -33,7 +33,7 @@
         </VBox>
     </HBox>
 
-    <!-- Results Table -->
+    <Label text="Séances Normales" styleClass="form-label" />
     <TableView fx:id="resultTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
         <columns>
             <TableColumn fx:id="patientNameColumn" text="Nom du Patient" prefWidth="220" />
@@ -45,7 +45,14 @@
         </columnResizePolicy>
     </TableView>
 
-    <HBox alignment="CENTER_RIGHT" styleClass="modal-actions">
-        <Button text="Fermer" onAction="#handleClose" styleClass="btn-ghost" />
-    </HBox>
+    <Label text="Plans Thérapeutiques" styleClass="form-label" />
+    <TableView fx:id="therapyPlanTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+        <columns>
+            <TableColumn fx:id="tpPatientNameColumn" text="Nom du Patient" prefWidth="350" />
+            <TableColumn fx:id="tpPaidColumn" text="Montant (DZD)" prefWidth="150" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
 </VBox>

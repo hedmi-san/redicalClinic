@@ -47,6 +47,7 @@ public class SessionController implements Initializable {
     private Label dayTotalPaidLabel;
 
     private final SessionDAO sessionDAO = new SessionDAO();
+    private final dao.TherapyPlanDAO therapyPlanDAO = new dao.TherapyPlanDAO();
     private ObservableList<Session> sessionList = FXCollections.observableArrayList();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -98,9 +99,18 @@ public class SessionController implements Initializable {
         double totalCost = 0;
         double totalPaid = 0;
         for (Session s : sessionList) {
-            totalCost += s.getCost();
-            totalPaid += s.getPaidAmount();
+            // Only add normal sessions (where therapyPlanId is null or 0)
+            if (s.getTherapyPlanId() == null || s.getTherapyPlanId() == 0) {
+                totalCost += s.getCost();
+                totalPaid += s.getPaidAmount();
+            }
         }
+        
+        String date = datePicker.getValue().format(DATE_FORMATTER);
+        double therapyPlanTotal = therapyPlanDAO.getTotalCostByDate(date);
+        totalCost += therapyPlanTotal;
+        totalPaid += therapyPlanTotal;
+        
         dayTotalCostLabel.setText(String.format("%.2f DZD", totalCost));
         dayTotalPaidLabel.setText(String.format("%.2f DZD", totalPaid));
     }

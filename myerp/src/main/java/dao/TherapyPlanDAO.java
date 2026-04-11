@@ -45,6 +45,7 @@ public class TherapyPlanDAO {
                         plan.setId(generatedKeys.getInt(1));
                     }
                 }
+                new PatientDAO().updatePatientTotals(plan.getPatientId());
                 return true;
             }
             return false;
@@ -64,14 +65,19 @@ public class TherapyPlanDAO {
             pstmt.setDouble(2, plan.getCost());
             pstmt.setInt(3, plan.getId());
 
-            return pstmt.executeUpdate() > 0;
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                new PatientDAO().updatePatientTotals(plan.getPatientId());
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             System.err.println("Error updating therapy plan: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean deleteTherapyPlan(int id) {
+    public boolean deleteTherapyPlan(int id, int patientId) {
         // Delete associated sessions first, then the plan
         String deleteSessionsQuery = "DELETE FROM session WHERE therapyPlanId = ?";
         String deletePlanQuery = "DELETE FROM therapyPlan WHERE id = ?";
@@ -88,6 +94,7 @@ public class TherapyPlanDAO {
                     pstmt.executeUpdate();
                 }
                 conn.commit();
+                new PatientDAO().updatePatientTotals(patientId);
                 return true;
             } catch (SQLException e) {
                 conn.rollback();
@@ -105,6 +112,85 @@ public class TherapyPlanDAO {
         plan.setPatientId(rs.getInt("patientId"));
         plan.setDate(rs.getString("date"));
         plan.setCost(rs.getDouble("cost"));
+        
+        try {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                if ("patientName".equalsIgnoreCase(metaData.getColumnLabel(i))) {
+                    plan.setPatientName(rs.getString(i));
+                    break;
+                }
+            }
+        } catch (SQLException ignored) {
+        }
+        
         return plan;
+    }
+
+    public List<TherapyPlan> getTherapyPlansWithPatientInfo(String date, String gender) {
+        List<TherapyPlan> plans = new ArrayList<>();
+        boolean filterGender = gender != null && !gender.isEmpty() && !gender.equalsIgnoreCase("Tout");
+
+        String query = """
+                    SELECT t.*, p.name as patientName, p.gender as patientGender
+                    FROM therapyPlan t
+                    LEFT JOIN patient p ON t.patientId = p.id
+                    WHERE t.date = ?
+                """ + (filterGender ? " AND LOWER(p.gender) = LOWER(?)" : "") + """
+                    
+                    ORDER BY t.id DESC
+                """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, date);
+            if (filterGender) {
+                pstmt.setString(2, gender);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    plans.add(mapResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching therapy plans with patient info: " + e.getMessage());
+        }
+        return plans;
+    }
+
+    public double getTotalCostByDate(String date) {
+        String query = "SELECT SUM(cost) as totalCost FROM therapyPlan WHERE date = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, date);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("totalCost");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching total cost by date: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public double getMonthlyTotalCost(int month, int year) {
+        String query = "SELECT SUM(cost) as totalCost FROM therapyPlan WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, String.format("%02d", month));
+            pstmt.setString(2, String.valueOf(year));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("totalCost");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching monthly total cost: " + e.getMessage());
+        }
+        return 0;
     }
 }

@@ -84,6 +84,14 @@ public class PatientDetailController {
             totalCost += s.getCost();
             totalPaid += s.getPaidAmount();
         }
+        
+        // Add therapy plan costs to totals
+        List<TherapyPlan> plans = therapyPlanDAO.getTherapyPlansByPatientId(patient.getId());
+        for (TherapyPlan plan : plans) {
+            totalCost += plan.getCost();
+            totalPaid += plan.getCost(); 
+        }
+
         this.patient.setTotalCost(totalCost);
         this.patient.setTotalPaid(totalPaid);
 
@@ -96,16 +104,20 @@ public class PatientDetailController {
             sessionsContainer.getChildren().add(createSessionCard(session));
         }
 
-        // Therapy plans
-        refreshTherapyPlans();
+        // Display Therapy plans
+        refreshTherapyPlans(plans);
     }
 
-    private void refreshTherapyPlans() {
+    private void refreshTherapyPlans(List<TherapyPlan> plans) {
         therapyPlansContainer.getChildren().clear();
-        List<TherapyPlan> plans = therapyPlanDAO.getTherapyPlansByPatientId(patient.getId());
         for (TherapyPlan plan : plans) {
             therapyPlansContainer.getChildren().add(createTherapyPlanCard(plan));
         }
+    }
+
+    private void refreshTherapyPlans() {
+        List<TherapyPlan> plans = therapyPlanDAO.getTherapyPlansByPatientId(patient.getId());
+        refreshTherapyPlans(plans);
     }
 
     private String getInitials(String name) {
