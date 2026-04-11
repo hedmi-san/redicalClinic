@@ -95,13 +95,42 @@ public class PatientDAO {
     }
 
     public boolean deletePatient(int id) {
-        String query = "DELETE FROM patient WHERE id = ?";
+        String deleteSessions = "DELETE FROM session WHERE patientId = ?";
+        String deleteTherapyPlans = "DELETE FROM therapyPlan WHERE patientId = ?";
+        String deletePatient = "DELETE FROM patient WHERE id = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setInt(1, id);
-            return pstmt.executeUpdate() > 0;
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                // Delete sessions
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteSessions)) {
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+                }
+                
+                // Delete therapy plans
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteTherapyPlans)) {
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+                }
+                
+                // Delete patient
+                boolean deleted = false;
+                try (PreparedStatement pstmt = conn.prepareStatement(deletePatient)) {
+                    pstmt.setInt(1, id);
+                    deleted = pstmt.executeUpdate() > 0;
+                }
+                
+                conn.commit();
+                return deleted;
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Error during cascade delete, rolling back: " + e.getMessage());
+                return false;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
+            }
         } catch (SQLException e) {
             System.err.println("Error deleting patient: " + e.getMessage());
             return false;

@@ -147,7 +147,7 @@ public class PatientDetailController {
 
             if (controller.isSaveClicked()) {
                 patientDAO.updatePatient(controller.getPatient());
-                refreshUI();
+                javafx.application.Platform.runLater(this::refreshUI);
                 if (onUpdateListener != null)
                     onUpdateListener.run();
             }
@@ -173,7 +173,7 @@ public class PatientDetailController {
 
             if (controller.isSaveClicked()) {
                 sessionDAO.addSession(controller.getSession());
-                refreshUI();
+                javafx.application.Platform.runLater(this::refreshUI);
                 if (onUpdateListener != null)
                     onUpdateListener.run();
             }
@@ -468,7 +468,7 @@ public class PatientDetailController {
 
             if (controller.isSaveClicked()) {
                 sessionDAO.updateSession(controller.getSession());
-                refreshUI();
+                javafx.application.Platform.runLater(this::refreshUI);
                 if (onUpdateListener != null)
                     onUpdateListener.run();
             }

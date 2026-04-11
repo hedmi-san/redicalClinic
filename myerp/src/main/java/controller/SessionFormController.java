@@ -69,10 +69,13 @@ public class SessionFormController {
             costColumnText(session.getCost());
             paidAmountText(session.getPaidAmount());
 
-            // Set selected patient
-            Patient selectedPatient = patientDAO.getPatientById(session.getPatientId());
-            if (selectedPatient != null) {
-                patientComboBox.getSelectionModel().select(selectedPatient);
+            if (session.getPatientId() > 0) {
+                for (Patient p : patientComboBox.getItems()) {
+                    if (p.getId() == session.getPatientId()) {
+                        patientComboBox.getSelectionModel().select(p);
+                        break;
+                    }
+                }
             }
 
             saveBtn.setText("Mettre à jour");
@@ -80,9 +83,11 @@ public class SessionFormController {
             titleLabel.setText("Nouvelle Séance");
             datePicker.setValue(LocalDate.now());
             if (patientId > 0) {
-                Patient selectedPatient = patientDAO.getPatientById(patientId);
-                if (selectedPatient != null) {
-                    patientComboBox.getSelectionModel().select(selectedPatient);
+                for (Patient p : patientComboBox.getItems()) {
+                    if (p.getId() == patientId) {
+                        patientComboBox.getSelectionModel().select(p);
+                        break;
+                    }
                 }
             }
             saveBtn.setText("Enregistrer");

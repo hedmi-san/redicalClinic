@@ -80,4 +80,17 @@ public class Patient {
     public int getSessionCount() {
         return sessions.size();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Patient patient = (Patient) o;
+        return id == patient.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }
