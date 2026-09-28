@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.User;
+import util.UserSession;
 
 import java.io.IOException;
 
@@ -72,10 +73,7 @@ public class LoginController {
         User user = UserDAO.login(userName, password);
 
         if (user != null) {
-            // showAlert(Alert.AlertType.INFORMATION,
-            // "Connexion réussie",
-            // "Bienvenue, " + user.getFullName());
-            // TODO: close login window and open Dashboard
+            UserSession.setCurrentUser(user);
             loginButton.getScene().getWindow().hide();
             try {
                 Parent root = FXMLLoader.load(getClass().getResource("/fxml/home.fxml"));

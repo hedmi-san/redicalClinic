@@ -34,7 +34,6 @@ public class SessionFormController {
     private boolean saveClicked = false;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final PatientDAO patientDAO = new PatientDAO();
-    private List<Patient> allPatients;
 
     @FXML
     public void initialize() {

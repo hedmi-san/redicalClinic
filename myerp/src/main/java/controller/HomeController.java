@@ -7,15 +7,20 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import util.UserSession;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
@@ -37,6 +42,17 @@ public class HomeController implements Initializable {
     private Button btnBills;
     @FXML
     private Button btnSolds;
+    @FXML
+    private Button btnUsers;
+
+    @FXML
+    private Label lblUserFullName;
+    @FXML
+    private Label lblUserRole;
+    @FXML
+    private Label lblUserInitial;
+    @FXML
+    private Button btnLogout;
 
     private Button activeButton;
     private double x = 0;
@@ -57,8 +73,56 @@ public class HomeController implements Initializable {
             });
         }
 
-        // Load the default page on startup
-        handleNavAccueil(null);
+        // Configure role-based UI access and route to initial authorized page
+        setupRoleBasedAccess();
+    }
+
+    private void setupRoleBasedAccess() {
+        // Populate profile indicator badge
+        if (UserSession.isLoggedIn()) {
+            if (lblUserFullName != null) {
+                lblUserFullName.setText(UserSession.getCurrentUser().getFullName());
+            }
+            if (lblUserRole != null) {
+                if (UserSession.isAdmin()) {
+                    lblUserRole.setText("Compte admin");
+                } else if (UserSession.isEmployee()) {
+                    lblUserRole.setText("Employé");
+                } else {
+                    lblUserRole.setText(UserSession.getDisplayRole());
+                }
+            }
+            if (lblUserInitial != null) {
+                String name = UserSession.getCurrentUser().getFullName();
+                lblUserInitial.setText(name != null && !name.trim().isEmpty() ? name.trim().substring(0, 1).toUpperCase() : "A");
+            }
+        } else {
+            if (lblUserFullName != null) lblUserFullName.setText("Administrateur");
+            if (lblUserRole != null) lblUserRole.setText("Compte admin");
+            if (lblUserInitial != null) lblUserInitial.setText("A");
+        }
+
+        if (UserSession.isEmployee()) {
+            // Hide restricted buttons from employee
+            if (btnAccueil != null) {
+                btnAccueil.setVisible(false);
+                btnAccueil.setManaged(false);
+            }
+            if (btnWorkers != null) {
+                btnWorkers.setVisible(false);
+                btnWorkers.setManaged(false);
+            }
+            if (btnUsers != null) {
+                btnUsers.setVisible(false);
+                btnUsers.setManaged(false);
+            }
+
+            // Default landing page for employees is Patients
+            handleNavPatients(null);
+        } else {
+            // Default landing page for Admin is Accueil (Dashboard)
+            handleNavAccueil(null);
+        }
     }
 
     @FXML
@@ -81,6 +145,9 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleNavAccueil(ActionEvent event) {
+        if (UserSession.isEmployee()) {
+            return;
+        }
         loadPage("/fxml/pages/dashboard.fxml");
         setActiveButton(btnAccueil);
     }
@@ -99,6 +166,9 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleNavWorkers(ActionEvent event) {
+        if (UserSession.isEmployee()) {
+            return;
+        }
         loadPage("/fxml/pages/worker.fxml");
         setActiveButton(btnWorkers);
     }
@@ -116,8 +186,29 @@ public class HomeController implements Initializable {
     }
 
     @FXML
+    private void handleNavUsers(ActionEvent event) {
+        if (!UserSession.isAdmin()) {
+            return;
+        }
+        loadPage("/fxml/pages/user.fxml");
+        setActiveButton(btnUsers);
+    }
+
+    @FXML
     private void handleLogout(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Déconnexion");
+        alert.setHeaderText("Confirmer la déconnexion");
+        alert.setContentText("Êtes-vous sûr de vouloir vous déconnecter ?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
         try {
+            // Clear session context
+            UserSession.clear();
+
             // Close the current dashboard window
             Node source = (Node) event.getSource();
             Stage currentStage = (Stage) source.getScene().getWindow();

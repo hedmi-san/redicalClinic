@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootVBox" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.UserFormController"
+      spacing="0" style="-fx-background-color: #f4f6f9;" prefWidth="480.0">
+
+    <VBox styleClass="form-container" spacing="15" VBox.vgrow="ALWAYS">
+        <Label fx:id="lblTitle" text="Détails de l'Utilisateur" styleClass="form-title" />
+
+        <GridPane hgap="15" vgap="15">
+            <columnConstraints>
+                <ColumnConstraints minWidth="150" />
+                <ColumnConstraints minWidth="260" hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <!-- Full Name -->
+            <Label text="Nom et Prénom:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="form-label" />
+            <TextField fx:id="txtFullName" promptText="ex. Dr. Nour El Islam" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+            <!-- Username -->
+            <Label text="Nom d'utilisateur:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="form-label" />
+            <TextField fx:id="txtUserName" promptText="ex. nour" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+            <!-- Password -->
+            <Label text="Mot de passe:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="form-label" />
+            <StackPane alignment="CENTER_RIGHT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <TextField fx:id="txtPasswordVisible"
+                           promptText="Entrez le mot de passe"
+                           visible="false" managed="false" />
+                <PasswordField fx:id="txtPassword"
+                               promptText="Entrez le mot de passe" />
+                <Button fx:id="btnTogglePassword"
+                        text="👁"
+                        onAction="#togglePasswordVisibility"
+                        styleClass="toggle-btn"
+                        focusTraversable="false" />
+            </StackPane>
+
+            <!-- Role -->
+            <Label text="Rôle:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="form-label" />
+            <ComboBox fx:id="cbRole" maxWidth="Infinity" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        </GridPane>
+
+        <Label fx:id="lblPasswordHint" text="* Laissez vide pour conserver le mot de passe actuel lors de la modification."
+               style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-style: italic;" visible="false" managed="false" />
+
+        <Region VBox.vgrow="ALWAYS" minHeight="15" />
+
+        <HBox spacing="15" alignment="CENTER_RIGHT">
+            <Button text="Annuler" styleClass="secondary-button" onAction="#handleCancel" />
+            <Button text="Enregistrer" styleClass="primary-button" onAction="#handleSave" />
+        </HBox>
+    </VBox>
+
+</VBox>

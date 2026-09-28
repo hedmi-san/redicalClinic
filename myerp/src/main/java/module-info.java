@@ -1,10 +1,12 @@
 module com.myerp {
     // JavaFX modules needed
-    requires javafx.controls;
+    requires transitive javafx.controls;
+    requires transitive javafx.graphics;
+    requires transitive javafx.base;
     requires javafx.fxml;
 
     // JDBC for SQLite
-    requires java.sql;
+    requires transitive java.sql;
 
     // Apache PDFBox for invoice PDF generation
     requires org.apache.pdfbox;
@@ -16,4 +18,13 @@ module com.myerp {
 
     // Open model package for TableView PropertyValueFactory bindings
     opens model to javafx.base;
+    opens util to javafx.base;
+
+    // Export packages for public access
+    exports config;
+    exports dao;
+    exports model;
+    exports util;
+    exports controller;
+    exports com.myerp;
 }

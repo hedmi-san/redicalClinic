@@ -3,10 +3,12 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 
 <BorderPane prefHeight="700.0" prefWidth="1200.0" 
             styleClass="root-pane" 
@@ -31,27 +33,96 @@
         <VBox styleClass="sidebar" prefWidth="250.0" BorderPane.alignment="CENTER">
             
             <!-- Branding Area -->
-            <VBox alignment="CENTER" spacing="5" styleClass="sidebar-brand">
-                <Label text="🏥" styleClass="brand-icon"/>
+            <VBox alignment="CENTER" spacing="6" styleClass="sidebar-brand">
+                <StackPane styleClass="brand-icon-box" minWidth="36" minHeight="36" alignment="CENTER">
+                    <SVGPath content="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" styleClass="brand-icon" />
+                </StackPane>
                 <Label text="Cabinet" styleClass="brand-text-top"/>
                 <Label text="Nour El Islam" styleClass="brand-text-bottom"/>
             </VBox>
 
             <!-- Navigation Buttons -->
-            <VBox spacing="2" styleClass="nav-menu">
-                <Button fx:id="btnAccueil" text="🏠 Accueil" styleClass="nav-btn" onAction="#handleNavAccueil" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button fx:id="btnPatients" text="👥 Patients" styleClass="nav-btn" onAction="#handleNavPatients" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button fx:id="btnSessions" text="🩺 Séances" styleClass="nav-btn" onAction="#handleNavSessions" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button fx:id="btnWorkers" text="👨‍⚕️ Employés" styleClass="nav-btn" onAction="#handleNavWorkers" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button fx:id="btnBills" text="💰 Factures" styleClass="nav-btn" onAction="#handleNavBills" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button fx:id="btnSolds" text="💰 Ventes" styleClass="nav-btn" onAction="#handleNavSolds" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+            <VBox spacing="3" styleClass="nav-menu">
+                <Button fx:id="btnAccueil" text="Accueil" styleClass="nav-btn" onAction="#handleNavAccueil" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnPatients" text="Patients" styleClass="nav-btn" onAction="#handleNavPatients" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnSessions" text="Séances" styleClass="nav-btn" onAction="#handleNavSessions" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnWorkers" text="Employés" styleClass="nav-btn" onAction="#handleNavWorkers" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M9 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm11-4h-2V7h-2v2h-2v2h2v2h2v-2h2v-2z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnBills" text="Factures" styleClass="nav-btn" onAction="#handleNavBills" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnSolds" text="Ventes" styleClass="nav-btn" onAction="#handleNavSolds" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnUsers" text="Utilisateurs" styleClass="nav-btn" onAction="#handleNavUsers" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
             </VBox>
 
             <VBox VBox.vgrow="ALWAYS" /> <!-- Spacer -->
 
-            <!-- Logout Button -->
+            <!-- Thin divider line above user block -->
+            <VBox styleClass="sidebar-divider-container">
+                <Separator styleClass="sidebar-divider" />
+            </VBox>
+
+            <!-- User Session Profile Badge -->
+            <VBox styleClass="user-profile-container">
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="user-profile-card">
+                    <StackPane styleClass="avatar-circle" minWidth="36" prefWidth="36" maxWidth="36" minHeight="36" prefHeight="36" maxHeight="36">
+                        <Label fx:id="lblUserInitial" text="A" styleClass="avatar-initial"/>
+                    </StackPane>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblUserFullName" text="Administrateur" styleClass="user-fullname-label"/>
+                        <Label fx:id="lblUserRole" text="Compte admin" styleClass="user-role-badge"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Logout Button with separation gap -->
             <VBox styleClass="logout-container">
-                <Button text="🚪 Déconnecter" styleClass="nav-btn, logout-btn" onAction="#handleLogout" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button fx:id="btnLogout" text="Déconnecter" styleClass="nav-btn, logout-btn" onAction="#handleLogout" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" styleClass="nav-icon, logout-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
             </VBox>
 
         </VBox>

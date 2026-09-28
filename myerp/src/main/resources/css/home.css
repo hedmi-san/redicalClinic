@@ -67,48 +67,129 @@
 
 /* ---- Navigation Menu --------------------------------------- */
 .nav-menu {
-    -fx-padding: 20 0 0 0;
+    -fx-padding: 16 12 0 12;
+    -fx-spacing: 4;
 }
 
 .nav-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #aad4cc;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-padding: 15 20 15 30;
+    -fx-text-fill: #b7d3cf;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-padding: 9 10 9 10;
+    -fx-background-radius: 8;
     -fx-cursor: hand;
+    -fx-graphic-text-gap: 10;
+}
+
+.nav-btn .nav-icon {
+    -fx-fill: #b7d3cf;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
 }
 
 .nav-btn:hover {
-    -fx-background-color: #004040;
+    -fx-background-color: rgba(255, 255, 255, 0.07);
     -fx-text-fill: white;
 }
 
+.nav-btn:hover .nav-icon {
+    -fx-fill: white;
+}
+
 .nav-btn-active {
-    -fx-background-color: #004d4d;
+    -fx-background-color: rgba(79, 209, 181, 0.16);
     -fx-text-fill: white;
-    -fx-border-color: transparent transparent transparent #80d8cc;
-    -fx-border-width: 0 0 0 5;
+    -fx-font-weight: bold;
+    -fx-border-width: 0;
+}
+
+.nav-btn-active .nav-icon {
+    -fx-fill: #4fd1b5;
+}
+
+/* ---- User Profile Badge & Divider -------------------------- */
+.sidebar-divider-container {
+    -fx-padding: 0 14 10 14;
+}
+
+.sidebar-divider {
+    -fx-border-color: rgba(255, 255, 255, 0.12) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-opacity: 0.8;
+}
+
+.user-profile-container {
+    -fx-padding: 0 12;
+}
+
+.user-profile-card {
+    -fx-background-color: rgba(0, 34, 34, 0.6);
+    -fx-background-radius: 8px;
+    -fx-padding: 8 10;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.avatar-circle {
+    -fx-background-color: #0f4f46;
+    -fx-background-radius: 18px;
+    -fx-alignment: center;
+}
+
+.avatar-initial {
+    -fx-text-fill: #4fd1b5;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.user-fullname-label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.user-role-badge {
+    -fx-text-fill: #80d8cc;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
 }
 
 /* ---- Logout Button ----------------------------------------- */
 .logout-container {
-    -fx-padding: 0 0 20 0;
+    -fx-padding: 8 12 16 12;
 }
 
 .logout-btn {
-    -fx-text-fill: #e07b7b;
+    -fx-text-fill: #f0a3a3;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 7 10 7 10;
+    -fx-background-radius: 8;
+    -fx-graphic-text-gap: 10;
+    -fx-cursor: hand;
+}
+
+.logout-btn .logout-icon {
+    -fx-fill: #f0a3a3;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
 }
 
 .logout-btn:hover {
-    -fx-background-color: #4a1f1f;
+    -fx-background-color: rgba(240, 163, 163, 0.12);
     -fx-text-fill: #ffb3b3;
+}
+
+.logout-btn:hover .logout-icon {
+    -fx-fill: #ffb3b3;
 }
 
 /* ---- Content Area ------------------------------------------ */
 .content-area {
-    -fx-padding: 20;
-    -fx-background-color: #f0f4f4;
+    -fx-padding: 0;
+    -fx-background-color: #f8fafc;
 }
 
 /* ---- Sub-page Titles & Cards (Used in the modular FXMLs) --- */

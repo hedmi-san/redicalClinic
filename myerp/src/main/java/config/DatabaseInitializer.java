@@ -8,6 +8,9 @@ import java.sql.Statement;
 public class DatabaseInitializer {
 
     public static void initializeDatabase() {
+        // Create an automatic safety backup of existing clinic.db before performing any operations
+        backupDatabaseIfExists();
+
         try (Connection conn = DatabaseConfig.getConnection();
                 Statement stmt = conn.createStatement()) {
 
@@ -134,6 +137,10 @@ public class DatabaseInitializer {
                             quantity       REAL
                         );
                     """);
+
+            // Normalize existing user records without a defined role to 'Admin'
+            stmt.execute("UPDATE Users SET userType = 'Admin' WHERE userType IS NULL OR TRIM(userType) = '';");
+
             System.out.println("Database initialized successfully.");
 
             // Seed a default admin user if none exists yet
@@ -142,6 +149,27 @@ public class DatabaseInitializer {
         } catch (SQLException e) {
             System.err.println("❌ Database initialization failed: " + e.getMessage());
             throw new RuntimeException("Database initialization failed", e);
+        }
+    }
+
+    /**
+     * Creates a timestamped backup copy of clinic.db in ~/clinic/backups/
+     * before running any schema or database operations.
+     */
+    private static void backupDatabaseIfExists() {
+        try {
+            java.nio.file.Path dbPath = java.nio.file.Paths.get(DatabaseConfig.getDatabasePath());
+            if (java.nio.file.Files.exists(dbPath) && java.nio.file.Files.size(dbPath) > 0) {
+                java.nio.file.Path backupDir = dbPath.getParent().resolve("backups");
+                java.nio.file.Files.createDirectories(backupDir);
+                String timestamp = java.time.LocalDateTime.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                java.nio.file.Path backupFile = backupDir.resolve("clinic_backup_" + timestamp + ".db");
+                java.nio.file.Files.copy(dbPath, backupFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("✅ Pre-launch database backup created: " + backupFile);
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Failed to create database backup: " + e.getMessage());
         }
     }
 }

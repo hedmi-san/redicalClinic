@@ -1,0 +1,111 @@
+/* Modern UI styling for User Management Page */
+
+.root {
+    -fx-background-color: #f4f6f9;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused {
+    -fx-border-color: #4dabf7;
+    -fx-effect: dropshadow(three-pass-box, rgba(77, 171, 247, 0.2), 5, 0, 0, 0);
+}
+
+.action-button {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-text-fill: white;
+}
+
+.primary-button {
+    -fx-background-color: #3b82f6;
+    -fx-border-color: #2563eb;
+    -fx-border-radius: 6px;
+}
+
+.primary-button:hover {
+    -fx-background-color: #2563eb;
+}
+
+.secondary-button {
+    -fx-background-color: #10b981;
+    -fx-border-color: #059669;
+    -fx-border-radius: 6px;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #059669;
+}
+
+.danger-button {
+    -fx-background-color: #ef4444;
+    -fx-border-color: #dc2626;
+    -fx-border-radius: 6px;
+}
+
+.danger-button:hover {
+    -fx-background-color: #dc2626;
+}
+
+/* Modern TableView */
+.modern-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0;
+}
+
+.modern-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 1 0;
+}
+
+.modern-table .column-header {
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 10px;
+}
+
+.modern-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 44px;
+}
+
+.modern-table .table-row-cell:odd {
+    -fx-background-color: #fcfcfc;
+}
+
+.modern-table .table-row-cell:hover {
+    -fx-background-color: #f0fdf4;
+}
+
+.modern-table .table-row-cell:selected {
+    -fx-background-color: #e0f2fe;
+}
+
+.modern-table .table-cell {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 10px;
+}

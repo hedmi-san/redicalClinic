@@ -1,0 +1,85 @@
+/* Form Styling for User Dialog */
+
+.form-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 2);
+}
+
+.form-title {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-padding: 0 0 15px 0;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.form-label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.text-field, .password-field, .combo-box {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.2), 5, 0, 0, 0);
+}
+
+.primary-button {
+    -fx-background-color: #3b82f6;
+    -fx-border-color: #2563eb;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 20px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #2563eb;
+}
+
+.secondary-button {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-text-fill: #64748b;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
+}
+
+.toggle-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}

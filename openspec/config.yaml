@@ -1,0 +1,14 @@
+schema: spec-driven
+
+context: |
+  Project: Cabinet Nour El Islam - Desktop ERP for a physical rehabilitation and motor therapy clinic (Cabinet de rééducation fonctionnelle et motrice).
+  Tech stack: Java 17, JavaFX 17 (FXML, custom CSS), SQLite (via sqlite-jdbc, stored in ~/clinic/clinic.db), Apache PDFBox 3.0.5.
+  Build tool: Apache Maven (myerp/pom.xml).
+  Architecture: Layered MVC with JavaFX FXML controllers, JDBC DAOs, domain models, and service layer.
+  Key domain entities:
+    - Patients & Sessions (individual appointments with payment status: PAYÉ, PARTIEL, IMPAYÉ)
+    - Therapy Plans (structured rehabilitation packages with allocated sessions and completion tracking)
+    - Staff/Workers & Payment Checks (payroll disbursements)
+    - Clinic Bills & BillItems (operational expenses)
+    - Direct Sales (counter equipment/supplies)
+  Locale & Internationalization: French UI by default; custom ArabicTextHelper for Arabic shaping and bidi reordering in PDF invoices.

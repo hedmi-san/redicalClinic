@@ -1,88 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
+<?import javafx.scene.shape.SVGPath?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SoldController" 
-      spacing="0" styleClass="main-content">
+<ScrollPane fitToWidth="true" styleClass="page-scroll-pane" 
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.SoldController">
     <stylesheets>
         <URL value="@../../css/pages/sold.css" />
     </stylesheets>
 
-    <!-- Hero Header -->
-    <HBox styleClass="hero-header" alignment="CENTER_LEFT" spacing="24">
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Gestion des Ventes" styleClass="hero-name" />
-            <Label text="Suivre les ventes d'articles et de produits" styleClass="hero-phone" />
-        </VBox>
-        <Button onAction="#handleNewSold" text="+ Nouvelle Vente" styleClass="btn-teal" />
-    </HBox>
+    <!-- Main Content Container with spacing 18 and padding 22 26 -->
+    <VBox spacing="18" styleClass="content-container">
 
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
-        <VBox spacing="0">
-            <!-- Filter Section -->
-            <VBox styleClass="filter-section" spacing="10">
-                <HBox spacing="15" alignment="CENTER_LEFT">
-                    <VBox spacing="5">
-                        <Label text="Mois" styleClass="form-label"/>
-                        <ComboBox fx:id="monthComboBox" prefWidth="150" styleClass="form-control" />
-                    </VBox>
-                    <VBox spacing="5">
-                        <Label text="Année" styleClass="form-label"/>
-                        <ComboBox fx:id="yearComboBox" prefWidth="120" styleClass="form-control" />
-                    </VBox>
-                    <VBox spacing="5" HBox.hgrow="ALWAYS">
-                        <Label text="Recherche par article" styleClass="form-label"/>
-                        <HBox spacing="5">
-                            <TextField fx:id="searchField" promptText="Nom de l'article..." styleClass="form-control" HBox.hgrow="ALWAYS"/>
-                            <Button text="Rechercher" onAction="#handleSearch" styleClass="btn-secondary"/>
-                        </HBox>
-                    </VBox>
-                </HBox>
+        <!-- 1. Page Header (merged directly into the page background) -->
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="page-header">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Gestion des ventes" styleClass="page-title" />
+                <Label text="Suivre les ventes d'articles et de produits" styleClass="page-subtitle" />
             </VBox>
+            <Button onAction="#handleNewSold" text="+ Nouvelle vente" styleClass="btn-primary-teal" />
+        </HBox>
 
-            <!-- Summary Cards -->
-            <HBox spacing="20" styleClass="fin-cards-grid">
-                <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                    <Label text="NOMBRE DE VENTES" styleClass="fc-label" />
-                    <Label fx:id="soldCountLabel" text="0" styleClass="fc-value, fc-blue" />
+        <!-- 2. Filter Card (Single row: Mois 130px, Année 90px, Recherche fills remaining width) -->
+        <VBox styleClass="card-box, filter-card">
+            <HBox spacing="16" alignment="BOTTOM_LEFT">
+                <VBox spacing="6">
+                    <Label text="Mois" styleClass="field-label" />
+                    <ComboBox fx:id="monthComboBox" prefWidth="130" prefHeight="34" styleClass="custom-combo-box" />
                 </VBox>
-                <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                    <Label text="REVENU TOTAL" styleClass="fc-label" />
-                    <Label fx:id="totalRevenueLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
+                <VBox spacing="6">
+                    <Label text="Année" styleClass="field-label" />
+                    <ComboBox fx:id="yearComboBox" prefWidth="90" prefHeight="34" styleClass="custom-combo-box" />
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Recherche par article" styleClass="field-label" />
+                    <HBox alignment="CENTER_LEFT" styleClass="search-box" prefHeight="34" HBox.hgrow="ALWAYS">
+                        <StackPane minWidth="20" prefWidth="20" alignment="CENTER">
+                            <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" styleClass="search-icon"/>
+                        </StackPane>
+                        <TextField fx:id="searchField" promptText="Nom de l'article..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                    </HBox>
                 </VBox>
             </HBox>
-
-            <!-- Table Section -->
-            <VBox styleClass="sessions-area" spacing="16">
-                <HBox alignment="CENTER_LEFT">
-                    <Label text="Liste des Ventes" styleClass="section-title" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <HBox spacing="10">
-                        <Button onAction="#handleEditSold" text="Modifier" styleClass="btn-ghost" />
-                        <Button onAction="#handleDeleteSold" text="Supprimer" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
-                    </HBox>
-                </HBox>
-                
-                <TableView fx:id="soldTable" VBox.vgrow="ALWAYS" styleClass="modern-table" minHeight="400">
-                    <columns>
-                        <TableColumn fx:id="idColumn" prefWidth="80" text="ID" />
-                        <TableColumn fx:id="itemNameColumn" prefWidth="250" text="Article" />
-                        <TableColumn fx:id="dateColumn" prefWidth="150" text="Date de Vente" />
-                        <TableColumn fx:id="priceColumn" prefWidth="120" text="Prix (DZD)" />
-                        <TableColumn fx:id="quantityColumn" prefWidth="100" text="Quantité" />
-                        <TableColumn fx:id="totalColumn" prefWidth="120" text="Total (DZD)" />
-                    </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                    </columnResizePolicy>
-                    <placeholder>
-                        <Label text="Aucune vente trouvée." />
-                    </placeholder>
-                </TableView>
-            </VBox>
         </VBox>
-    </ScrollPane>
-</VBox>
+
+        <!-- 3. Stat Cards Row (equal widths, 12px gap, neutral light-gray background) -->
+        <HBox spacing="12" styleClass="stat-cards-row">
+            <VBox styleClass="card-box, stat-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <Label text="NOMBRE DE VENTES" styleClass="stat-card-label" />
+                <Label fx:id="soldCountLabel" text="0" styleClass="stat-card-value" />
+            </VBox>
+            <VBox styleClass="card-box, stat-card" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <Label text="REVENU TOTAL" styleClass="stat-card-label" />
+                <HBox alignment="BASELINE_LEFT" spacing="6">
+                    <Label fx:id="totalRevenueLabel" text="0,00" styleClass="stat-card-value" />
+                    <Label text="DZD" styleClass="stat-card-unit" />
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- 4. Table Card (Rounded 12px card, clip, Modifier/Supprimer buttons) -->
+        <VBox fx:id="tableCard" styleClass="card-box, table-card">
+            <!-- Table Card Header -->
+            <HBox alignment="CENTER_LEFT" styleClass="table-card-header">
+                <Label text="Liste des ventes" styleClass="table-card-title" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnEdit" onAction="#handleEditSold" text="Modifier" styleClass="btn-action-outline">
+                        <graphic>
+                            <SVGPath content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" styleClass="action-icon, icon-edit" />
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnDelete" onAction="#handleDeleteSold" text="Supprimer" styleClass="btn-action-outline, btn-action-delete">
+                        <graphic>
+                            <SVGPath content="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" styleClass="action-icon, icon-delete" />
+                        </graphic>
+                    </Button>
+                </HBox>
+            </HBox>
+
+            <!-- TableView with proportioned column widths and right-aligned numeric columns -->
+            <TableView fx:id="soldTable" styleClass="sales-table" prefHeight="380">
+                <columns>
+                    <TableColumn fx:id="idColumn" prefWidth="60" minWidth="50" maxWidth="80" text="ID" styleClass="col-center" />
+                    <TableColumn fx:id="itemNameColumn" prefWidth="280" minWidth="200" text="Article" styleClass="col-left" />
+                    <TableColumn fx:id="dateColumn" prefWidth="140" minWidth="120" text="Date de vente" styleClass="col-left" />
+                    <TableColumn fx:id="priceColumn" prefWidth="120" minWidth="100" text="Prix (DZD)" styleClass="col-right" />
+                    <TableColumn fx:id="quantityColumn" prefWidth="90" minWidth="70" text="Quantité" styleClass="col-right" />
+                    <TableColumn fx:id="totalColumn" prefWidth="130" minWidth="100" text="Total (DZD)" styleClass="col-right" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>
