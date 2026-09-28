@@ -1,0 +1,182 @@
+/* =========================================================================
+   Sale Invoice Selection Modal Stylesheet
+   Modern, Clean, High-Contrast UI for Proforma Invoice Generation
+   ========================================================================= */
+
+.modal-root {
+    -fx-background-color: #f8fafc;
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-padding: 22 24;
+}
+
+.modal-header {
+    -fx-padding: 0 0 10 0;
+}
+
+.modal-title {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.modal-subtitle {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.section-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-padding: 12 16;
+}
+
+.field-label {
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.input-field {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-pref-height: 34px;
+    -fx-font-size: 13px;
+    -fx-padding: 0 10;
+    -fx-text-fill: #1e293b;
+}
+
+.input-field:focused {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.15), 4, 0, 0, 0);
+}
+
+.date-picker .text-field {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-pref-height: 34px;
+    -fx-font-size: 13px;
+}
+
+.date-picker:focused .text-field {
+    -fx-border-color: #0d9488;
+}
+
+.btn-reset-dates {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-pref-height: 34px;
+}
+
+.btn-reset-dates:hover {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #0f172a;
+}
+
+.summary-pill {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #99f6e4;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4 10;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #0d9488;
+}
+
+/* Modern Table */
+.items-table {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.items-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.items-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 6 4;
+}
+
+.items-table .column-header .label {
+    -fx-font-weight: 600;
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
+}
+
+.items-table .table-row-cell {
+    -fx-cell-size: 34px;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+}
+
+.items-table .table-row-cell:odd {
+    -fx-background-color: #fcfdfe;
+}
+
+.items-table .table-row-cell:selected {
+    -fx-background-color: #f0fdfa;
+}
+
+.items-table .table-row-cell:selected .text {
+    -fx-fill: #0f172a;
+}
+
+/* Action Buttons */
+.modal-actions {
+    -fx-padding: 10 0 0 0;
+}
+
+.btn-cancel {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 18;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #0f172a;
+}
+
+.btn-primary-teal {
+    -fx-background-color: #0d9488;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-primary-teal:hover {
+    -fx-background-color: #0f766e;
+}

@@ -42,6 +42,50 @@ public class SoldDAO {
         return solds;
     }
 
+    public List<Sold> getAllSolds() {
+        List<Sold> solds = new ArrayList<>();
+        String query = "SELECT * FROM sold ORDER BY soldDate DESC, id DESC";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                solds.add(mapResultSetToSold(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching all sales records: " + e.getMessage());
+        }
+        return solds;
+    }
+
+    public List<Sold> getSoldsByDateRange(String startDate, String endDate) {
+        List<Sold> solds = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT * FROM sold WHERE 1=1");
+        List<String> params = new ArrayList<>();
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            query.append(" AND soldDate >= ?");
+            params.add(startDate.trim());
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            query.append(" AND soldDate <= ?");
+            params.add(endDate.trim());
+        }
+        query.append(" ORDER BY soldDate DESC, id DESC");
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setString(i + 1, params.get(i));
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    solds.add(mapResultSetToSold(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching sales by date range: " + e.getMessage());
+        }
+        return solds;
+    }
+
     public boolean addSold(Sold sold) {
         String query = "INSERT INTO sold (itemName, soldDate, soldPrice, quantity) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();

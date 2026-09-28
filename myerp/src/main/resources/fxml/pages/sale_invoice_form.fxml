@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.SaleInvoiceFormController"
+      styleClass="modal-root" spacing="14" prefWidth="820" prefHeight="640">
+    <stylesheets>
+        <URL value="@../../css/pages/sale_invoice_form.css" />
+    </stylesheets>
+
+    <!-- Header Section -->
+    <VBox spacing="4" styleClass="modal-header">
+        <Label text="🧾 Facture Proforma - Sélection des articles" styleClass="modal-title" />
+        <Label text="Sélectionnez les articles vendus à inclure dans la facture proforma et renseignez les informations du client." styleClass="modal-subtitle" />
+    </VBox>
+
+    <!-- Client & Invoice Info Card -->
+    <VBox styleClass="section-card" spacing="10">
+        <HBox spacing="16" alignment="CENTER_LEFT">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Nom du client / Bénéficiaire" styleClass="field-label" />
+                <TextField fx:id="clientNameField" promptText="Ex: Client au comptant, Nom prénom, Entreprise..." styleClass="input-field" />
+            </VBox>
+            <VBox spacing="4" prefWidth="180">
+                <Label text="Date de facture" styleClass="field-label" />
+                <DatePicker fx:id="invoiceDatePicker" prefWidth="180" styleClass="date-picker" />
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Search & Date Filter Card -->
+    <VBox styleClass="section-card" spacing="10">
+        <HBox spacing="14" alignment="BOTTOM_LEFT">
+            <VBox spacing="4">
+                <Label text="Date début" styleClass="field-label" />
+                <DatePicker fx:id="startDatePicker" prefWidth="140" styleClass="date-picker" promptText="AAAA-MM-JJ" />
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Date fin" styleClass="field-label" />
+                <DatePicker fx:id="endDatePicker" prefWidth="140" styleClass="date-picker" promptText="AAAA-MM-JJ" />
+            </VBox>
+            <Button onAction="#handleResetDateFilter" text="Toutes les dates" styleClass="btn-reset-dates" />
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Recherche par article" styleClass="field-label" />
+                <TextField fx:id="searchField" promptText="Filtrer par nom d'article..." styleClass="input-field" HBox.hgrow="ALWAYS" />
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Table Toolbar: Select All & Summary Pill -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <CheckBox fx:id="selectAllCheckBox" text="Tout sélectionner" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="selectionSummaryLabel" text="0 article(s) sélectionné(s) — Total: 0,00 DZD" styleClass="summary-pill" />
+    </HBox>
+
+    <!-- Items Table -->
+    <TableView fx:id="itemsTable" VBox.vgrow="ALWAYS" styleClass="items-table" editable="true">
+        <columns>
+            <TableColumn fx:id="selectColumn" prefWidth="48" minWidth="40" maxWidth="60" text="" sortable="false" />
+            <TableColumn fx:id="dateColumn" prefWidth="110" minWidth="90" text="Date de vente" />
+            <TableColumn fx:id="itemNameColumn" prefWidth="280" minWidth="200" text="Article / Désignation" />
+            <TableColumn fx:id="priceColumn" prefWidth="120" minWidth="90" text="Prix (DZD)" />
+            <TableColumn fx:id="quantityColumn" prefWidth="80" minWidth="70" text="Quantité" />
+            <TableColumn fx:id="totalColumn" prefWidth="130" minWidth="100" text="Total (DZD)" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="modal-actions">
+        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-cancel" />
+        <Button fx:id="btnGenerate" text="Générer la facture proforma" onAction="#handleGenerate" styleClass="btn-primary-teal" />
+    </HBox>
+</VBox>

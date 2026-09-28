@@ -16,17 +16,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import model.Sold;
+import service.InvoiceService;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -241,6 +246,90 @@ public class SoldController implements Initializable {
     @FXML
     private void handleNewSold() {
         showSoldForm(null);
+    }
+
+    @FXML
+    private void handleGenerateProformaInvoice() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/sale_invoice_form.fxml"));
+            Parent root = loader.load();
+
+            SaleInvoiceFormController controller = loader.getController();
+
+            // Populate all sales from database
+            List<Sold> allSolds = soldDAO.getAllSolds();
+            controller.setSolds(allSolds);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Générer une facture proforma");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initStyle(StageStyle.UTILITY);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
+
+            if (!controller.isConfirmed()) {
+                return;
+            }
+
+            List<Sold> selectedItems = controller.getSelectedSolds();
+            if (selectedItems.isEmpty()) {
+                showAlert("Aucun article", "Aucun article n'a été sélectionné.");
+                return;
+            }
+
+            // FileChooser to select output location
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer la facture proforma PDF");
+            String safeClientName = controller.getClientName().replaceAll("[^a-zA-Z0-9_\\-\\s]", "").trim().replaceAll("\\s+", "_");
+            if (safeClientName.isEmpty()) safeClientName = "Client";
+            fileChooser.setInitialFileName("Facture_Proforma_" + safeClientName + ".pdf");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF (*.pdf)", "*.pdf")
+            );
+
+            Stage ownerStage = (Stage) soldTable.getScene().getWindow();
+            File file = fileChooser.showSaveDialog(ownerStage);
+
+            if (file == null) {
+                return; // User cancelled save dialog
+            }
+
+            // Generate the proforma invoice PDF
+            InvoiceService invoiceService = new InvoiceService();
+            invoiceService.generateSalesProformaInvoice(
+                    controller.getClientName(),
+                    controller.getInvoiceDateFormatted(),
+                    selectedItems,
+                    file
+            );
+
+            // Confirmation Alert with Open option
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Facture générée");
+            alert.setHeaderText("Facture proforma générée avec succès");
+            alert.setContentText("Le document a été enregistré sous :\n" + file.getAbsolutePath());
+
+            ButtonType btnOpen = new ButtonType("Ouvrir le fichier");
+            ButtonType btnClose = new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(btnOpen, btnClose);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == btnOpen) {
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                    new Thread(() -> {
+                        try {
+                            Desktop.getDesktop().open(file);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }).start();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la génération de la facture proforma : " + e.getMessage());
+        }
     }
 
     @FXML

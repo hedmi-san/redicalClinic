@@ -22,7 +22,14 @@
                 <Label text="Gestion des ventes" styleClass="page-title" />
                 <Label text="Suivre les ventes d'articles et de produits" styleClass="page-subtitle" />
             </VBox>
-            <Button onAction="#handleNewSold" text="+ Nouvelle vente" styleClass="btn-primary-teal" />
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button onAction="#handleGenerateProformaInvoice" text="Facture proforma" styleClass="btn-secondary-proforma">
+                    <graphic>
+                        <SVGPath content="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" styleClass="proforma-icon" />
+                    </graphic>
+                </Button>
+                <Button onAction="#handleNewSold" text="+ Nouvelle vente" styleClass="btn-primary-teal" />
+            </HBox>
         </HBox>
 
         <!-- 2. Filter Card (Single row: Mois 130px, Année 90px, Recherche fills remaining width) -->

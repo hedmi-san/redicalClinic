@@ -329,3 +329,35 @@
     -fx-font-size: 13px;
     -fx-text-fill: #64748b;
 }
+
+/* Proforma Invoice Button in Header */
+.btn-secondary-proforma {
+    -fx-background-color: white;
+    -fx-border-color: #0d9488;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1.5;
+    -fx-padding: 7 16;
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #0d9488;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 8;
+}
+
+.btn-secondary-proforma:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0f766e;
+    -fx-text-fill: #0f766e;
+}
+
+.btn-secondary-proforma .proforma-icon {
+    -fx-fill: #0d9488;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+.btn-secondary-proforma:hover .proforma-icon {
+    -fx-fill: #0f766e;
+}
