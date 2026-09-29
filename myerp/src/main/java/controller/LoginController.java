@@ -74,7 +74,7 @@ public class LoginController {
 
         if (user != null) {
             UserSession.setCurrentUser(user);
-            loginButton.getScene().getWindow().hide();
+            Stage loginStage = (Stage) loginButton.getScene().getWindow();
             try {
                 Parent root = FXMLLoader.load(getClass().getResource("/fxml/home.fxml"));
                 Stage stage = new Stage();
@@ -96,6 +96,7 @@ public class LoginController {
                 stage.setResizable(false);
                 stage.setScene(scene);
                 stage.show();
+                loginStage.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

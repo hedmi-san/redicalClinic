@@ -15,7 +15,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import util.UserSession;
 
 import java.io.IOException;
@@ -220,17 +219,8 @@ public class HomeController implements Initializable {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
-            // Allow dragging the window (if using transparent/undecorated)
-            root.setOnMousePressed((MouseEvent mouseEvent) -> {
-                x = mouseEvent.getSceneX();
-                y = mouseEvent.getSceneY();
-            });
-            root.setOnMouseDragged((MouseEvent mouseEvent) -> {
-                loginStage.setX(mouseEvent.getScreenX() - x);
-                loginStage.setY(mouseEvent.getScreenY() - y);
-            });
-
-            loginStage.initStyle(StageStyle.TRANSPARENT);
+            loginStage.setTitle("Cabinet Nour El Islam");
+            loginStage.setResizable(false);
             loginStage.setScene(scene);
             loginStage.show();
 

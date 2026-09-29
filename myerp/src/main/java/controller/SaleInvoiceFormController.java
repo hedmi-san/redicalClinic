@@ -18,31 +18,47 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.List;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class SaleInvoiceFormController implements Initializable {
 
-    @FXML private TextField clientNameField;
-    @FXML private DatePicker invoiceDatePicker;
-    @FXML private DatePicker startDatePicker;
-    @FXML private DatePicker endDatePicker;
-    @FXML private TextField searchField;
-    @FXML private CheckBox selectAllCheckBox;
-    @FXML private Label selectionSummaryLabel;
+    @FXML
+    private TextField clientNameField;
+    @FXML
+    private DatePicker invoiceDatePicker;
+    @FXML
+    private DatePicker startDatePicker;
+    @FXML
+    private DatePicker endDatePicker;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private CheckBox selectAllCheckBox;
+    @FXML
+    private Label selectionSummaryLabel;
 
-    @FXML private TableView<SoldSelection> itemsTable;
-    @FXML private TableColumn<SoldSelection, Boolean> selectColumn;
-    @FXML private TableColumn<SoldSelection, String> dateColumn;
-    @FXML private TableColumn<SoldSelection, String> itemNameColumn;
-    @FXML private TableColumn<SoldSelection, String> priceColumn;
-    @FXML private TableColumn<SoldSelection, String> quantityColumn;
-    @FXML private TableColumn<SoldSelection, String> totalColumn;
+    @FXML
+    private TableView<SoldSelection> itemsTable;
+    @FXML
+    private TableColumn<SoldSelection, Boolean> selectColumn;
+    @FXML
+    private TableColumn<SoldSelection, String> dateColumn;
+    @FXML
+    private TableColumn<SoldSelection, String> itemNameColumn;
+    @FXML
+    private TableColumn<SoldSelection, String> priceColumn;
+    @FXML
+    private TableColumn<SoldSelection, String> quantityColumn;
+    @FXML
+    private TableColumn<SoldSelection, String> totalColumn;
 
-    @FXML private Button btnGenerate;
+    @FXML
+    private Button btnGenerate;
 
     private final ObservableList<SoldSelection> masterList = FXCollections.observableArrayList();
     private FilteredList<SoldSelection> filteredList;
@@ -77,14 +93,16 @@ public class SaleInvoiceFormController implements Initializable {
         selectColumn.setCellFactory(CheckBoxTableCell.forTableColumn(selectColumn));
 
         // Data columns
-        dateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getSold().getSoldDate() != null ? cellData.getValue().getSold().getSoldDate() : ""));
-        itemNameColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getSold().getItemName() != null ? cellData.getValue().getSold().getItemName() : ""));
+        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getSold().getSoldDate() != null ? cellData.getValue().getSold().getSoldDate()
+                        : ""));
+        itemNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getSold().getItemName() != null ? cellData.getValue().getSold().getItemName()
+                        : ""));
 
         // Price
-        priceColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(MONEY_FORMAT.format(cellData.getValue().getSold().getSoldPrice())));
+        priceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                MONEY_FORMAT.format(cellData.getValue().getSold().getSoldPrice())));
         priceColumn.setCellFactory(col -> createAlignedCell(Pos.CENTER_RIGHT));
 
         // Quantity
@@ -219,7 +237,8 @@ public class SaleInvoiceFormController implements Initializable {
                 .mapToDouble(s -> s.getSold().getSoldPrice() * s.getSold().getQuantity())
                 .sum();
 
-        selectionSummaryLabel.setText(count + " article(s) sélectionné(s) — Total: " + MONEY_FORMAT.format(total) + " DZD");
+        selectionSummaryLabel
+                .setText(count + " article(s) sélectionné(s) — Total: " + MONEY_FORMAT.format(total) + " DZD");
     }
 
     @FXML
