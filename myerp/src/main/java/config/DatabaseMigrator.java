@@ -47,6 +47,18 @@ public class DatabaseMigrator {
         // 1. Create a safety backup of clinic.db
         createPreMigrationBackup(sqliteDbPath);
 
+        // Ensure H2 columns are widened to TEXT to avoid string length limits
+        try (Statement alterStmt = h2Conn.createStatement()) {
+            alterStmt.execute("ALTER TABLE worker ALTER COLUMN name SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE billItem ALTER COLUMN itemName SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE patient ALTER COLUMN name SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE patient ALTER COLUMN gender SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE patient ALTER COLUMN phone SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE session ALTER COLUMN paied SET DATA TYPE TEXT");
+            alterStmt.execute("ALTER TABLE sold ALTER COLUMN itemName SET DATA TYPE TEXT");
+        } catch (SQLException ignored) {
+        }
+
         String sqliteUrl = "jdbc:sqlite:" + sqliteDbPath;
         try (Connection sqliteConn = DriverManager.getConnection(sqliteUrl)) {
             boolean originalAutoCommit = h2Conn.getAutoCommit();
