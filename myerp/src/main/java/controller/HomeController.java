@@ -16,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import util.UserSession;
+import config.AppConfig;
+import network.ConnectionMonitor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -53,6 +55,11 @@ public class HomeController implements Initializable {
     @FXML
     private Button btnLogout;
 
+    @FXML
+    private HBox connectionAlertBanner;
+    @FXML
+    private Label lblConnectionAlert;
+
     private Button activeButton;
     private double x = 0;
     private double y = 0;
@@ -74,6 +81,16 @@ public class HomeController implements Initializable {
 
         // Configure role-based UI access and route to initial authorized page
         setupRoleBasedAccess();
+
+        // Start connection health monitor on client nodes
+        if (AppConfig.isClient()) {
+            ConnectionMonitor.start(connected -> {
+                if (connectionAlertBanner != null) {
+                    connectionAlertBanner.setVisible(!connected);
+                    connectionAlertBanner.setManaged(!connected);
+                }
+            });
+        }
     }
 
     private void setupRoleBasedAccess() {
@@ -138,6 +155,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleClose(ActionEvent event) {
+        ConnectionMonitor.stop();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }
@@ -205,6 +223,9 @@ public class HomeController implements Initializable {
         }
 
         try {
+            // Stop monitor
+            ConnectionMonitor.stop();
+
             // Clear session context
             UserSession.clear();
 

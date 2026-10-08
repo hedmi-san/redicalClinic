@@ -1,21 +1,29 @@
 package controller;
 
+import config.AppConfig;
+import config.DatabaseConfig;
 import dao.UserDAO;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.User;
+import network.LanDiscoveryClient;
 import util.UserSession;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LoginController {
 
@@ -29,6 +37,10 @@ public class LoginController {
     private Button togglePasswordBtn;
     @FXML
     private Button loginButton;
+    @FXML
+    private Label lblNetworkStatus;
+
+    private ScheduledExecutorService discoveryExecutor;
 
     private double x = 0;
     private double y = 0;
@@ -38,6 +50,50 @@ public class LoginController {
         // Sync text between the hidden TextField and the PasswordField
         if (passwordField != null && passwordTextField != null) {
             passwordTextField.textProperty().bindBidirectional(passwordField.textProperty());
+        }
+
+        setupNetworkState();
+    }
+
+    private void setupNetworkState() {
+        if (lblNetworkStatus == null) return;
+        lblNetworkStatus.setVisible(true);
+        lblNetworkStatus.setManaged(true);
+
+        if (AppConfig.isHost()) {
+            lblNetworkStatus.setText("🟢 Poste Principal (Serveur local actif)");
+            lblNetworkStatus.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+        } else {
+            // Client mode: check connection and discover if needed
+            lblNetworkStatus.setText("⏳ Recherche du poste principal sur le réseau WiFi...");
+            lblNetworkStatus.setStyle("-fx-text-fill: #d97706; -fx-font-weight: bold;");
+            loginButton.setDisable(true);
+
+            discoveryExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "ClientDiscovery-Thread");
+                t.setDaemon(true);
+                return t;
+            });
+
+            discoveryExecutor.scheduleWithFixedDelay(() -> {
+                LanDiscoveryClient.DiscoveryResult result = LanDiscoveryClient.discoverHost();
+                if (result.success() && DatabaseConfig.testConnection()) {
+                    Platform.runLater(() -> {
+                        lblNetworkStatus.setText("🟢 Connecté au poste principal (" + AppConfig.getDbHost() + ")");
+                        lblNetworkStatus.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                        loginButton.setDisable(false);
+                    });
+                    if (discoveryExecutor != null) {
+                        discoveryExecutor.shutdown();
+                    }
+                } else {
+                    Platform.runLater(() -> {
+                        lblNetworkStatus.setText("⏳ En attente du poste du médecin (WiFi local)...");
+                        lblNetworkStatus.setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold;");
+                        loginButton.setDisable(true);
+                    });
+                }
+            }, 0, 3, TimeUnit.SECONDS);
         }
     }
 
@@ -73,6 +129,9 @@ public class LoginController {
         User user = UserDAO.login(userName, password);
 
         if (user != null) {
+            if (discoveryExecutor != null) {
+                discoveryExecutor.shutdown();
+            }
             UserSession.setCurrentUser(user);
             Stage loginStage = (Stage) loginButton.getScene().getWindow();
             try {

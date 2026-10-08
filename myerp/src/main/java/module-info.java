@@ -5,8 +5,9 @@ module com.myerp {
     requires transitive javafx.base;
     requires javafx.fxml;
 
-    // JDBC for SQLite
+    // Database engines
     requires transitive java.sql;
+    requires com.h2database;
 
     // Apache PDFBox for invoice PDF generation
     requires org.apache.pdfbox;
@@ -27,4 +28,5 @@ module com.myerp {
     exports util;
     exports controller;
     exports com.myerp;
+    exports network;
 }

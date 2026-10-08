@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="500.0" prefWidth="640.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.WorkstationSetupController"
+            styleClass="root-pane"
+            stylesheets="@../css/style.css">
+
+    <top>
+        <VBox spacing="8" style="-fx-background-color: #1e293b; -fx-padding: 24 30;">
+            <Label text="🏥 Cabinet Nour El Islam" style="-fx-font-size: 16px; -fx-text-fill: #38bdf8; -fx-font-weight: bold;"/>
+            <Label text="Configuration Initiale du Poste" style="-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            <Label text="Veuillez sélectionner le rôle de cet ordinateur dans le réseau local de la clinique." style="-fx-font-size: 13px; -fx-text-fill: #94a3b8;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 30;">
+            <fx:define>
+                <ToggleGroup fx:id="roleToggleGroup"/>
+            </fx:define>
+
+            <!-- Option 1: Host / Doctor -->
+            <VBox fx:id="cardHost" spacing="8"
+                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 16; -fx-cursor: hand;"
+                  onMouseClicked="#handleSelectHost">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <RadioButton fx:id="radioHost" text="Poste Principal (Médecin / Serveur)" toggleGroup="$roleToggleGroup" selected="true"
+                                 style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                </HBox>
+                <Label text="• Héberge la base de données centrale et conserve l'historique complet des patients."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+                <Label text="• Démarre automatiquement le serveur interne pour les autres postes du cabinet."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+                <Label text="• Utilisé par le médecin (Comptes Administrateurs avec accès complet)."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+            </VBox>
+
+            <!-- Option 2: Client / Receptionist -->
+            <VBox fx:id="cardClient" spacing="8"
+                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 16; -fx-cursor: hand;"
+                  onMouseClicked="#handleSelectClient">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <RadioButton fx:id="radioClient" text="Poste Secondaire (Réception / Client)" toggleGroup="$roleToggleGroup"
+                                 style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                </HBox>
+                <Label text="• Se connecte automatiquement au poste principal à travers le réseau WiFi local."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+                <Label text="• Ne crée aucune base de données locale pour garantir l'unicité et la cohérence des données."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+                <Label text="• Utilisé pour l'accueil et la prise en charge (Compte Employé / Réceptionniste)."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
+            </VBox>
+
+            <Label fx:id="lblError" text="" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" visible="false"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="16" style="-fx-padding: 20 30; -fx-background-color: #f1f5f9; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="btnConfirm" text="Confirmer et Enregistrer" onAction="#handleConfirm"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -61,8 +61,8 @@ public class PaymentCheckDAO {
         String yearStr = String.valueOf(year);
 
         String query = "SELECT * FROM paymentCheck WHERE workerId = ? " +
-                "AND strftime('%m', paymentDate) = ? " +
-                "AND strftime('%Y', paymentDate) = ? " +
+                "AND SUBSTRING(paymentDate, 6, 2) = ? " +
+                "AND SUBSTRING(paymentDate, 1, 4) = ? " +
                 "ORDER BY paymentDate DESC";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -86,8 +86,8 @@ public class PaymentCheckDAO {
         String yearStr = String.valueOf(year);
 
         String query = "SELECT SUM(paidAmount) FROM paymentCheck WHERE workerId = ? " +
-                "AND strftime('%m', paymentDate) = ? " +
-                "AND strftime('%Y', paymentDate) = ?";
+                "AND SUBSTRING(paymentDate, 6, 2) = ? " +
+                "AND SUBSTRING(paymentDate, 1, 4) = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -141,8 +141,8 @@ public class PaymentCheckDAO {
         String yearStr = String.valueOf(year);
 
         String query = "SELECT SUM(paidAmount) FROM paymentCheck WHERE " +
-                "strftime('%m', paymentDate) = ? " +
-                "AND strftime('%Y', paymentDate) = ?";
+                "SUBSTRING(paymentDate, 6, 2) = ? " +
+                "AND SUBSTRING(paymentDate, 1, 4) = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {

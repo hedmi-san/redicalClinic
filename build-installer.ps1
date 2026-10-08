@@ -63,6 +63,21 @@ New-Item -ItemType Directory -Path $packageInputDir | Out-Null
 Copy-Item "$targetDir\myerp-1.0-SNAPSHOT.jar" $packageInputDir
 Copy-Item "$targetDir\dependency\*" $packageInputDir
 
+# Generate firewall configuration script in package input
+$firewallScript = @"
+@echo off
+echo ========================================================
+echo Configuration du Pare-feu Windows - RedicalClinic
+echo ========================================================
+netsh advfirewall firewall delete rule name="RedicalClinic-H2" >nul 2>&1
+netsh advfirewall firewall delete rule name="RedicalClinic-Discovery" >nul 2>&1
+netsh advfirewall firewall add rule name="RedicalClinic-H2" dir=in action=allow protocol=TCP localport=9092 enable=yes profile=private
+netsh advfirewall firewall add rule name="RedicalClinic-Discovery" dir=in action=allow protocol=UDP localport=8888 enable=yes profile=private
+echo [OK] Regles de pare-feu configurees avec succes pour le reseau local (TCP:9092, UDP:8888).
+pause
+"@
+Set-Content -Path (Join-Path $packageInputDir "configure-firewall.bat") -Value $firewallScript
+
 # Prepare output dist directory
 if (Test-Path $distDir) { Remove-Item -Recurse -Force $distDir }
 New-Item -ItemType Directory -Path $distDir | Out-Null

@@ -40,6 +40,9 @@
 
                 <Label text="Connexion" styleClass="login-title"/>
                 <Label text="Connectez-vous à votre compte" styleClass="login-subtitle"/>
+                <Label fx:id="lblNetworkStatus" text=""
+                       style="-fx-font-size: 11px; -fx-padding: 3 8; -fx-background-radius: 4;"
+                       visible="false" managed="false"/>
 
                 <!-- Username -->
                 <VBox spacing="6">

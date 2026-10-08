@@ -178,7 +178,7 @@ public class TherapyPlanDAO {
     }
 
     public double getMonthlyTotalCost(int month, int year) {
-        String query = "SELECT SUM(cost) as totalCost FROM therapyPlan WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?";
+        String query = "SELECT SUM(cost) as totalCost FROM therapyPlan WHERE SUBSTRING(date, 6, 2) = ? AND SUBSTRING(date, 1, 4) = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, String.format("%02d", month));

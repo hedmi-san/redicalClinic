@@ -146,8 +146,8 @@ public class SessionDAO {
                            SUM(cost) as totalCost,
                            SUM(paidAmount) as totalPaid
                     FROM session
-                    WHERE strftime('%m', sessionDate) = ?
-                    AND strftime('%Y', sessionDate) = ?
+                    WHERE SUBSTRING(sessionDate, 6, 2) = ?
+                    AND SUBSTRING(sessionDate, 1, 4) = ?
                     AND therapyPlanId IS NULL
                 """;
 

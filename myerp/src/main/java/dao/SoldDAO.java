@@ -14,7 +14,7 @@ public class SoldDAO {
         String monthStr = String.format("%02d", month);
         String yearStr = String.valueOf(year);
         
-        String query = "SELECT * FROM sold WHERE strftime('%m', soldDate) = ? AND strftime('%Y', soldDate) = ?";
+        String query = "SELECT * FROM sold WHERE SUBSTRING(soldDate, 6, 2) = ? AND SUBSTRING(soldDate, 1, 4) = ?";
         
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
             query += " AND itemName LIKE ?";
@@ -146,7 +146,7 @@ public class SoldDAO {
         String monthStr = String.format("%02d", month);
         String yearStr = String.valueOf(year);
         String query = "SELECT COUNT(*) as soldCount, SUM(soldPrice * quantity) as totalRevenue " +
-                       "FROM sold WHERE strftime('%m', soldDate) = ? AND strftime('%Y', soldDate) = ?";
+                       "FROM sold WHERE SUBSTRING(soldDate, 6, 2) = ? AND SUBSTRING(soldDate, 1, 4) = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {

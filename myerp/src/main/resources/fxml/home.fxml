@@ -130,9 +130,20 @@
 
     <!-- CENTER CONTENT AREA -->
     <center>
-        <StackPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER">
-            <!-- Dynamic pages will be loaded here -->
-        </StackPane>
+        <VBox BorderPane.alignment="CENTER">
+            <!-- Disconnection warning banner -->
+            <HBox fx:id="connectionAlertBanner" alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color: #dc2626; -fx-padding: 8 16;"
+                  visible="false" managed="false">
+                <Label text="⚠️" style="-fx-font-size: 14px; -fx-text-fill: white;"/>
+                <Label fx:id="lblConnectionAlert" text="Connexion avec le poste principal perdue. Tentative de reconnexion en cours..."
+                       style="-fx-font-size: 12px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <StackPane fx:id="contentArea" styleClass="content-area" VBox.vgrow="ALWAYS">
+                <!-- Dynamic pages will be loaded here -->
+            </StackPane>
+        </VBox>
     </center>
 
 </BorderPane>

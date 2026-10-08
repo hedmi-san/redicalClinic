@@ -31,7 +31,7 @@ public class BillDAO {
         List<Bill> bills = new ArrayList<>();
         String monthStr = String.format("%02d", month);
         String yearStr = String.valueOf(year);
-        String query = "SELECT * FROM bill WHERE strftime('%m', billDate) = ? AND strftime('%Y', billDate) = ? ORDER BY billDate DESC";
+        String query = "SELECT * FROM bill WHERE SUBSTRING(billDate, 6, 2) = ? AND SUBSTRING(billDate, 1, 4) = ? ORDER BY billDate DESC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, monthStr);
@@ -100,8 +100,8 @@ public class BillDAO {
         String query = """
                     SELECT SUM(totalCost)
                     FROM bill
-                    WHERE strftime('%m', billDate) = ?
-                    AND strftime('%Y', billDate) = ?
+                    WHERE SUBSTRING(billDate, 6, 2) = ?
+                    AND SUBSTRING(billDate, 1, 4) = ?
                 """;
 
         try (Connection conn = DatabaseConfig.getConnection();
