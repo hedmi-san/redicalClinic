@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
-public class DashboardController implements Initializable {
+public class DashboardController implements Initializable, Refreshable {
 
     @FXML
     private ComboBox<String> monthSelector;
@@ -64,6 +64,11 @@ public class DashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setupSelectors();
         setupCardClickHandlers();
+        loadDashboardData();
+    }
+
+    @Override
+    public void refresh() {
         loadDashboardData();
     }
 

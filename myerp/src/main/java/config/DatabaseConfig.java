@@ -1,18 +1,19 @@
 package config;
 
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.Server;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
  * Manages database connections and the embedded H2 TCP Server lifecycle.
  * In HOST mode, launches an embedded H2 TCP server with AES encryption and remote LAN access.
  * In CLIENT mode, connects dynamically to the discovered host IP.
+ * Uses a persistent JdbcConnectionPool to eliminate TCP connection setup overhead across LAN.
  */
 public class DatabaseConfig {
 
@@ -25,6 +26,8 @@ public class DatabaseConfig {
     private static final String FULL_PASSWORD = FILE_PASSWORD + " " + USER_PASSWORD;
 
     private static Server tcpServer;
+    private static JdbcConnectionPool connectionPool;
+    private static String poolJdbcUrl;
 
     static {
         try {
@@ -74,12 +77,43 @@ public class DatabaseConfig {
     }
 
     /**
-     * Opens and returns a connection to the database.
+     * Obtains or creates the JdbcConnectionPool for the current configuration.
+     * Automatically recreates the pool if the target host URL changes.
+     */
+    private static synchronized JdbcConnectionPool getPool() {
+        String currentUrl = getJdbcUrl();
+        if (connectionPool == null || !currentUrl.equals(poolJdbcUrl)) {
+            if (connectionPool != null) {
+                try {
+                    connectionPool.dispose();
+                } catch (Exception ignored) {}
+            }
+            connectionPool = JdbcConnectionPool.create(currentUrl, DB_USER, FULL_PASSWORD);
+            connectionPool.setMaxConnections(20);
+            connectionPool.setLoginTimeout(5);
+            poolJdbcUrl = currentUrl;
+        }
+        return connectionPool;
+    }
+
+    /**
+     * Opens and returns a connection from the connection pool.
      */
     public static Connection getConnection() throws SQLException {
-        DriverManager.setLoginTimeout(4);
-        String url = getJdbcUrl();
-        return DriverManager.getConnection(url, DB_USER, FULL_PASSWORD);
+        return getPool().getConnection();
+    }
+
+    /**
+     * Resets and disposes the connection pool.
+     */
+    public static synchronized void resetPool() {
+        if (connectionPool != null) {
+            try {
+                connectionPool.dispose();
+            } catch (Exception ignored) {}
+            connectionPool = null;
+            poolJdbcUrl = null;
+        }
     }
 
     /**
@@ -89,6 +123,7 @@ public class DatabaseConfig {
         try (Connection conn = getConnection()) {
             return conn != null && !conn.isClosed();
         } catch (Exception e) {
+            resetPool();
             return false;
         }
     }
@@ -104,6 +139,7 @@ public class DatabaseConfig {
             BackupManager.createBackup();
         }
         network.LanDiscoveryHost.stop();
+        resetPool();
         if (tcpServer != null && tcpServer.isRunning(false)) {
             System.out.println("🛑 Stopping embedded H2 TCP Server...");
             tcpServer.stop();

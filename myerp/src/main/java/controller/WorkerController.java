@@ -2,6 +2,7 @@ package controller;
 
 import dao.WorkerDAO;
 import model.Worker;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class WorkerController implements Initializable {
+public class WorkerController implements Initializable, Refreshable {
 
     @FXML
     private VBox mainContainer;
@@ -48,6 +50,7 @@ public class WorkerController implements Initializable {
 
     private WorkerDAO workerDAO;
     private ObservableList<Worker> workerList;
+    private final PauseTransition searchDebounce = new PauseTransition(Duration.millis(200));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -73,9 +76,10 @@ public class WorkerController implements Initializable {
 
         workerTable.setItems(workerList);
 
-        // Search listener
+        // Search listener with 200ms debounce
+        searchDebounce.setOnFinished(e -> loadWorkers(searchField.getText()));
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            loadWorkers(newValue);
+            searchDebounce.playFromStart();
         });
 
         // Double click listener for profile
@@ -86,6 +90,11 @@ public class WorkerController implements Initializable {
         });
 
         loadWorkers("");
+    }
+
+    @Override
+    public void refresh() {
+        loadWorkers(searchField != null ? searchField.getText() : "");
     }
 
     private void loadWorkers(String query) {

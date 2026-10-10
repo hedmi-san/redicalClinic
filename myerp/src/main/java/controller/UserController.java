@@ -1,6 +1,7 @@
 package controller;
 
 import dao.UserDAO;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.User;
 import util.UserSession;
 
@@ -23,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class UserController implements Initializable {
+public class UserController implements Initializable, Refreshable {
 
     @FXML
     private VBox mainContainer;
@@ -46,6 +48,7 @@ public class UserController implements Initializable {
 
     private UserDAO userDAO;
     private ObservableList<User> userList;
+    private final PauseTransition searchDebounce = new PauseTransition(Duration.millis(200));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -89,9 +92,10 @@ public class UserController implements Initializable {
 
         userTable.setItems(userList);
 
-        // Real-time search listener
+        // Real-time search listener with 200ms debounce
+        searchDebounce.setOnFinished(e -> loadUsers(searchField.getText()));
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            loadUsers(newValue);
+            searchDebounce.playFromStart();
         });
 
         // Double-click to edit user
@@ -102,6 +106,11 @@ public class UserController implements Initializable {
         });
 
         loadUsers("");
+    }
+
+    @Override
+    public void refresh() {
+        loadUsers(searchField != null ? searchField.getText() : "");
     }
 
     private void loadUsers(String query) {

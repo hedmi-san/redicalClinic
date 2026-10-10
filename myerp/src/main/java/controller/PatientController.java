@@ -1,9 +1,8 @@
 package controller;
 
 import dao.PatientDAO;
-import dao.SessionDAO;
 import model.Patient;
-import model.Session;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,13 +17,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class PatientController implements Initializable {
+public class PatientController implements Initializable, Refreshable {
 
     @FXML
     private VBox mainContainer;
@@ -40,8 +40,8 @@ public class PatientController implements Initializable {
     private TableColumn<Patient, String> balanceColumn;
 
     private PatientDAO patientDAO;
-    private SessionDAO sessionDAO;
     private ObservableList<Patient> patientList;
+    private final PauseTransition searchDebounce = new PauseTransition(Duration.millis(200));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -52,24 +52,15 @@ public class PatientController implements Initializable {
         }
 
         patientDAO = new PatientDAO();
-        sessionDAO = new SessionDAO();
         patientList = FXCollections.observableArrayList();
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
+        // Instant in-memory balance display without firing per-row network SQL queries
         balanceColumn.setCellValueFactory(cellData -> {
             Patient p = cellData.getValue();
-            List<Session> sessions = sessionDAO.getSessionsByPatientId(p.getId());
-            double totalCost = 0;
-            double totalPaid = 0;
-            for (Session s : sessions) {
-                totalCost += s.getCost();
-                totalPaid += s.getPaidAmount();
-            }
-            p.setTotalCost(totalCost);
-            p.setTotalPaid(totalPaid);
-            return new SimpleStringProperty(String.format("%.2f DZD", p.getBalance()));
+            return new SimpleStringProperty(String.format("%.2f DZD", p != null ? p.getBalance() : 0.0));
         });
 
         // Disable column reordering for consistency
@@ -79,9 +70,10 @@ public class PatientController implements Initializable {
 
         patientTable.setItems(patientList);
 
-        // Search listener
+        // Search listener with 200ms debounce to avoid hammering DB on fast typing
+        searchDebounce.setOnFinished(e -> loadPatients(searchField.getText()));
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            loadPatients(newValue);
+            searchDebounce.playFromStart();
         });
 
         // Double click listener for profile popup
@@ -92,6 +84,11 @@ public class PatientController implements Initializable {
         });
 
         loadPatients("");
+    }
+
+    @Override
+    public void refresh() {
+        loadPatients(searchField != null ? searchField.getText() : "");
     }
 
     private void loadPatients(String query) {

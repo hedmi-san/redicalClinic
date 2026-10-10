@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class BillController implements Initializable {
+public class BillController implements Initializable, Refreshable {
 
     @FXML
     private TableView<Bill> billTable;
@@ -54,6 +54,11 @@ public class BillController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setupFilters();
         setupTable();
+        loadBills();
+    }
+
+    @Override
+    public void refresh() {
         loadBills();
     }
 

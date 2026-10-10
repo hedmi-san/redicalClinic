@@ -3,13 +3,13 @@
     Builds the RedicalClinic Windows Installer packages (.msi and .exe).
 
 .PARAMETER Version
-    The application version to package (defaults to "1.6").
+    The application version to package (defaults to "1.8").
 
 .PARAMETER OutputDir
     Directory to place the final installers.
 #>
 param(
-    [string]$Version = "1.6",
+    [string]$Version = "1.8",
     [string]$OutputDir = "C:\Users\LAPTOP SPIRIT\Documents\FeedbackHub"
 )
 
@@ -24,10 +24,13 @@ $distDir = Join-Path $targetDir "dist"
 Write-Host "=== Building RedicalClinic Version $Version ===" -ForegroundColor Cyan
 
 # 1. Setup Java and WiX environment
-if (-not $env:JAVA_HOME) {
-    if (Test-Path "C:\dev\Java21") {
-        $env:JAVA_HOME = "C:\dev\Java21"
-    }
+if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME "bin\java.exe"))) {
+    # Valid JDK root
+} elseif ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME "java.exe"))) {
+    # JAVA_HOME was set to bin directory; resolve to JDK parent
+    $env:JAVA_HOME = Split-Path -Parent $env:JAVA_HOME
+} elseif (Test-Path "C:\dev\Java21") {
+    $env:JAVA_HOME = "C:\dev\Java21"
 }
 $wixBin = "C:\Program Files (x86)\WiX Toolset v3.14\bin"
 if (Test-Path $wixBin) {

@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class SessionController implements Initializable {
+public class SessionController implements Initializable, Refreshable {
 
     @FXML
     private DatePicker datePicker;
@@ -62,6 +62,11 @@ public class SessionController implements Initializable {
                 loadSessions();
             }
         });
+    }
+
+    @Override
+    public void refresh() {
+        loadSessions();
     }
 
     private void setupTable() {

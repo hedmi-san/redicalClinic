@@ -165,6 +165,30 @@ public class DatabaseInitializer {
             // Seed a default admin user if none exists yet
             UserDAO.seedDefaultAdmin();
 
+            // Create performance indexes to ensure instant queries over LAN
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_date ON session(sessionDate);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_patientId ON session(patientId);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_therapyPlanId ON session(therapyPlanId);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_therapyplan_patientId ON therapyPlan(patientId);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_bill_date ON bill(billDate);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_billitem_billId ON billItem(billId);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_paymentcheck_workerId ON paymentCheck(workerId);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_sold_date ON sold(soldDate);");
+            stmt.execute("CREATE INDEX IF NOT EXISTS idx_patient_name ON patient(name);");
+
+            // Ensure patient totalCost and totalPaid are accurate from all sessions & therapy plans
+            try {
+                stmt.execute("""
+                    UPDATE patient p
+                    SET totalCost = COALESCE((SELECT SUM(cost) FROM session s WHERE s.patientId = p.id AND s.therapyPlanId IS NULL), 0) +
+                                    COALESCE((SELECT SUM(cost) FROM therapyPlan tp WHERE tp.patientId = p.id), 0),
+                        totalPaid = COALESCE((SELECT SUM(paidAmount) FROM session s WHERE s.patientId = p.id AND s.therapyPlanId IS NULL), 0) +
+                                    COALESCE((SELECT SUM(cost) FROM therapyPlan tp WHERE tp.patientId = p.id), 0);
+                """);
+            } catch (SQLException ignored) {
+                // Table might be empty on fresh first boot
+            }
+
             System.out.println("Database initialized successfully.");
 
         } catch (SQLException e) {

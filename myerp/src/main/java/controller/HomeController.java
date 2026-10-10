@@ -60,6 +60,9 @@ public class HomeController implements Initializable {
     @FXML
     private Label lblConnectionAlert;
 
+    private final java.util.Map<String, Parent> pageCache = new java.util.HashMap<>();
+    private final java.util.Map<String, Object> controllerCache = new java.util.HashMap<>();
+
     private Button activeButton;
     private double x = 0;
     private double y = 0;
@@ -226,6 +229,10 @@ public class HomeController implements Initializable {
             // Stop monitor
             ConnectionMonitor.stop();
 
+            // Clear page and controller cache
+            pageCache.clear();
+            controllerCache.clear();
+
             // Clear session context
             UserSession.clear();
 
@@ -251,13 +258,24 @@ public class HomeController implements Initializable {
     }
 
     /**
-     * Loads an FXML file into the central content area.
+     * Loads an FXML file into the central content area with view caching and instant tab switching.
      */
     private void loadPage(String fxmlPath) {
         try {
-            Parent page = FXMLLoader.load(getClass().getResource(fxmlPath));
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(page);
+            Parent page = pageCache.get(fxmlPath);
+            Object controller = controllerCache.get(fxmlPath);
+
+            if (page == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                page = loader.load();
+                controller = loader.getController();
+                pageCache.put(fxmlPath, page);
+                controllerCache.put(fxmlPath, controller);
+            } else if (controller instanceof Refreshable refreshable) {
+                refreshable.refresh();
+            }
+
+            contentArea.getChildren().setAll(page);
         } catch (IOException e) {
             System.err.println("Could not load page: " + fxmlPath);
             e.printStackTrace();

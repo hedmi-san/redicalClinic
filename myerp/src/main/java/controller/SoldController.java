@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class SoldController implements Initializable {
+public class SoldController implements Initializable, Refreshable {
 
     @FXML private ComboBox<String> monthComboBox;
     @FXML private ComboBox<Integer> yearComboBox;
@@ -83,6 +83,11 @@ public class SoldController implements Initializable {
         setupTable();
         setupActionButtons();
         setupEmptyState();
+        loadSolds();
+    }
+
+    @Override
+    public void refresh() {
         loadSolds();
     }
 
