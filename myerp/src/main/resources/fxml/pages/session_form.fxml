@@ -4,48 +4,98 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SessionFormController" 
-      styleClass="modal" spacing="20" prefWidth="440">
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controller.SessionFormController"
+           fx:id="modalRootPane"
+           styleClass="modal-root-pane"
+           prefWidth="520" maxWidth="520">
+
     <stylesheets>
-        <URL value="@../../css/pages/patient.css" />
+        <URL value="@../../css/pages/session.css" />
     </stylesheets>
 
-    <HBox alignment="CENTER_LEFT">
-        <Label fx:id="titleLabel" text="Détails de la Séance" styleClass="modal-title" />
-    </HBox>
+    <!-- Main Modal Card -->
+    <VBox fx:id="cardRoot" styleClass="session-modal-card" prefWidth="488" maxWidth="488" spacing="0">
 
-    <VBox spacing="15">
-        <VBox spacing="8">
-            <Label text="SÉLECTIONNER UN PATIENT" styleClass="form-label" />
-            <ComboBox fx:id="patientComboBox" promptText="Choisir un patient..." styleClass="form-control" maxWidth="Infinity" />
-        </VBox>
-
-        <HBox spacing="14">
-            <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="DATE DE LA SÉANCE" styleClass="form-label" />
-                <DatePicker fx:id="datePicker" promptText="Sélectionnez la date" styleClass="form-control" maxWidth="Infinity" />
+        <!-- Custom Header Bar (Draggable) -->
+        <HBox fx:id="headerBar" alignment="CENTER_LEFT" styleClass="header-bar">
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label fx:id="titleLabel" text="Nouvelle séance" styleClass="modal-title" />
+                <Label fx:id="subtitleLabel" text="Enregistrer un traitement et le règlement du jour" styleClass="modal-subtitle" />
             </VBox>
+            <Button fx:id="closeBtn" text="✕" onAction="#handleCancel"
+                    styleClass="btn-close-icon" prefWidth="30" prefHeight="30" minWidth="30" minHeight="30" maxWidth="30" maxHeight="30" />
         </HBox>
 
-        <VBox spacing="8">
-            <Label text="TRAITEMENT / NOTES" styleClass="form-label" />
-            <TextArea fx:id="treatmentArea" promptText="Décrivez le traitement..." styleClass="form-control" prefHeight="80" wrapText="true" />
+        <!-- Form Body -->
+        <VBox spacing="16" style="-fx-padding: 20 24 16 24;">
+
+            <!-- 1. Patient Search -->
+            <VBox spacing="6">
+                <Label text="Patient" styleClass="field-label" />
+                <StackPane fx:id="patientFieldContainer" alignment="CENTER_LEFT">
+                    <TextField fx:id="patientSearchField" promptText="Rechercher par nom ou téléphone..."
+                               styleClass="form-field, search-input" />
+                    <Label text="🔍" styleClass="search-icon-label" mouseTransparent="true" />
+                    <Button fx:id="btnClearPatient" text="✕" onAction="#handleClearPatient"
+                            styleClass="btn-clear-input" StackPane.alignment="CENTER_RIGHT" visible="false" />
+                </StackPane>
+                <Label fx:id="patientErrorLabel" text="Sélectionnez un patient dans la liste"
+                       styleClass="field-error-label" visible="false" managed="false" />
+            </VBox>
+
+            <!-- 2. Date -->
+            <VBox spacing="6">
+                <Label text="Date de la séance" styleClass="field-label" />
+                <DatePicker fx:id="datePicker" styleClass="custom-date-picker" maxWidth="Infinity" />
+            </VBox>
+
+            <!-- 3. Notes / Traitement -->
+            <VBox spacing="6">
+                <Label text="Traitement / notes" styleClass="field-label" />
+                <TextArea fx:id="treatmentArea" promptText="Décrivez le traitement..."
+                          styleClass="notes-text-area" prefRowCount="3" wrapText="true" />
+            </VBox>
+
+            <!-- 4. Money Fields -->
+            <GridPane hgap="12" vgap="4">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50.0" />
+                    <ColumnConstraints percentWidth="50.0" />
+                </columnConstraints>
+
+                <!-- Cost -->
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Coût de la séance" styleClass="field-label" />
+                    <StackPane alignment="CENTER_RIGHT">
+                        <TextField fx:id="costField" styleClass="form-field, money-field" />
+                        <Label text="DA" styleClass="currency-suffix" mouseTransparent="true" />
+                    </StackPane>
+                    <Label fx:id="costErrorLabel" text="Montant invalide"
+                           styleClass="field-error-label" visible="false" managed="false" />
+                </VBox>
+
+                <!-- Cash Received -->
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="Espèces reçues" styleClass="field-label" />
+                    <StackPane alignment="CENTER_RIGHT">
+                        <TextField fx:id="paidAmountField" styleClass="form-field, money-field" />
+                        <Label text="DA" styleClass="currency-suffix" mouseTransparent="true" />
+                    </StackPane>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Hyperlink fx:id="linkPayFull" text="Payer la totalité" onAction="#handlePayFull" styleClass="pay-full-link" />
+                    </HBox>
+                </VBox>
+            </GridPane>
+
+            <!-- 5. Financial Live Summary Box -->
+            <VBox fx:id="financialSummaryBox" spacing="8" styleClass="summary-box, summary-box-empty" />
         </VBox>
 
-        <HBox spacing="14">
-            <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="COÛT (DZD)" styleClass="form-label" />
-                <TextField fx:id="costField" promptText="0.00" styleClass="form-control" />
-            </VBox>
-            <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="MONTANT PAYÉ (DZD)" styleClass="form-label" />
-                <TextField fx:id="paidAmountField" promptText="0.00" styleClass="form-control" />
-            </VBox>
+        <!-- Footer Actions -->
+        <HBox alignment="CENTER_RIGHT" spacing="8" styleClass="footer-bar">
+            <Button fx:id="cancelBtn" text="Annuler" onAction="#handleCancel" styleClass="btn-cancel" />
+            <Button fx:id="saveBtn" text="Enregistrer" onAction="#handleSave" styleClass="btn-save" />
         </HBox>
     </VBox>
-
-    <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="modal-actions">
-        <Button text="Annuler" onAction="#handleCancel" styleClass="btn-ghost" />
-        <Button text="Enregistrer" fx:id="saveBtn" onAction="#handleSave" styleClass="btn-teal" />
-    </HBox>
-</VBox>
+</StackPane>

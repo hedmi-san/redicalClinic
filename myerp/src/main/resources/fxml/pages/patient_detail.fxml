@@ -59,7 +59,7 @@
                 </ScrollPane>
             </Tab>
         <!-- Advanced Therapy plan -->
-            <Tab text="Versement">
+            <Tab text="Plans Thérapeutiques">
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
                     <VBox spacing="0">
                         <VBox styleClass="sessions-area" spacing="24">
@@ -70,6 +70,24 @@
                             </HBox>
 
                             <VBox fx:id="therapyPlansContainer" spacing="16" />
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+        <!-- Payments & Deposits Ledger -->
+            <Tab text="Paiements &amp; Versements">
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
+                    <VBox spacing="0">
+                        <VBox styleClass="sessions-area" spacing="24">
+                            <HBox alignment="CENTER_LEFT" spacing="12">
+                                <Label text="Grand Livre des Versements &amp; Paiements" styleClass="section-title" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button text="Rembourser Avance" onAction="#handleRefundAction" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
+                                <Button text="+ Nouveau Versement" onAction="#handleAddPaymentAction" styleClass="btn-teal" />
+                            </HBox>
+
+                            <VBox fx:id="paymentsContainer" spacing="12" />
                         </VBox>
                     </VBox>
                 </ScrollPane>

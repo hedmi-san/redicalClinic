@@ -54,6 +54,7 @@ public class DashboardController implements Initializable, Refreshable {
     private final PaymentCheckDAO paymentCheckDAO = new PaymentCheckDAO();
     private final SoldDAO soldDAO = new SoldDAO();
     private final dao.TherapyPlanDAO therapyPlanDAO = new dao.TherapyPlanDAO();
+    private final dao.PaymentDAO paymentDAO = new dao.PaymentDAO();
 
     private final String[] months = {
             "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -106,7 +107,7 @@ public class DashboardController implements Initializable, Refreshable {
         sessionCountLabel.setText(String.valueOf(sessionSummary.count()));
         
         double totalExpectedProfit = sessionSummary.totalCost() + therapyPlanTotal;
-        double totalActualProfit = sessionSummary.totalPaid() + therapyPlanTotal;
+        double totalActualProfit = paymentDAO.getMonthlyTotalCollected(month, year);
 
         expectedProfitLabel.setText(String.format("%,.2f", totalExpectedProfit));
         actualProfitLabel.setText(String.format("%,.2f", totalActualProfit));

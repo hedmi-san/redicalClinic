@@ -55,7 +55,11 @@ public class DatabaseConfig {
                 System.out.println("🚀 Embedded H2 TCP Server started on port " + port + " (remote access enabled)");
                 network.LanDiscoveryHost.start();
             } catch (SQLException e) {
-                System.err.println("⚠️ Error starting H2 TCP server: " + e.getMessage());
+                if (e.getCause() instanceof java.net.BindException || (e.getMessage() != null && e.getMessage().contains("Address already in use"))) {
+                    System.out.println("ℹ️ H2 TCP Server is already active on port " + AppConfig.getDbPort() + ".");
+                } else {
+                    System.err.println("⚠️ Error starting H2 TCP server: " + e.getMessage());
+                }
             }
         }
     }

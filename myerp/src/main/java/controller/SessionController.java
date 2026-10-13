@@ -51,6 +51,9 @@ public class SessionController implements Initializable, Refreshable {
     private ObservableList<Session> sessionList = FXCollections.observableArrayList();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private final dao.PaymentDAO paymentDAO = new dao.PaymentDAO();
+    private final dao.PatientDAO patientDAO = new dao.PatientDAO();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         datePicker.setValue(LocalDate.now());
@@ -76,21 +79,40 @@ public class SessionController implements Initializable, Refreshable {
         });
         treatmentColumn.setCellValueFactory(new PropertyValueFactory<>("treatment"));
         costColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getCost())));
+                cellData -> new SimpleStringProperty(String.format("%.2f", cellData.getValue().getCost())));
         paidColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getPaidAmount())));
+                cellData -> new SimpleStringProperty(String.format("%.2f", cellData.getValue().getPaidAmount())));
 
         statusColumn.setCellValueFactory(cellData -> {
-            String status = cellData.getValue().getPaymentStatus();
-            return new SimpleStringProperty(status);
+            Session s = cellData.getValue();
+            if (s.getPaidAmount() >= s.getCost() && s.getCost() > 0) {
+                return new SimpleStringProperty("RÉGLÉ");
+            } else if (s.getPaidAmount() > 0) {
+                return new SimpleStringProperty("PARTIEL");
+            } else {
+                // If 0 cash paid today, check if covered by patient's balance
+                model.Patient p = patientDAO.getPatientById(s.getPatientId());
+                if (p != null && p.getBalance() <= 0.01) {
+                    return new SimpleStringProperty("COUVERT (AVANCE)");
+                } else {
+                    return new SimpleStringProperty("IMPAYÉ");
+                }
+            }
         });
 
         balanceColumn.setCellValueFactory(cellData -> {
-            double balance = cellData.getValue().getCost() - cellData.getValue().getPaidAmount();
-            return new SimpleStringProperty(String.format("%.2f", balance));
+            Session s = cellData.getValue();
+            model.Patient p = patientDAO.getPatientById(s.getPatientId());
+            double bal = p != null ? p.getBalance() : (s.getCost() - s.getPaidAmount());
+            if (bal < -0.01) {
+                return new SimpleStringProperty(String.format("+%.2f (Avance)", Math.abs(bal)));
+            } else if (bal > 0.01) {
+                return new SimpleStringProperty(String.format("%.2f (Dû)", bal));
+            } else {
+                return new SimpleStringProperty("0.00 (À jour)");
+            }
         });
 
-        // Add action buttons column if needed or use context menu
         sessionTable.setItems(sessionList);
     }
 
@@ -102,22 +124,23 @@ public class SessionController implements Initializable, Refreshable {
 
     private void updateSummaryCards() {
         double totalCost = 0;
-        double totalPaid = 0;
         for (Session s : sessionList) {
             // Only add normal sessions (where therapyPlanId is null or 0)
             if (s.getTherapyPlanId() == null || s.getTherapyPlanId() == 0) {
                 totalCost += s.getCost();
-                totalPaid += s.getPaidAmount();
             }
         }
         
         String date = datePicker.getValue().format(DATE_FORMATTER);
         double therapyPlanTotal = therapyPlanDAO.getTotalCostByDate(date);
         totalCost += therapyPlanTotal;
-        totalPaid += therapyPlanTotal;
         
+        // Exact physical cash in drawer on this business date from payment ledger
+        dao.PaymentDAO.DailyCashRegister cashRegister = paymentDAO.getDailyCashRegister(date);
+        double actualCashInDrawer = cashRegister.netCash();
+
         dayTotalCostLabel.setText(String.format("%.2f DZD", totalCost));
-        dayTotalPaidLabel.setText(String.format("%.2f DZD", totalPaid));
+        dayTotalPaidLabel.setText(String.format("%.2f DZD", actualCashInDrawer));
     }
 
     @FXML
@@ -161,22 +184,29 @@ public class SessionController implements Initializable, Refreshable {
             Parent root = loader.load();
 
             SessionFormController controller = loader.getController();
-            controller.setSession(session, session != null ? session.getPatientId() : 0);
 
             Stage stage = new Stage();
-            stage.setTitle(session == null ? "Nouvelle Séance" : "Modifier la Séance");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UTILITY);
-            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.TRANSPARENT);
+            Scene scene = new Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            stage.setResizable(false);
 
+            controller.setSession(session, session != null ? session.getPatientId() : 0);
+            controller.initStage(stage);
+
+            stage.sizeToScene();
             stage.showAndWait();
 
             if (controller.isSaveClicked()) {
                 Session updatedSession = controller.getSession();
+                double cashReceived = controller.getCashReceived();
+                String username = util.UserSession.isLoggedIn() ? util.UserSession.getCurrentUser().getUserName() : "Employé";
                 if (session == null) {
-                    sessionDAO.addSession(updatedSession);
+                    sessionDAO.addSession(updatedSession, cashReceived, username);
                 } else {
-                    sessionDAO.updateSession(updatedSession);
+                    sessionDAO.updateSession(updatedSession, cashReceived, username);
                 }
                 loadSessions();
             }

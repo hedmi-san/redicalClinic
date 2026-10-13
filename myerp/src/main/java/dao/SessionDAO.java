@@ -60,61 +60,170 @@ public class SessionDAO {
     }
 
     public boolean addSession(Session session) {
+        return addSession(session, session.getPaidAmount(), "System");
+    }
+
+    public boolean addSession(Session session, double cashReceived, String username) {
         String query = "INSERT INTO session (patientId, sessionDate, treatment, paied, cost, paidAmount, therapyPlanId) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setInt(1, session.getPatientId());
+                    pstmt.setString(2, session.getDate());
+                    pstmt.setString(3, session.getTreatment());
+                    pstmt.setString(4, session.getPaied());
+                    pstmt.setDouble(5, session.getCost());
+                    pstmt.setDouble(6, cashReceived);
+                    if (session.getTherapyPlanId() != null) {
+                        pstmt.setInt(7, session.getTherapyPlanId());
+                    } else {
+                        pstmt.setNull(7, java.sql.Types.INTEGER);
+                    }
 
-            pstmt.setInt(1, session.getPatientId());
-            pstmt.setString(2, session.getDate());
-            pstmt.setString(3, session.getTreatment());
-            pstmt.setString(4, session.getPaied());
-            pstmt.setDouble(5, session.getCost());
-            pstmt.setDouble(6, session.getPaidAmount());
-            if (session.getTherapyPlanId() != null) {
-                pstmt.setInt(7, session.getTherapyPlanId());
-            } else {
-                pstmt.setNull(7, java.sql.Types.INTEGER);
-            }
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        session.setId(generatedKeys.getInt(1));
+                    int affectedRows = pstmt.executeUpdate();
+                    if (affectedRows > 0) {
+                        try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                session.setId(generatedKeys.getInt(1));
+                            }
+                        }
+                    } else {
+                        conn.rollback();
+                        return false;
                     }
                 }
-                new PatientDAO().updatePatientTotals(session.getPatientId());
+
+                // Record actual cash payment in ledger if received
+                if (cashReceived > 0 && (session.getTherapyPlanId() == null || session.getTherapyPlanId() == 0)) {
+                    model.Payment payment = new model.Payment();
+                    payment.setPatientId(session.getPatientId());
+                    payment.setSessionId(session.getId());
+                    payment.setPaymentDate(session.getDate());
+                    payment.setAmount(cashReceived);
+                    payment.setPaymentType(model.Payment.TYPE_SESSION);
+                    payment.setReason("Paiement séance #" + session.getId());
+                    payment.setCreatedBy(username != null ? username : "System");
+                    new PaymentDAO().recordPayment(conn, payment);
+                }
+
+                new PatientDAO().updatePatientTotals(conn, session.getPatientId());
+                conn.commit();
                 return true;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
             }
-            return false;
         } catch (SQLException e) {
-            System.err.println("Error adding session: " + e.getMessage());
+            System.err.println("Error adding session with payment: " + e.getMessage());
             return false;
         }
     }
 
     public boolean updateSession(Session session) {
+        return updateSession(session, session.getPaidAmount(), "System");
+    }
+
+    public boolean updateSession(Session session, double cashReceived, String username) {
         String query = "UPDATE session SET sessionDate = ?, treatment = ?, paied = ?, cost = ?, paidAmount = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                    pstmt.setString(1, session.getDate());
+                    pstmt.setString(2, session.getTreatment());
+                    pstmt.setString(3, session.getPaied());
+                    pstmt.setDouble(4, session.getCost());
+                    pstmt.setDouble(5, cashReceived);
+                    pstmt.setInt(6, session.getId());
 
-            pstmt.setString(1, session.getDate());
-            pstmt.setString(2, session.getTreatment());
-            pstmt.setString(3, session.getPaied());
-            pstmt.setDouble(4, session.getCost());
-            pstmt.setDouble(5, session.getPaidAmount());
-            pstmt.setInt(6, session.getId());
+                    int affectedRows = pstmt.executeUpdate();
+                    if (affectedRows == 0) {
+                        conn.rollback();
+                        return false;
+                    }
+                }
 
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                new PatientDAO().updatePatientTotals(session.getPatientId());
+                // Check if payment already exists for this session
+                String checkPaymentQuery = "SELECT id, amount FROM payment WHERE sessionId = ? AND paymentType = 'SESSION' AND reversalOf IS NULL";
+                Integer existingPaymentId = null;
+                Double existingAmount = null;
+                try (PreparedStatement pstmt = conn.prepareStatement(checkPaymentQuery)) {
+                    pstmt.setInt(1, session.getId());
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                        if (rs.next()) {
+                            existingPaymentId = rs.getInt("id");
+                            existingAmount = rs.getDouble("amount");
+                        }
+                    }
+                }
+
+                if (existingPaymentId != null) {
+                    if (cashReceived <= 0) {
+                        // Reverse existing payment
+                        model.Payment reversal = new model.Payment();
+                        reversal.setPatientId(session.getPatientId());
+                        reversal.setSessionId(session.getId());
+                        reversal.setPaymentDate(session.getDate());
+                        reversal.setAmount(-Math.abs(existingAmount));
+                        reversal.setPaymentType(model.Payment.TYPE_REVERSAL);
+                        reversal.setReversalOf(existingPaymentId);
+                        reversal.setReason("Annulation paiement séance #" + session.getId());
+                        reversal.setCreatedBy(username != null ? username : "System");
+                        new PaymentDAO().recordPayment(conn, reversal);
+                    } else if (Math.abs(existingAmount - cashReceived) > 0.001) {
+                        // Amount changed: reverse old + insert new
+                        model.Payment reversal = new model.Payment();
+                        reversal.setPatientId(session.getPatientId());
+                        reversal.setSessionId(session.getId());
+                        reversal.setPaymentDate(session.getDate());
+                        reversal.setAmount(-Math.abs(existingAmount));
+                        reversal.setPaymentType(model.Payment.TYPE_REVERSAL);
+                        reversal.setReversalOf(existingPaymentId);
+                        reversal.setReason("Correction montant séance #" + session.getId());
+                        reversal.setCreatedBy(username != null ? username : "System");
+                        new PaymentDAO().recordPayment(conn, reversal);
+
+                        model.Payment corrected = new model.Payment();
+                        corrected.setPatientId(session.getPatientId());
+                        corrected.setSessionId(session.getId());
+                        corrected.setPaymentDate(session.getDate());
+                        corrected.setAmount(cashReceived);
+                        corrected.setPaymentType(model.Payment.TYPE_SESSION);
+                        corrected.setReason("Paiement corrigé séance #" + session.getId());
+                        corrected.setCreatedBy(username != null ? username : "System");
+                        new PaymentDAO().recordPayment(conn, corrected);
+                    }
+                } else if (cashReceived > 0 && (session.getTherapyPlanId() == null || session.getTherapyPlanId() == 0)) {
+                    // No existing payment: insert new payment
+                    model.Payment payment = new model.Payment();
+                    payment.setPatientId(session.getPatientId());
+                    payment.setSessionId(session.getId());
+                    payment.setPaymentDate(session.getDate());
+                    payment.setAmount(cashReceived);
+                    payment.setPaymentType(model.Payment.TYPE_SESSION);
+                    payment.setReason("Paiement séance #" + session.getId());
+                    payment.setCreatedBy(username != null ? username : "System");
+                    new PaymentDAO().recordPayment(conn, payment);
+                }
+
+                new PatientDAO().updatePatientTotals(conn, session.getPatientId());
+                conn.commit();
                 return true;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
             }
-            return false;
         } catch (SQLException e) {
-            System.err.println("Error updating session: " + e.getMessage());
+            System.err.println("Error updating session with payment: " + e.getMessage());
             return false;
         }
     }

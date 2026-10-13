@@ -1,0 +1,306 @@
+/* ==========================================================================
+   Session Form Modal - Cabinet Nour El Islam
+   Theme Tokens:
+   - Primary Teal: #0f9d84 / Hover: #0b8570
+   - Surface / BG: #ffffff / #f8fafc
+   - Borders: #e2e8f0 / Focus dropshadow: rgba(15, 157, 132, 0.25)
+   - Text: #0f172a / Muted: #64748b / Placeholder: #94a3b8
+   - Control Height: 38px / Radius: 8px / Card Radius: 16px
+   ========================================================================== */
+
+.modal-root-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 16px;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.session-modal-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.20), 24, 0, 0, 6);
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Nunito", sans-serif;
+}
+
+/* --- HEADER BAR --- */
+.header-bar {
+    -fx-padding: 20px 24px 16px 24px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cursor: move;
+}
+
+.modal-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #0f172a;
+}
+
+.modal-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.btn-close-icon {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.btn-close-icon:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #0f172a;
+}
+
+/* --- LABELS --- */
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.field-error-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: 600;
+}
+
+/* --- CONTROLS SHARED TOKENS --- */
+.form-field {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 13px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+.form-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+    -fx-effect: dropshadow(gaussian, rgba(15, 157, 132, 0.25), 6, 0, 0, 0);
+}
+
+/* --- SEARCH PATIENT FIELD --- */
+.search-input {
+    -fx-padding: 0 32px 0 34px;
+}
+
+.search-icon-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 0 12px;
+}
+
+.btn-clear-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 10px 0 0;
+}
+
+.btn-clear-input:hover {
+    -fx-text-fill: #0f172a;
+}
+
+/* --- DATE PICKER --- */
+.custom-date-picker {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.custom-date-picker > .text-field {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+}
+
+.custom-date-picker > .text-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+    -fx-effect: dropshadow(gaussian, rgba(15, 157, 132, 0.25), 6, 0, 0, 0);
+}
+
+.custom-date-picker > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0 12px 0 0;
+}
+
+.custom-date-picker > .arrow-button > .arrow {
+    -fx-background-color: #64748b;
+    -fx-shape: "M 19 4 h -1 V 2 h -2 v 2 H 8 V 2 H 6 v 2 H 5 c -1.1 0 -2 0.9 -2 2 v 14 c 0 1.1 0.9 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 6 c 0 -1.1 -0.9 -2 -2 -2 Z m 0 16 H 5 V 10 h 14 v 10 Z M 9 14 H 7 v -2 h 2 v 2 Z m 4 0 h -2 v -2 h 2 v 2 Z m 4 0 h -2 v -2 h 2 v 2 Z";
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+/* --- NOTES TEXTAREA --- */
+.notes-text-area {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+.notes-text-area:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+    -fx-effect: dropshadow(gaussian, rgba(15, 157, 132, 0.25), 6, 0, 0, 0);
+}
+
+.notes-text-area .scroll-pane,
+.notes-text-area .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.notes-text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 9px 12px;
+}
+
+/* --- MONEY FIELDS --- */
+.money-field {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-padding: 0 38px 0 12px;
+}
+
+.currency-suffix {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 0 14px 0 0;
+}
+
+.pay-full-link {
+    -fx-text-fill: #0f9d84;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-underline: false;
+    -fx-padding: 2px 0 0 0;
+}
+
+.pay-full-link:hover {
+    -fx-underline: true;
+    -fx-text-fill: #0b8570;
+}
+
+/* --- FINANCIAL SUMMARY BOX --- */
+.summary-box {
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 12px 14px;
+}
+
+.summary-box-empty {
+    -fx-background-color: transparent;
+    -fx-border-color: #cbd5e1;
+    -fx-border-style: dashed;
+    -fx-border-width: 1px;
+}
+
+.summary-box-active {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+}
+
+/* --- FOOTER BUTTONS --- */
+.footer-bar {
+    -fx-padding: 16px 24px 20px 24px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.btn-cancel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-min-width: 110px;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.btn-save {
+    -fx-background-color: #0f9d84;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-min-width: 110px;
+}
+
+.btn-save:hover {
+    -fx-background-color: #0b8570;
+}
+
+.btn-save:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* --- PATIENT POPUP LISTVIEW --- */
+.patient-popup-list {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.14), 16, 0, 0, 4);
+    -fx-padding: 4px;
+    -fx-hbar-policy: never;
+}
+
+.patient-popup-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 10px;
+    -fx-cursor: hand;
+}
+
+.patient-popup-list .list-cell:filled:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.patient-popup-list .list-cell:filled:selected {
+    -fx-background-color: #f1f5f9;
+}
