@@ -410,10 +410,31 @@ public class PatientDetailController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label hintLabel = new Label("Double-cliquer pour ouvrir");
-        hintLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-style: italic;");
+        HBox actions = new HBox(8);
+        Button openBtn = new Button("Ouvrir");
+        openBtn.getStyleClass().add("btn-ghost");
+        openBtn.setOnAction(e -> showTherapyPlanDetail(plan));
 
-        topRow.getChildren().addAll(dateLabel, costLabel, badge, spacer, hintLabel);
+        Button deleteBtn = new Button("Supprimer");
+        deleteBtn.getStyleClass().add("btn-ghost");
+        deleteBtn.setStyle("-fx-text-fill: #e11d48;");
+        deleteBtn.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ce plan et toutes ses séances ?",
+                    ButtonType.YES, ButtonType.NO);
+            alert.showAndWait().ifPresent(res -> {
+                if (res == ButtonType.YES) {
+                    therapyPlanDAO.deleteTherapyPlan(plan.getId(), plan.getPatientId());
+                    patientDAO.updatePatientTotals(patient.getId());
+                    refreshTherapyPlans();
+                    refreshUI();
+                    if (onUpdateListener != null)
+                        onUpdateListener.run();
+                }
+            });
+        });
+
+        actions.getChildren().addAll(openBtn, deleteBtn);
+        topRow.getChildren().addAll(dateLabel, costLabel, badge, spacer, actions);
 
         card.getChildren().add(topRow);
         return card;

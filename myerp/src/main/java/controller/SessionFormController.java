@@ -81,6 +81,9 @@ public class SessionFormController {
     private Patient selectedPatient;
     private boolean saveClicked = false;
     private boolean userManuallyChangedCash = false;
+    private boolean isEditMode = false;
+    private double originalCost = 0.0;
+    private double originalPaidAmount = 0.0;
 
     private final PatientDAO patientDAO = new PatientDAO();
     private final ObservableList<Patient> allPatients = FXCollections.observableArrayList();
@@ -209,7 +212,12 @@ public class SessionFormController {
     private void setupListeners() {
         // Search text typing with debounce
         patientSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (selectedPatient != null && !newVal.equals(selectedPatient.getName())) {
+            if (selectedPatient != null && newVal != null && newVal.trim().equalsIgnoreCase(selectedPatient.getName().trim())) {
+                searchDebounce.stop();
+                suggestionPopup.hide();
+                return;
+            }
+            if (selectedPatient != null && (newVal == null || !newVal.trim().equalsIgnoreCase(selectedPatient.getName().trim()))) {
                 // User edited the field after selecting a patient: clear selection
                 selectedPatient = null;
                 btnClearPatient.setVisible(false);
@@ -249,7 +257,7 @@ public class SessionFormController {
 
         // Cost field listeners
         costField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!userManuallyChangedCash) {
+            if (!userManuallyChangedCash && !isEditMode) {
                 applySuggestedCashAmount();
             }
             recalculateFinancialSummary();
@@ -316,13 +324,16 @@ public class SessionFormController {
 
     private void commitPatientSelection(Patient patient) {
         this.selectedPatient = patient;
+        searchDebounce.stop();
+        suggestionPopup.hide();
         patientSearchField.setText(patient.getName());
         btnClearPatient.setVisible(true);
         patientErrorLabel.setVisible(false);
         patientErrorLabel.setManaged(false);
-        suggestionPopup.hide();
 
-        applySuggestedCashAmount();
+        if (!userManuallyChangedCash && !isEditMode) {
+            applySuggestedCashAmount();
+        }
         recalculateFinancialSummary();
         updateSaveButtonState();
     }
@@ -348,6 +359,9 @@ public class SessionFormController {
     }
 
     private void applySuggestedCashAmount() {
+        if (isEditMode) {
+            return;
+        }
         if (selectedPatient == null) {
             paidAmountField.setText("0,00");
             return;
@@ -400,10 +414,18 @@ public class SessionFormController {
         double currentBalance = selectedPatient.getBalance();
         double cost = parseAmount(costField.getText());
         double cashReceived = parseAmount(paidAmountField.getText());
-        double newBalance = currentBalance + cost - cashReceived;
 
-        // Row 1: Solde actuel
-        HBox row1 = createSummaryRow("Solde actuel", formatBalance(currentBalance), getBalanceColor(currentBalance));
+        boolean isSessionForThisPatient = isEditMode && session != null
+                && selectedPatient != null && session.getPatientId() == selectedPatient.getId();
+        double effectiveOriginalCost = isSessionForThisPatient ? originalCost : 0.0;
+        double effectiveOriginalPaid = isSessionForThisPatient ? originalPaidAmount : 0.0;
+
+        double baseBalance = currentBalance - effectiveOriginalCost + effectiveOriginalPaid;
+        double newBalance = baseBalance + cost - cashReceived;
+
+        // Row 1: Solde actuel or Solde avant séance
+        String balanceLabel = isEditMode ? "Solde avant séance" : "Solde actuel";
+        HBox row1 = createSummaryRow(balanceLabel, formatBalance(baseBalance), getBalanceColor(baseBalance));
         // Row 2: Cette séance
         HBox row2 = createSummaryRow("Cette séance", "+ " + formatNumber(cost) + " DA", "#334155");
         // Row 3: − Espèces reçues
@@ -490,15 +512,27 @@ public class SessionFormController {
 
     public void setSession(Session session, int patientId) {
         this.session = session;
+        this.isEditMode = (session != null && session.getId() > 0);
 
-        if (session != null) {
+        if (isEditMode) {
+            this.originalCost = session.getCost();
+            this.originalPaidAmount = session.getPaidAmount();
+            this.userManuallyChangedCash = true;
+
             titleLabel.setText("Modifier la séance");
             subtitleLabel.setText("Mettre à jour les informations de la séance");
-            datePicker.setValue(LocalDate.parse(session.getDate(), DATE_FORMATTER));
+            if (session.getDate() != null && !session.getDate().trim().isEmpty()) {
+                try {
+                    datePicker.setValue(LocalDate.parse(session.getDate(), DATE_FORMATTER));
+                } catch (Exception e) {
+                    datePicker.setValue(LocalDate.now());
+                }
+            } else {
+                datePicker.setValue(LocalDate.now());
+            }
             treatmentArea.setText(session.getTreatment());
             costField.setText(formatNumber(session.getCost()));
             paidAmountField.setText(formatNumber(session.getPaidAmount()));
-            userManuallyChangedCash = true;
 
             int pid = session.getPatientId() > 0 ? session.getPatientId() : patientId;
             if (pid > 0) {
@@ -507,14 +541,20 @@ public class SessionFormController {
                     commitPatientSelection(p);
                 }
             }
+            searchDebounce.stop();
+            suggestionPopup.hide();
+
             saveBtn.setText("Mettre à jour");
         } else {
+            this.originalCost = 0.0;
+            this.originalPaidAmount = 0.0;
+            this.userManuallyChangedCash = false;
+
             titleLabel.setText("Nouvelle séance");
             subtitleLabel.setText("Enregistrer un traitement et le règlement du jour");
             datePicker.setValue(LocalDate.now());
             costField.setText("0,00");
             paidAmountField.setText("0,00");
-            userManuallyChangedCash = false;
 
             if (patientId > 0) {
                 Patient p = patientDAO.getPatientById(patientId);
@@ -522,6 +562,9 @@ public class SessionFormController {
                     commitPatientSelection(p);
                 }
             }
+            searchDebounce.stop();
+            suggestionPopup.hide();
+
             saveBtn.setText("Enregistrer");
         }
 

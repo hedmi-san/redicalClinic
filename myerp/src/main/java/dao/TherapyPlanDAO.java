@@ -57,20 +57,34 @@ public class TherapyPlanDAO {
 
     public boolean updateTherapyPlan(TherapyPlan plan) {
         String query = "UPDATE therapyPlan SET date = ?, cost = ? WHERE id = ?";
+        String updatePayment = "UPDATE payment SET amount = ?, paymentDate = ? WHERE patientId = ? AND paymentType = 'THERAPY_PLAN' AND reason = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setString(1, plan.getDate());
-            pstmt.setDouble(2, plan.getCost());
-            pstmt.setInt(3, plan.getId());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                new PatientDAO().updatePatientTotals(plan.getPatientId());
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                    pstmt.setString(1, plan.getDate());
+                    pstmt.setDouble(2, plan.getCost());
+                    pstmt.setInt(3, plan.getId());
+                    pstmt.executeUpdate();
+                }
+                try (PreparedStatement pstmt = conn.prepareStatement(updatePayment)) {
+                    pstmt.setDouble(1, plan.getCost());
+                    pstmt.setString(2, plan.getDate());
+                    pstmt.setInt(3, plan.getPatientId());
+                    pstmt.setString(4, "Forfait thérapie #" + plan.getId());
+                    pstmt.executeUpdate();
+                }
+                new PatientDAO().updatePatientTotals(conn, plan.getPatientId());
+                conn.commit();
                 return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
             }
-            return false;
         } catch (SQLException e) {
             System.err.println("Error updating therapy plan: " + e.getMessage());
             return false;
@@ -78,27 +92,49 @@ public class TherapyPlanDAO {
     }
 
     public boolean deleteTherapyPlan(int id, int patientId) {
-        // Delete associated sessions first, then the plan
+        // Delete associated sessions and linked payments first, then the plan
         String deleteSessionsQuery = "DELETE FROM session WHERE therapyPlanId = ?";
+        String nullifyReversalsQuery = "UPDATE payment SET reversalOf = NULL WHERE reversalOf IN (SELECT id FROM payment WHERE patientId = ? AND paymentType = 'THERAPY_PLAN' AND reason = ?)";
+        String deleteReversalsQuery = "DELETE FROM payment WHERE patientId = ? AND paymentType = 'REVERSAL' AND reason LIKE ?";
+        String deletePaymentsQuery = "DELETE FROM payment WHERE patientId = ? AND paymentType = 'THERAPY_PLAN' AND reason = ?";
         String deletePlanQuery = "DELETE FROM therapyPlan WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement pstmt = conn.prepareStatement(deleteSessionsQuery)) {
                     pstmt.setInt(1, id);
                     pstmt.executeUpdate();
                 }
+                String planReason = "Forfait thérapie #" + id;
+                try (PreparedStatement pstmt = conn.prepareStatement(nullifyReversalsQuery)) {
+                    pstmt.setInt(1, patientId);
+                    pstmt.setString(2, planReason);
+                    pstmt.executeUpdate();
+                }
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteReversalsQuery)) {
+                    pstmt.setInt(1, patientId);
+                    pstmt.setString(2, "%#" + id + "%");
+                    pstmt.executeUpdate();
+                }
+                try (PreparedStatement pstmt = conn.prepareStatement(deletePaymentsQuery)) {
+                    pstmt.setInt(1, patientId);
+                    pstmt.setString(2, planReason);
+                    pstmt.executeUpdate();
+                }
                 try (PreparedStatement pstmt = conn.prepareStatement(deletePlanQuery)) {
                     pstmt.setInt(1, id);
                     pstmt.executeUpdate();
                 }
+                new PatientDAO().updatePatientTotals(conn, patientId);
                 conn.commit();
-                new PatientDAO().updatePatientTotals(patientId);
                 return true;
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
             }
         } catch (SQLException e) {
             System.err.println("Error deleting therapy plan: " + e.getMessage());

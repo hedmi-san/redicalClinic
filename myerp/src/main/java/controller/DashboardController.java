@@ -55,6 +55,7 @@ public class DashboardController implements Initializable, Refreshable {
     private final SoldDAO soldDAO = new SoldDAO();
     private final dao.TherapyPlanDAO therapyPlanDAO = new dao.TherapyPlanDAO();
     private final dao.PaymentDAO paymentDAO = new dao.PaymentDAO();
+    private final dao.PatientDAO patientDAO = new dao.PatientDAO();
 
     private final String[] months = {
             "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -108,19 +109,18 @@ public class DashboardController implements Initializable, Refreshable {
         
         double totalExpectedProfit = sessionSummary.totalCost() + therapyPlanTotal;
         double totalActualProfit = paymentDAO.getMonthlyTotalCollected(month, year);
+        double resteAPercevoir = patientDAO.getTotalOutstandingDebt();
 
         expectedProfitLabel.setText(String.format("%,.2f", totalExpectedProfit));
         actualProfitLabel.setText(String.format("%,.2f", totalActualProfit));
-
-        double balance = totalExpectedProfit - totalActualProfit;
-        balanceLabel.setText(String.format("%,.2f", balance));
+        balanceLabel.setText(String.format("%,.2f", resteAPercevoir));
 
         workerPaymentsLabel.setText(String.format("%,.2f", workerPayments));
         billsLabel.setText(String.format("%,.2f", billTotal));
         salesLabel.setText(String.format("%,.2f", soldSummary.totalRevenue()));
 
-        // Color balancing - optionally highlight if balance is high or profit is low
-        if (balance > 0) {
+        // Color balancing - highlight in orange if there is outstanding patient debt to collect
+        if (resteAPercevoir > 0.01) {
             balanceLabel.setStyle("-fx-text-fill: #f59e0b;"); // Orange warning
         } else {
             balanceLabel.setStyle("-fx-text-fill: #14b8a6;"); // Teal healthy

@@ -23,28 +23,28 @@
             <Button text="Supprimer Patient" onAction="#handleDeletePatient" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
         </HBox>
     </HBox>
-    <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane">
+    <!-- Financial Stats (Always visible across all tabs) -->
+    <HBox spacing="20" styleClass="fin-cards-grid">
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="COÛT TOTAL" styleClass="fc-label" />
+            <Label fx:id="totalCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
+        </VBox>
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="TOTAL PAYÉ" styleClass="fc-label" />
+            <Label fx:id="totalPaidLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
+        </VBox>
+        <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
+            <Label text="SOLDE" styleClass="fc-label" />
+            <Label fx:id="balanceLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
+        </VBox>
+    </HBox>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane" VBox.vgrow="ALWAYS">
         <tabs>
         <!-- Normal Session -->
             <Tab text="Session Normale">
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="profile-scroll">
                     <VBox spacing="0">
-                        <!-- Financial Stats -->
-                        <HBox spacing="20" styleClass="fin-cards-grid">
-                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                                <Label text="COÛT TOTAL" styleClass="fc-label" />
-                                <Label fx:id="totalCostLabel" text="0.00 DZD" styleClass="fc-value, fc-teal" />
-                            </VBox>
-                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                                <Label text="TOTAL PAYÉ" styleClass="fc-label" />
-                                <Label fx:id="totalPaidLabel" text="0.00 DZD" styleClass="fc-value, fc-green" />
-                            </VBox>
-                            <VBox styleClass="fin-card" HBox.hgrow="ALWAYS">
-                                <Label text="SOLDE" styleClass="fc-label" />
-                                <Label fx:id="balanceLabel" text="0.00 DZD" styleClass="fc-value, fc-rose" />
-                            </VBox>
-                        </HBox>
-
                         <!-- Session History -->
                         <VBox styleClass="sessions-area" spacing="24">
                             <HBox alignment="CENTER_LEFT">

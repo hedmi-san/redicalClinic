@@ -202,30 +202,39 @@ public class DatabaseInitializer {
             // 12. Idempotent Backfill Migration of Legacy Payments into Ledger
             // ----------------------------------------------------------------
             try {
-                // Backfill legacy standalone session payments
-                stmt.execute("""
-                    INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
-                    SELECT s.patientId, s.id,
-                           CAST(SUBSTRING(s.sessionDate, 1, 10) AS DATE),
-                           CAST(SUBSTRING(s.sessionDate, 1, 10) || ' 12:00:00' AS TIMESTAMP),
-                           s.paidAmount, 'SESSION', 'Paiement initial séance #' || s.id, 'MIGRATION'
-                    FROM session s
-                    WHERE s.paidAmount > 0
-                      AND s.therapyPlanId IS NULL
-                      AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.sessionId = s.id);
-                """);
+                boolean migrationAlreadyDone = false;
+                try (var rs = stmt.executeQuery("SELECT COUNT(*) FROM payment WHERE createdBy = 'MIGRATION'")) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        migrationAlreadyDone = true;
+                    }
+                }
 
-                // Backfill legacy therapy plan payments
-                stmt.execute("""
-                    INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
-                    SELECT tp.patientId, NULL,
-                           CAST(SUBSTRING(tp.date, 1, 10) AS DATE),
-                           CAST(SUBSTRING(tp.date, 1, 10) || ' 12:00:00' AS TIMESTAMP),
-                           tp.cost, 'THERAPY_PLAN', 'Forfait thérapie #' || tp.id, 'MIGRATION'
-                    FROM therapyPlan tp
-                    WHERE tp.cost > 0
-                      AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.paymentType = 'THERAPY_PLAN' AND p.reason = 'Forfait thérapie #' || tp.id);
-                """);
+                if (!migrationAlreadyDone) {
+                    // Backfill legacy standalone session payments
+                    stmt.execute("""
+                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
+                        SELECT s.patientId, s.id,
+                               CAST(SUBSTRING(s.sessionDate, 1, 10) AS DATE),
+                               CAST(SUBSTRING(s.sessionDate, 1, 10) || ' 12:00:00' AS TIMESTAMP),
+                               s.paidAmount, 'SESSION', 'Paiement initial séance #' || s.id, 'MIGRATION'
+                        FROM session s
+                        WHERE s.paidAmount > 0
+                          AND s.therapyPlanId IS NULL
+                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.sessionId = s.id);
+                    """);
+
+                    // Backfill legacy therapy plan payments
+                    stmt.execute("""
+                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
+                        SELECT tp.patientId, NULL,
+                               CAST(SUBSTRING(tp.date, 1, 10) AS DATE),
+                               CAST(SUBSTRING(tp.date, 1, 10) || ' 12:00:00' AS TIMESTAMP),
+                               tp.cost, 'THERAPY_PLAN', 'Forfait thérapie #' || tp.id, 'MIGRATION'
+                        FROM therapyPlan tp
+                        WHERE tp.cost > 0
+                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.paymentType = 'THERAPY_PLAN' AND p.reason = 'Forfait thérapie #' || tp.id);
+                    """);
+                }
             } catch (SQLException e) {
                 System.err.println("⚠️ Warning during payment ledger backfill: " + e.getMessage());
             }

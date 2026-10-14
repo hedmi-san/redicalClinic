@@ -180,6 +180,20 @@ public class PatientDAO {
         return false;
     }
 
+    public double getTotalOutstandingDebt() {
+        String query = "SELECT COALESCE(SUM(totalCost - totalPaid), 0.0) FROM patient WHERE (totalCost - totalPaid) > 0.01";
+        try (Connection conn = DatabaseConfig.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching total outstanding debt: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
     public void updatePatientTotals(int patientId) {
         try (Connection conn = DatabaseConfig.getConnection()) {
             updatePatientTotals(conn, patientId);

@@ -5,9 +5,11 @@ import config.DatabaseInitializer;
 import dao.PatientDAO;
 import dao.PaymentDAO;
 import dao.SessionDAO;
+import dao.TherapyPlanDAO;
 import model.Patient;
 import model.Payment;
 import model.Session;
+import model.TherapyPlan;
 import controller.SessionFormController;
 
 import java.sql.Connection;
@@ -218,13 +220,39 @@ public class PaymentLedgerVerificationTest {
             if (register.reversals() < 600.0) {
                 throw new AssertionError("Reversals should be at least 600.0!");
             }
-            System.out.println("  ✓ Daily cash drawer arithmetic strictly verified.");
+            // 9. Therapy Plan Lifecycle & Patient Totals Alignment
+            System.out.println("\n[Test 9] Therapy Plan Lifecycle & Balance Alignment...");
+            TherapyPlanDAO therapyPlanDAO = new TherapyPlanDAO();
+            TherapyPlan testPlan = new TherapyPlan();
+            testPlan.setPatientId(patientId);
+            testPlan.setDate(today);
+            testPlan.setCost(10000.0);
+            if (!therapyPlanDAO.addTherapyPlan(testPlan)) {
+                throw new AssertionError("Failed to add test therapy plan!");
+            }
+            patientDAO.updatePatientTotals(patientId);
 
-            // 9. Clean up test patient data
-            System.out.println("\n[Test 9] Cleaning Up Test Data...");
+            Patient pWithPlan = patientDAO.getPatientById(patientId);
+            if (Math.abs(pWithPlan.getTotalCost() - 11000.0) > 0.01) {
+                throw new AssertionError("Expected totalCost 11000.0 with therapy plan, got: " + pWithPlan.getTotalCost());
+            }
+
+            // Deleting the therapy plan must restore cost and update patient totals
+            if (!therapyPlanDAO.deleteTherapyPlan(testPlan.getId(), patientId)) {
+                throw new AssertionError("Failed to delete test therapy plan!");
+            }
+            Patient pAfterPlanDeleted = patientDAO.getPatientById(patientId);
+            if (Math.abs(pAfterPlanDeleted.getTotalCost() - 1000.0) > 0.01) {
+                throw new AssertionError("Expected totalCost restored to 1000.0 after plan deletion, got: " + pAfterPlanDeleted.getTotalCost());
+            }
+            System.out.println("  ✓ Therapy plan creation and deletion properly synchronizes patient totals.");
+
+            // 10. Clean up test patient data
+            System.out.println("\n[Test 10] Cleaning Up Test Data...");
             try (Connection conn = DatabaseConfig.getConnection();
                  PreparedStatement nullReversals = conn.prepareStatement("UPDATE payment SET reversalOf = NULL WHERE patientId = ?");
                  PreparedStatement delPayments = conn.prepareStatement("DELETE FROM payment WHERE patientId = ?");
+                 PreparedStatement delPlans = conn.prepareStatement("DELETE FROM therapyPlan WHERE patientId = ?");
                  PreparedStatement delSessions = conn.prepareStatement("DELETE FROM session WHERE patientId = ?");
                  PreparedStatement delPatient = conn.prepareStatement("DELETE FROM patient WHERE id = ?")) {
                 nullReversals.setInt(1, patientId);
@@ -232,6 +260,9 @@ public class PaymentLedgerVerificationTest {
 
                 delPayments.setInt(1, patientId);
                 delPayments.executeUpdate();
+
+                delPlans.setInt(1, patientId);
+                delPlans.executeUpdate();
 
                 delSessions.setInt(1, patientId);
                 delSessions.executeUpdate();
@@ -241,8 +272,8 @@ public class PaymentLedgerVerificationTest {
             }
             System.out.println("  ✓ Test patient and linked ledger rows successfully cleaned up.");
 
-            // 10. Amount Parsing & Locale Formatting Verification
-            System.out.println("\n[Test 10] Amount Parsing Verification for French/Algerian Locale & Currencies...");
+            // 11. Amount Parsing & Locale Formatting Verification
+            System.out.println("\n[Test 11] Amount Parsing Verification for French/Algerian Locale & Currencies...");
             assertAmountParsed("2 500,00", 2500.0);
             assertAmountParsed("2\u202F500,00", 2500.0); // Narrow no-break space from Java 21 NumberFormat
             assertAmountParsed("2\u00A0500,00", 2500.0); // Standard non-breaking space
