@@ -133,7 +133,8 @@ public class PatientDetailController {
     }
 
     private void refreshPayments() {
-        if (paymentsContainer == null) return;
+        if (paymentsContainer == null)
+            return;
         paymentsContainer.getChildren().clear();
         List<Payment> payments = paymentDAO.getPaymentsByPatientId(patient.getId());
         if (payments.isEmpty()) {
@@ -242,15 +243,22 @@ public class PatientDetailController {
     @FXML
     private void printPatientBill() {
         try {
+            // Synchronize and refresh patient data from DB to ensure ledger accuracy
+            patientDAO.updatePatientTotals(patient.getId());
+            Patient updatedPatient = patientDAO.getPatientById(patient.getId());
+            if (updatedPatient != null) {
+                this.patient = updatedPatient;
+            }
+
             // 1. Load the session selection dialog
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/patient_session_invoice_form.fxml"));
             Parent root = loader.load();
 
             PatientSessionInvoiceFormController controller = loader.getController();
 
-            // Pass current patient's sessions to the dialog
+            // Pass current patient and their sessions to the dialog
             List<Session> sessions = sessionDAO.getSessionsByPatientId(patient.getId());
-            controller.setSessions(sessions);
+            controller.setPatientAndSessions(patient, sessions);
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Sélectionner les séances");
@@ -278,8 +286,7 @@ public class PatientDetailController {
             fileChooser.setTitle("Enregistrer la facture PDF");
             fileChooser.setInitialFileName("Facture_" + patient.getName().replaceAll("\\s+", "_") + ".pdf");
             fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-            );
+                    new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
 
             Stage ownerStage = (Stage) heroName.getScene().getWindow();
             File file = fileChooser.showSaveDialog(ownerStage);
@@ -625,7 +632,8 @@ public class PatientDetailController {
         reasonLabel.setWrapText(true);
 
         StringBuilder auditInfo = new StringBuilder();
-        auditInfo.append("Enregistré par : ").append(payment.getCreatedBy() != null ? payment.getCreatedBy() : "Système");
+        auditInfo.append("Enregistré par : ")
+                .append(payment.getCreatedBy() != null ? payment.getCreatedBy() : "Système");
         if (payment.getSessionId() != null) {
             auditInfo.append(" | Séance #").append(payment.getSessionId());
         }
@@ -642,7 +650,8 @@ public class PatientDetailController {
 
     @FXML
     private void handleAddPaymentAction() {
-        if (patient == null) return;
+        if (patient == null)
+            return;
 
         Dialog<Payment> dialog = new Dialog<>();
         dialog.setTitle("Nouveau Versement");
@@ -687,7 +696,8 @@ public class PatientDetailController {
                         : Payment.TYPE_SETTLEMENT;
                 String reason = reasonField.getText().trim();
                 if (reason.isEmpty()) {
-                    reason = typeCombo.getSelectionModel().getSelectedIndex() == 0 ? "Versement d'avance" : "Règlement dette";
+                    reason = typeCombo.getSelectionModel().getSelectedIndex() == 0 ? "Versement d'avance"
+                            : "Règlement dette";
                 }
                 String username = UserSession.isLoggedIn() ? UserSession.getCurrentUser().getUserName() : "Employé";
 
@@ -719,7 +729,8 @@ public class PatientDetailController {
 
     @FXML
     private void handleRefundAction() {
-        if (patient == null) return;
+        if (patient == null)
+            return;
 
         double balance = patient.getTotalCost() - patient.getTotalPaid();
         double availableCredit = balance < -0.01 ? Math.abs(balance) : 0;
@@ -728,7 +739,9 @@ public class PatientDetailController {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Aucune Avance Disponible");
             alert.setHeaderText(null);
-            alert.setContentText("Le patient " + patient.getName() + " n'a aucune avance disponible à rembourser.\n(Solde actuel: " + String.format("%.2f DZD", balance) + ")");
+            alert.setContentText(
+                    "Le patient " + patient.getName() + " n'a aucune avance disponible à rembourser.\n(Solde actuel: "
+                            + String.format("%.2f DZD", balance) + ")");
             alert.showAndWait();
             return;
         }
@@ -771,12 +784,15 @@ public class PatientDetailController {
         if (result.isPresent()) {
             double refundAmount = result.get();
             if (refundAmount <= 0 || refundAmount > availableCredit + 0.01) {
-                showErrorAlert(String.format("Montant invalide. Le remboursement doit être compris entre 0.01 et %.2f DZD.", availableCredit));
+                showErrorAlert(
+                        String.format("Montant invalide. Le remboursement doit être compris entre 0.01 et %.2f DZD.",
+                                availableCredit));
                 return;
             }
 
             String reason = reasonField.getText().trim();
-            if (reason.isEmpty()) reason = "Remboursement avance patient";
+            if (reason.isEmpty())
+                reason = "Remboursement avance patient";
             String username = UserSession.isLoggedIn() ? UserSession.getCurrentUser().getUserName() : "Employé";
 
             boolean ok = paymentDAO.refundCredit(patient.getId(), refundAmount, reason, username);
@@ -794,7 +810,9 @@ public class PatientDetailController {
     private void handleReversePayment(Payment p) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Annuler le Paiement");
-        dialog.setHeaderText(String.format("Annulation du paiement #%d de %.2f DZD\n(Action traçable dans le grand livre)", p.getId(), p.getAmount()));
+        dialog.setHeaderText(
+                String.format("Annulation du paiement #%d de %.2f DZD\n(Action traçable dans le grand livre)",
+                        p.getId(), p.getAmount()));
         dialog.setContentText("Motif obligatoire de l'annulation :");
 
         Optional<String> result = dialog.showAndWait();
@@ -821,7 +839,8 @@ public class PatientDetailController {
     private void handleCorrectPayment(Payment p) {
         Dialog<Double> dialog = new Dialog<>();
         dialog.setTitle("Corriger le Paiement #" + p.getId());
-        dialog.setHeaderText(String.format("Correction du paiement #%d (Montant actuel: %.2f DZD)", p.getId(), p.getAmount()));
+        dialog.setHeaderText(
+                String.format("Correction du paiement #%d (Montant actuel: %.2f DZD)", p.getId(), p.getAmount()));
 
         ButtonType saveButtonType = new ButtonType("Corriger", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
