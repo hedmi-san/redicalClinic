@@ -137,6 +137,28 @@ public class DatabaseConfig {
         return DB_DIR + "/" + DB_NAME + ".mv.db";
     }
 
+    /**
+     * Cleanly closes all pooled connections, flushes H2, and stops the embedded TCP server
+     * so that the underlying clinic.mv.db file handle is released on Windows for hot-swap operations.
+     */
+    public static synchronized void stopServerAndResetPool() {
+        try (Connection conn = connectionPool != null ? connectionPool.getConnection() : null) {
+            if (conn != null && !conn.isClosed()) {
+                try (java.sql.Statement stmt = conn.createStatement()) {
+                    stmt.execute("SHUTDOWN");
+                } catch (SQLException ignored) {
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        resetPool();
+        if (tcpServer != null && tcpServer.isRunning(false)) {
+            System.out.println("🛑 Stopping embedded H2 TCP Server for maintenance...");
+            tcpServer.stop();
+            tcpServer = null;
+        }
+    }
+
     /** Cleanly shuts down database server and connections on exit. */
     public static synchronized void shutdown() {
         if (AppConfig.isHost()) {

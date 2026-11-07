@@ -92,6 +92,13 @@
                         </StackPane>
                     </graphic>
                 </Button>
+                <Button fx:id="btnBackups" text="Sauvegardes" styleClass="nav-btn" onAction="#handleNavBackups" maxWidth="Infinity" alignment="BASELINE_LEFT">
+                    <graphic>
+                        <StackPane minWidth="22" prefWidth="22" maxWidth="22" alignment="CENTER" styleClass="nav-icon-container">
+                            <SVGPath content="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.59 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm6 12c0 .5-2.13 2-6 2s-6-1.5-6-2v-2.23c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V17zm0-5c0 .5-2.13 2-6 2s-6-1.5-6-2V9.77c1.61.78 3.72 1.23 6 1.23s4.39-.45 6-1.23V12z" styleClass="nav-icon" />
+                        </StackPane>
+                    </graphic>
+                </Button>
             </VBox>
 
             <VBox VBox.vgrow="ALWAYS" /> <!-- Spacer -->

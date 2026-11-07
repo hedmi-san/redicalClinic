@@ -12,15 +12,30 @@ The system SHALL allow an authenticated administrator on the Host workstation to
 - **THEN** the system prevents access and does not allow export operations.
 
 ### Requirement: Manifest Inspection and Pre-Restore Validation
-The system SHALL inspect and validate any selected `.cni` file prior to modifying or replacing the active clinic database.
+The system SHALL inspect and validate any selected `.cni` archive, legacy `.sql` dump file, or legacy `.db` SQLite database file prior to modifying or replacing the active clinic database.
 
-#### Scenario: Valid archive preview
+#### Scenario: Valid .cni archive preview
 - **WHEN** an administrator selects a valid `.cni` file for restoration
 - **THEN** the system extracts the manifest, verifies the SHA-256 hash against the bundled database file, and displays an inspection modal showing the backup timestamp and entity counts before asking for confirmation.
 
-#### Scenario: Corrupted or invalid archive rejection
-- **WHEN** a user selects an unreadable, altered, or non-CNI file for restoration
+#### Scenario: Valid legacy .sql or .db file preview
+- **WHEN** an administrator selects a valid legacy `.sql` dump script or `.db` SQLite file for import
+- **THEN** the system stages the file in a temporary SQLite database, normalizes legacy table schemas, computes the entity counts (patients, sessions, bills, users), and displays an inspection modal with the record counts before asking for confirmation.
+
+#### Scenario: Corrupted or invalid file rejection
+- **WHEN** a user selects an unreadable, altered, or invalid `.cni`, `.sql`, or `.db` file for restoration/import
 - **THEN** the system rejects the operation, displays an informative error dialog, and leaves the current database completely untouched.
+
+### Requirement: Legacy SQL Dump and SQLite Database Clean-Replace Import
+The system SHALL allow importing legacy `.sql` dump files and `.db` SQLite database files by performing a clean-replace migration into the H2 database, automatically backfilling the payment ledger, recalculating patient totals, and resetting identity sequences.
+
+#### Scenario: Importing a legacy .sql dump or .db file with older schema
+- **WHEN** an administrator confirms importing a legacy `.sql` or `.db` file (including dumps with 7-column `session` rows lacking `therapyPlanId` or 4-column `Users` rows lacking `userType`)
+- **THEN** the system creates a pre-restore safety snapshot of the active H2 database, clears existing H2 tables inside an atomic transaction, migrates all staged records, normalizes user roles to `Admin` where unspecified, backfills the `payment` ledger from historical `session.paidAmount` and `therapyPlan.cost` values, recalculates `patient.totalCost` and `patient.totalPaid`, resets all H2 `IDENTITY` sequences to `MAX(id) + 1`, and redirects to the login screen.
+
+#### Scenario: Rollback upon SQL or SQLite import failure
+- **WHEN** an error occurs while migrating staged `.sql` or `.db` records into H2
+- **THEN** the system rolls back the H2 transaction (or restores the pre-restore safety copy), leaves existing clinic data intact, and alerts the administrator.
 
 ### Requirement: Atomic Hot-Swap and Safe Database Restoration
 The system SHALL perform database restoration safely by creating a pre-restore safety copy, stopping active database handles, replacing the database file, and restarting the database engine with automatic rollback on error.
@@ -34,11 +49,11 @@ The system SHALL perform database restoration safely by creating a pre-restore s
 - **THEN** the system automatically restores the pre-restore safety copy, reinitializes the database engine, and alerts the user of the rollback.
 
 ### Requirement: First-Run Workstation Setup Restoration
-The system SHALL allow restoring an existing `.cni` backup directly from the initial workstation setup screen before any login or fresh database initialization occurs.
+The system SHALL allow restoring an existing `.cni` backup or importing a legacy `.sql` / `.db` database directly from the initial workstation setup screen before any login or fresh database initialization occurs.
 
-#### Scenario: Restoring on a clean or formatted PC
-- **WHEN** the application starts on an unconfigured system and the user clicks "Restaurer depuis une sauvegarde (.cni)" on the workstation setup dialog
-- **THEN** the system validates the selected `.cni` file, deploys `clinic.mv.db` into `~/clinic/`, writes `app.node_role=HOST` into `~/clinic/config.properties`, closes the setup dialog, and launches the login screen with all restored clinic data and users.
+#### Scenario: Restoring or importing on a clean or formatted PC
+- **WHEN** the application starts on an unconfigured system and the user clicks "Restaurer / Importer une base (.cni, .sql, .db)" on the workstation setup dialog
+- **THEN** the system validates the selected `.cni`, `.sql`, or `.db` file, deploys or migrates the data into `~/clinic/`, writes `app.node_role=HOST` into `~/clinic/config.properties`, closes the setup dialog, and launches the login screen with all restored clinic data and users.
 
 ### Requirement: Local Automated Backup Management
 The system SHALL display the history of automated database backups stored in the clinic directory and allow one-click copying to external storage.

@@ -7,9 +7,10 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="500.0" prefWidth="640.0"
+<BorderPane prefHeight="580.0" prefWidth="660.0"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controller.WorkstationSetupController"
@@ -17,22 +18,22 @@
             stylesheets="@../css/style.css">
 
     <top>
-        <VBox spacing="8" style="-fx-background-color: #1e293b; -fx-padding: 24 30;">
+        <VBox spacing="8" style="-fx-background-color: #1e293b; -fx-padding: 22 30;">
             <Label text="🏥 Cabinet Nour El Islam" style="-fx-font-size: 16px; -fx-text-fill: #38bdf8; -fx-font-weight: bold;"/>
             <Label text="Configuration Initiale du Poste" style="-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;"/>
-            <Label text="Veuillez sélectionner le rôle de cet ordinateur dans le réseau local de la clinique." style="-fx-font-size: 13px; -fx-text-fill: #94a3b8;"/>
+            <Label text="Veuillez sélectionner le rôle de cet ordinateur ou restaurer une sauvegarde existante." style="-fx-font-size: 13px; -fx-text-fill: #94a3b8;"/>
         </VBox>
     </top>
 
     <center>
-        <VBox spacing="20" style="-fx-padding: 30;">
+        <VBox spacing="16" style="-fx-padding: 24 30;">
             <fx:define>
                 <ToggleGroup fx:id="roleToggleGroup"/>
             </fx:define>
 
             <!-- Option 1: Host / Doctor -->
-            <VBox fx:id="cardHost" spacing="8"
-                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 16; -fx-cursor: hand;"
+            <VBox fx:id="cardHost" spacing="6"
+                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 14 16; -fx-cursor: hand;"
                   onMouseClicked="#handleSelectHost">
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <RadioButton fx:id="radioHost" text="Poste Principal (Médecin / Serveur)" toggleGroup="$roleToggleGroup" selected="true"
@@ -47,8 +48,8 @@
             </VBox>
 
             <!-- Option 2: Client / Receptionist -->
-            <VBox fx:id="cardClient" spacing="8"
-                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 16; -fx-cursor: hand;"
+            <VBox fx:id="cardClient" spacing="6"
+                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 14 16; -fx-cursor: hand;"
                   onMouseClicked="#handleSelectClient">
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <RadioButton fx:id="radioClient" text="Poste Secondaire (Réception / Client)" toggleGroup="$roleToggleGroup"
@@ -62,13 +63,26 @@
                        style="-fx-font-size: 12px; -fx-text-fill: #475569;" wrapText="true"/>
             </VBox>
 
-            <Label fx:id="lblError" text="" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" visible="false"/>
+            <!-- Option 3: Quick Restore / Legacy Import Banner -->
+            <HBox alignment="CENTER_LEFT" spacing="14"
+                  style="-fx-background-color: #f0fdfa; -fx-border-color: #99f6e4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12 16;">
+                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                    <Label text="Nouveau PC ou après formatage ?" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0f766e;"/>
+                    <Label text="Restaurez directement une sauvegarde (.cni) ou importez une ancienne base (.sql, .db) depuis une clé USB."
+                           style="-fx-font-size: 12px; -fx-text-fill: #115e59;" wrapText="true"/>
+                </VBox>
+                <Button fx:id="btnRestoreBackup" text="Restaurer / Importer (.cni, .sql, .db)" onAction="#handleRestoreBackup"
+                        style="-fx-background-color: #0d9488; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 6; -fx-cursor: hand;"/>
+            </HBox>
+
+            <Label fx:id="lblError" text="" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" visible="false" wrapText="true"/>
         </VBox>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="16" style="-fx-padding: 20 30; -fx-background-color: #f1f5f9; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
-            <Button fx:id="btnConfirm" text="Confirmer et Enregistrer" onAction="#handleConfirm"
+        <HBox alignment="CENTER_RIGHT" spacing="16" style="-fx-padding: 18 30; -fx-background-color: #f1f5f9; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnConfirm" text="Confirmer et Continuer" onAction="#handleConfirm"
                     style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"/>
         </HBox>
     </bottom>

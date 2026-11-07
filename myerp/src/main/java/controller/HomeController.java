@@ -45,6 +45,8 @@ public class HomeController implements Initializable {
     private Button btnSolds;
     @FXML
     private Button btnUsers;
+    @FXML
+    private Button btnBackups;
 
     @FXML
     private Label lblUserFullName;
@@ -119,6 +121,13 @@ public class HomeController implements Initializable {
             if (lblUserFullName != null) lblUserFullName.setText("Administrateur");
             if (lblUserRole != null) lblUserRole.setText("Compte admin");
             if (lblUserInitial != null) lblUserInitial.setText("A");
+        }
+
+        // Restrict "Sauvegardes" tab strictly to Admin running on the HOST workstation
+        if (btnBackups != null) {
+            boolean showBackups = UserSession.isAdmin() && AppConfig.isHost();
+            btnBackups.setVisible(showBackups);
+            btnBackups.setManaged(showBackups);
         }
 
         if (UserSession.isEmployee()) {
@@ -212,6 +221,15 @@ public class HomeController implements Initializable {
         }
         loadPage("/fxml/pages/user.fxml");
         setActiveButton(btnUsers);
+    }
+
+    @FXML
+    private void handleNavBackups(ActionEvent event) {
+        if (!UserSession.isAdmin() || !AppConfig.isHost()) {
+            return;
+        }
+        loadPage("/fxml/pages/backup.fxml");
+        setActiveButton(btnBackups);
     }
 
     @FXML
