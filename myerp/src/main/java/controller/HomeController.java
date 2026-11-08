@@ -36,6 +36,8 @@ public class HomeController implements Initializable {
     @FXML
     private Button btnPatients;
     @FXML
+    private Button btnRendezVous;
+    @FXML
     private Button btnSessions;
     @FXML
     private Button btnWorkers;
@@ -185,6 +187,12 @@ public class HomeController implements Initializable {
     private void handleNavPatients(ActionEvent event) {
         loadPage("/fxml/pages/patient.fxml");
         setActiveButton(btnPatients);
+    }
+
+    @FXML
+    private void handleNavRendezVous(ActionEvent event) {
+        loadPage("/fxml/pages/rendez_vous.fxml");
+        setActiveButton(btnRendezVous);
     }
 
     @FXML

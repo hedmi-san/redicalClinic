@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Appointment Form Modal - Cabinet Nour El Islam
+   ========================================================================== */
+
+.modal-root-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 16px;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.appointment-modal-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.20), 24, 0, 0, 6);
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Nunito", sans-serif;
+}
+
+.header-bar {
+    -fx-padding: 20px 24px 16px 24px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cursor: move;
+}
+
+.modal-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.modal-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.btn-close-icon {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.btn-close-icon:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #0f172a;
+}
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.field-error-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: 600;
+}
+
+.form-field {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 13px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+.form-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+    -fx-effect: dropshadow(gaussian, rgba(15, 157, 132, 0.25), 6, 0, 0, 0);
+}
+
+.search-input {
+    -fx-padding: 0 32px 0 34px;
+}
+
+.search-icon-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 0 12px;
+}
+
+.btn-clear-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 10px 0 0;
+}
+
+.btn-clear-input:hover {
+    -fx-text-fill: #0f172a;
+}
+
+/* Mode Toggle Buttons (Patient inscrit vs Invité) */
+.mode-toggle-group {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 10px;
+    -fx-padding: 3px;
+}
+
+.mode-toggle-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 6px 14px;
+    -fx-cursor: hand;
+}
+
+.mode-toggle-btn:selected {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0f9d84;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 6, 0, 0, 1);
+}
+
+.btn-inline-link {
+    -fx-background-color: #e6f6f3;
+    -fx-text-fill: #0f766e;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 10px;
+    -fx-cursor: hand;
+}
+
+.btn-inline-link:hover {
+    -fx-background-color: #ccfbf1;
+}
+
+.custom-date-picker {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.custom-date-picker > .text-field {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+}
+
+.custom-combo-box {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-font-size: 13px;
+}
+
+.custom-combo-box:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+}
+
+.notes-text-area {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+.notes-text-area:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #0f9d84;
+}
+
+.notes-text-area .scroll-pane,
+.notes-text-area .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.notes-text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 9px 12px;
+}
+
+.conflict-banner {
+    -fx-background-color: #fef3c7;
+    -fx-border-color: #f59e0b;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px 12px;
+}
+
+.footer-bar {
+    -fx-padding: 16px 24px 20px 24px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.btn-cancel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-min-width: 110px;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.btn-save {
+    -fx-background-color: #0f9d84;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-min-width: 120px;
+}
+
+.btn-save:hover {
+    -fx-background-color: #0b8570;
+}
+
+.btn-save:disabled {
+    -fx-opacity: 0.45;
+}
+
+.patient-popup-list {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.14), 16, 0, 0, 4);
+    -fx-padding: 4px;
+    -fx-hbar-policy: never;
+}
+
+.patient-popup-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 10px;
+    -fx-cursor: hand;
+}
+
+.patient-popup-list .list-cell:filled:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.patient-popup-list .list-cell:filled:selected {
+    -fx-background-color: #f1f5f9;
+}
+

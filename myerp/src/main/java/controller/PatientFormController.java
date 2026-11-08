@@ -47,6 +47,22 @@ public class PatientFormController implements Initializable {
         }
     }
 
+    public void setWalkInPrefill(String guestName, String guestPhone) {
+        this.patient = null;
+        titleLabel.setText("Créer Fiche Patient (Invité)");
+        if (guestName != null) {
+            nameField.setText(guestName.trim());
+        }
+        if (guestPhone != null) {
+            String digitsOnly = guestPhone.replaceAll("\\D+", "");
+            phoneField.setText(digitsOnly);
+        }
+        if (genderComboBox.getValue() == null) {
+            genderComboBox.setValue("Male");
+        }
+        saveBtn.setText("Enregistrer");
+    }
+
     public boolean isSaveClicked() {
         return saveClicked;
     }

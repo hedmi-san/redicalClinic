@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controller.AppointmentFormController"
+           fx:id="modalRootPane"
+           styleClass="modal-root-pane"
+           prefWidth="560" maxWidth="560">
+
+    <stylesheets>
+        <URL value="@../../css/pages/appointment_form.css" />
+    </stylesheets>
+
+    <!-- Main Modal Card -->
+    <VBox fx:id="cardRoot" styleClass="appointment-modal-card" prefWidth="528" maxWidth="528" spacing="0">
+
+        <!-- Draggable Header Bar -->
+        <HBox fx:id="headerBar" alignment="CENTER_LEFT" styleClass="header-bar">
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label fx:id="titleLabel" text="Nouveau Rendez-vous" styleClass="modal-title" />
+                <Label fx:id="subtitleLabel" text="Planifier un créneau pour un patient inscrit ou par téléphone" styleClass="modal-subtitle" />
+            </VBox>
+            <Button fx:id="closeBtn" text="✕" onAction="#handleCancel"
+                    styleClass="btn-close-icon" prefWidth="30" prefHeight="30" minWidth="30" minHeight="30" maxWidth="30" maxHeight="30" />
+        </HBox>
+
+        <!-- Form Body -->
+        <VBox spacing="14" style="-fx-padding: 18 24 16 24;">
+
+            <!-- 1. Mode Switch: Registered Patient vs Walk-In Caller -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <HBox styleClass="mode-toggle-group" spacing="4">
+                    <ToggleButton fx:id="toggleRegistered" text="Patient inscrit" selected="true" styleClass="mode-toggle-btn" />
+                    <ToggleButton fx:id="toggleWalkIn" text="Invité / Appel tél." styleClass="mode-toggle-btn" />
+                </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnQuickNewPatient" text="+ Créer fiche patient" onAction="#handleQuickCreatePatient" styleClass="btn-inline-link" />
+            </HBox>
+
+            <!-- 2A. Registered Patient Search Box -->
+            <VBox fx:id="registeredPatientBox" spacing="6">
+                <Label text="Patient inscrit" styleClass="field-label" />
+                <StackPane fx:id="patientFieldContainer" alignment="CENTER_LEFT">
+                    <TextField fx:id="patientSearchField" promptText="Rechercher par nom ou téléphone..."
+                               styleClass="form-field, search-input" />
+                    <Label text="🔍" styleClass="search-icon-label" mouseTransparent="true" />
+                    <Button fx:id="btnClearPatient" text="✕" onAction="#handleClearPatient"
+                            styleClass="btn-clear-input" StackPane.alignment="CENTER_RIGHT" visible="false" />
+                </StackPane>
+            </VBox>
+
+            <!-- 2B. Walk-in Guest Fields -->
+            <GridPane fx:id="walkInGuestBox" hgap="12" vgap="6" visible="false" managed="false">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="55.0" />
+                    <ColumnConstraints percentWidth="45.0" />
+                </columnConstraints>
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Nom de l'invité / patient *" styleClass="field-label" />
+                    <TextField fx:id="guestNameField" promptText="Ex: Karim Benali" styleClass="form-field" />
+                </VBox>
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="Téléphone" styleClass="field-label" />
+                    <TextField fx:id="guestPhoneField" promptText="Ex: 0550 12 34 56" styleClass="form-field" />
+                </VBox>
+            </GridPane>
+
+            <Label fx:id="patientErrorLabel" text="Veuillez sélectionner un patient ou saisir le nom de l'invité"
+                   styleClass="field-error-label" visible="false" managed="false" />
+
+            <!-- 3. Date, Start Time, and Duration -->
+            <GridPane hgap="12" vgap="6">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="42.0" />
+                    <ColumnConstraints percentWidth="30.0" />
+                    <ColumnConstraints percentWidth="28.0" />
+                </columnConstraints>
+
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Date du RDV *" styleClass="field-label" />
+                    <DatePicker fx:id="datePicker" styleClass="custom-date-picker" maxWidth="Infinity" />
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="Heure début *" styleClass="field-label" />
+                    <ComboBox fx:id="startTimeCombo" editable="true" styleClass="custom-combo-box" maxWidth="Infinity" />
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <Label text="Durée (min)" styleClass="field-label" />
+                    <ComboBox fx:id="durationCombo" editable="true" styleClass="custom-combo-box" maxWidth="Infinity" />
+                </VBox>
+            </GridPane>
+
+            <!-- 4. Practitioner (Optional) & Status -->
+            <GridPane hgap="12" vgap="6">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="55.0" />
+                    <ColumnConstraints percentWidth="45.0" />
+                </columnConstraints>
+
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Praticien / Kiné (Optionnel)" styleClass="field-label" />
+                    <ComboBox fx:id="workerCombo" styleClass="custom-combo-box" maxWidth="Infinity" />
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="Statut" styleClass="field-label" />
+                    <ComboBox fx:id="statusCombo" styleClass="custom-combo-box" maxWidth="Infinity" />
+                </VBox>
+            </GridPane>
+
+            <!-- 5. Motif / Notes -->
+            <VBox spacing="6">
+                <Label text="Motif / Traitement prévu" styleClass="field-label" />
+                <TextArea fx:id="motifArea" promptText="Ex: Consultation initiale, Séance rééducation épaule..."
+                          styleClass="notes-text-area" prefRowCount="2" wrapText="true" />
+            </VBox>
+
+            <!-- 6. Live Overlap Conflict Banner (non-blocking warning) -->
+            <HBox fx:id="conflictWarningBanner" spacing="10" alignment="CENTER_LEFT"
+                  styleClass="conflict-banner" visible="false" managed="false">
+                <Label text="⚠️" style="-fx-font-size: 15px;" />
+                <Label fx:id="conflictWarningLabel" wrapText="true" HBox.hgrow="ALWAYS"
+                       style="-fx-text-fill: #92400e; -fx-font-size: 12px; -fx-font-weight: 600;" />
+            </HBox>
+        </VBox>
+
+        <!-- Footer Actions -->
+        <HBox alignment="CENTER_RIGHT" spacing="8" styleClass="footer-bar">
+            <Button fx:id="cancelBtn" text="Annuler" onAction="#handleCancel" styleClass="btn-cancel" />
+            <Button fx:id="saveBtn" text="Enregistrer" onAction="#handleSave" styleClass="btn-save" />
+        </HBox>
+    </VBox>
+</StackPane>
+

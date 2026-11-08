@@ -1,5 +1,6 @@
 package controller;
 
+import dao.AppointmentDAO;
 import dao.PatientDAO;
 import dao.PaymentDAO;
 import dao.SessionDAO;
@@ -20,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.Appointment;
 import model.Patient;
 import model.Payment;
 import model.Session;
@@ -42,6 +44,8 @@ public class PatientDetailController {
     private Label heroName;
     @FXML
     private Label heroPhone;
+    @FXML
+    private Label nextAppointmentLabel;
 
     @FXML
     private Label totalCostLabel;
@@ -61,6 +65,7 @@ public class PatientDetailController {
     private final SessionDAO sessionDAO = new SessionDAO();
     private final TherapyPlanDAO therapyPlanDAO = new TherapyPlanDAO();
     private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final AppointmentDAO appointmentDAO = new AppointmentDAO();
     private Patient patient;
     private Runnable onUpdateListener;
 
@@ -118,6 +123,62 @@ public class PatientDetailController {
 
         // Display Payments Ledger
         refreshPayments();
+
+        // Display Next Upcoming Appointment ("Prochain RDV")
+        refreshNextAppointment();
+    }
+
+    private void refreshNextAppointment() {
+        if (nextAppointmentLabel == null || patient == null) {
+            return;
+        }
+        Appointment nextRdv = appointmentDAO.getNextUpcomingAppointmentForPatient(patient.getId());
+        if (nextRdv != null) {
+            nextAppointmentLabel.setText(String.format("📅 Prochain RDV : %s à %s (%s)",
+                    nextRdv.getDate(),
+                    nextRdv.getStartTime(),
+                    Appointment.formatStatusLabel(nextRdv.getStatus())));
+            nextAppointmentLabel.setStyle("-fx-background-color: #ccfbf1; -fx-border-color: #0d9488; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 3 10; -fx-text-fill: #0f766e; -fx-font-size: 12px; -fx-font-weight: bold;");
+        } else {
+            nextAppointmentLabel.setText("📅 Prochain RDV : Aucun RDV prévu");
+            nextAppointmentLabel.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 3 10; -fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold;");
+        }
+    }
+
+    @FXML
+    private void handleScheduleAppointment() {
+        if (patient == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/pages/appointment_form.fxml"));
+            Parent root = loader.load();
+            AppointmentFormController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            Scene scene = new Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            stage.setResizable(false);
+
+            controller.setAppointment(null, patient.getId(), LocalDate.now());
+            controller.initStage(stage);
+
+            stage.sizeToScene();
+            stage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                appointmentDAO.addAppointment(controller.getAppointment());
+                javafx.application.Platform.runLater(this::refreshUI);
+                if (onUpdateListener != null) {
+                    onUpdateListener.run();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void refreshTherapyPlans(List<TherapyPlan> plans) {

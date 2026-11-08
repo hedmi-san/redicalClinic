@@ -572,6 +572,27 @@ public class SessionFormController {
         updateSaveButtonState();
     }
 
+    /**
+     * Pre-populates a new Session form from an existing Appointment for one-click conversion.
+     */
+    public void setPrefillFromAppointment(int patientId, String dateStr, String motif) {
+        setSession(null, patientId);
+        titleLabel.setText("Convertir RDV en séance");
+        subtitleLabel.setText("Valider le traitement et enregistrer le règlement");
+        if (dateStr != null && !dateStr.trim().isEmpty()) {
+            try {
+                datePicker.setValue(LocalDate.parse(dateStr.trim(), DATE_FORMATTER));
+            } catch (Exception ignored) {
+                datePicker.setValue(LocalDate.now());
+            }
+        }
+        if (motif != null && !motif.trim().isEmpty()) {
+            treatmentArea.setText(motif.trim());
+        }
+        recalculateFinancialSummary();
+        updateSaveButtonState();
+    }
+
     public boolean isSaveClicked() {
         return saveClicked;
     }

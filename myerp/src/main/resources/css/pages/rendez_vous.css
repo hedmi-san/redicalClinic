@@ -1,0 +1,603 @@
+/* ==========================================================================
+   Agenda & Rendez-vous Stylesheet - Cabinet Nour El Islam
+   Matching Target Visual Specification (Clean Modern Desktop ERP)
+   ========================================================================== */
+
+.rendezvous-root {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 20px 24px;
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Nunito", sans-serif;
+}
+
+.rendezvous-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-padding: 20px 24px 24px 24px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 8, 0, 0, 2);
+}
+
+/* --- 1. HEADER BAR --- */
+.rdv-header {
+    -fx-padding: 0 0 12px 0;
+}
+
+.rdv-header-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.rdv-header-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.clock-icon {
+    -fx-fill: #94a3b8;
+    -fx-scale-x: 0.65;
+    -fx-scale-y: 0.65;
+}
+
+/* Header Action Buttons */
+.btn-hdr-outline {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0 14px;
+    -fx-graphic-text-gap: 8px;
+    -fx-cursor: hand;
+}
+
+.btn-hdr-outline:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.btn-hdr-icon-only {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-pref-width: 36px;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.btn-hdr-icon-only:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.btn-hdr-icon {
+    -fx-fill: #475569;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+/* --- 2. TOOLBAR (VIEW TOGGLE, DATE NAV, STACKED FILTERS) --- */
+.rdv-toolbar-container {
+    -fx-padding: 4px 0 8px 0;
+}
+
+/* Segmented View Mode Toggle */
+.view-mode-group {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 2px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-alignment: center-left;
+}
+
+.view-mode-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-padding: 0 16px;
+    -fx-cursor: hand;
+}
+
+.view-mode-btn:selected {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 600;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 3, 0, 0, 1);
+}
+
+/* Date Navigation Buttons */
+.btn-nav-arrow {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.btn-nav-arrow:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.nav-arrow-icon {
+    -fx-fill: #475569;
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+.btn-nav-today {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0 14px;
+    -fx-cursor: hand;
+}
+
+.btn-nav-today:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.period-title-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #0f172a;
+    -fx-padding: 0 4px;
+}
+
+/* Calendar DatePicker Button */
+.calendar-trigger-picker {
+    -fx-background-color: transparent;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+}
+
+.calendar-trigger-picker > .text-field {
+    -fx-pref-width: 0;
+    -fx-min-width: 0;
+    -fx-max-width: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+    -fx-padding: 0;
+    -fx-opacity: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.calendar-trigger-picker > .arrow-button {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.calendar-trigger-picker > .arrow-button:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.calendar-trigger-picker > .arrow-button > .arrow {
+    -fx-shape: "M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z";
+    -fx-background-color: #475569;
+    -fx-scale-x: 0.72;
+    -fx-scale-y: 0.72;
+    -fx-padding: 7px;
+}
+
+/* Stacked Filters on Right */
+.filter-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-font-size: 13px;
+    -fx-padding: 0 4px;
+    -fx-cursor: hand;
+}
+
+.filter-combo:focused {
+    -fx-border-color: #0f9d84;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #334155;
+    -fx-padding: 0 8px;
+}
+
+.filter-combo > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8px;
+}
+
+.filter-combo > .arrow-button > .arrow {
+    -fx-background-color: #64748b;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+/* --- 3. STAT CHIPS ROW --- */
+.stat-chips-row {
+    -fx-padding: 6px 0 10px 0;
+}
+
+.stat-chip {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 999px;
+    -fx-background-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px 12px;
+}
+
+.stat-chip-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #475569;
+}
+
+.stat-chip-value {
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.period-scope-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: 500;
+}
+
+/* --- 4. DAILY VIEW TABLE --- */
+.modern-table {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.modern-table .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.modern-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-size: 38px;
+    -fx-pref-height: 38px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.modern-table .column-header .label {
+    -fx-alignment: CENTER_LEFT;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.modern-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1px 0;
+    -fx-pref-height: 60px;
+    -fx-min-height: 60px;
+    -fx-cell-size: 60px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.modern-table .table-row-cell:odd {
+    -fx-background-color: #ffffff;
+}
+
+.modern-table .table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.modern-table .table-row-cell:selected {
+    -fx-background-color: #f0fdfa;
+}
+
+.modern-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8px;
+}
+
+/* Hide TableView corner gray artifacts */
+.modern-table .show-hide-columns-button,
+.modern-table .corner {
+    -fx-background-color: transparent;
+}
+
+/* Empty state styling */
+.modern-table .placeholder .label {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13px;
+}
+
+/* Action Buttons inside Table Row */
+.btn-row-action {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0 16px;
+    -fx-cursor: hand;
+}
+
+.btn-row-action:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+.btn-row-more {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #475569;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-min-width: 32px;
+    -fx-max-width: 32px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.btn-row-more:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+/* Patient Type Badges (Inscrit / Inscrite / Invité) */
+.badge-patient-type {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 10px;
+    -fx-font-weight: 500;
+    -fx-padding: 1px 6px;
+}
+
+/* Status Pills */
+.rdv-pill {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 3px 12px;
+    -fx-alignment: center;
+}
+
+.rdv-pill-prevu {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-text-fill: #1d4ed8;
+}
+
+.rdv-pill-confirme {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #99f6e4;
+    -fx-text-fill: #0f766e;
+}
+
+.rdv-pill-termine {
+    -fx-background-color: #f0fdf4;
+    -fx-border-color: #bbf7d0;
+    -fx-text-fill: #15803d;
+}
+
+.rdv-pill-annule {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-text-fill: #64748b;
+}
+
+.rdv-pill-absent {
+    -fx-background-color: #fef2f2;
+    -fx-border-color: #fecaca;
+    -fx-text-fill: #b91c1c;
+}
+
+/* --- 5. WEEKLY VIEW --- */
+.week-day-column {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.week-day-column-off {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-opacity: 0.85;
+}
+
+.week-day-header {
+    -fx-padding: 8px 10px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: #fafafa;
+    -fx-background-radius: 10px 10px 0 0;
+    -fx-cursor: hand;
+}
+
+.week-day-header-today {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0d9488;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.week-appointment-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.03), 4, 0, 0, 1);
+}
+
+.week-appointment-card:hover {
+    -fx-border-color: #0d9488;
+    -fx-background-color: #f0fdfa;
+}
+
+.btn-week-add {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #0f766e;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-pref-height: 26px;
+    -fx-min-height: 26px;
+    -fx-max-height: 26px;
+    -fx-cursor: hand;
+}
+
+.btn-week-add:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0d9488;
+}
+
+/* --- 6. MONTHLY VIEW --- */
+.month-hdr-label {
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
+    -fx-padding: 4px 0;
+    -fx-alignment: center;
+}
+
+.month-day-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+    -fx-cursor: hand;
+    -fx-min-height: 65px;
+    -fx-pref-height: 72px;
+}
+
+.month-day-cell:hover {
+    -fx-border-color: #0d9488;
+    -fx-background-color: #f0fdfa;
+}
+
+.month-day-cell-today {
+    -fx-border-color: #0d9488;
+    -fx-border-width: 2px;
+    -fx-background-color: #f0fdfa;
+}
+
+.month-day-cell-outside {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #f1f5f9;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+    -fx-opacity: 0.5;
+    -fx-min-height: 65px;
+    -fx-pref-height: 72px;
+}
+
+.month-rdv-badge {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-border-radius: 999px;
+    -fx-background-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #1d4ed8;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 2px 8px;
+}

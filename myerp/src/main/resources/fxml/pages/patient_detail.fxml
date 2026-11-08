@@ -15,9 +15,14 @@
         <Label fx:id="heroInitials" text="JD" styleClass="initials-avatar" />
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label fx:id="heroName" text="Nom du Patient" styleClass="hero-name" />
-            <Label fx:id="heroPhone" text="Téléphone" styleClass="hero-phone" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label fx:id="heroPhone" text="Téléphone" styleClass="hero-phone" />
+                <Label fx:id="nextAppointmentLabel" text="📅 Prochain RDV : Aucun RDV prévu"
+                       style="-fx-background-color: #f0fdfa; -fx-border-color: #99f6e4; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 3 10; -fx-text-fill: #0f766e; -fx-font-size: 12px; -fx-font-weight: bold;" />
+            </HBox>
         </VBox>
-        <HBox spacing="12" alignment="CENTER_RIGHT">
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="+ Programmer RDV" onAction="#handleScheduleAppointment" styleClass="btn-teal" />
             <Button text="Imprimer La Facture" onAction="#printPatientBill" styleClass="btn-ghost"/>
             <Button text="Modifier Infos" onAction="#handleEditPatient" styleClass="btn-ghost" />
             <Button text="Supprimer Patient" onAction="#handleDeletePatient" styleClass="btn-ghost" style="-fx-text-fill: #e11d48;" />
