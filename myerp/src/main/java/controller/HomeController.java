@@ -1,35 +1,74 @@
 package controller;
 
+import config.AppConfig;
+import config.DatabaseConfig;
+import config.OfflineSyncManager;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
-import util.UserSession;
-import config.AppConfig;
+import javafx.util.Duration;
 import network.ConnectionMonitor;
+import util.UserSession;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
 
+    private static final double SIDEBAR_EXPANDED_WIDTH = 250.0;
+    private static final double SIDEBAR_COLLAPSED_WIDTH = 68.0;
+    private static final String ICON_COLLAPSE = "M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z";
+    private static final String ICON_EXPAND = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+
     @FXML
     private StackPane contentArea;
     @FXML
     private HBox titleBar;
+
+    @FXML
+    private VBox sidebar;
+    @FXML
+    private HBox sidebarToggleContainer;
+    @FXML
+    private Button btnToggleSidebar;
+    @FXML
+    private SVGPath toggleSidebarIcon;
+    @FXML
+    private VBox sidebarBrand;
+    @FXML
+    private Label lblBrandTop;
+    @FXML
+    private Label lblBrandBottom;
+    @FXML
+    private HBox userProfileCard;
+    @FXML
+    private VBox userInfoBox;
 
     @FXML
     private Button btnAccueil;
@@ -64,16 +103,16 @@ public class HomeController implements Initializable {
     @FXML
     private Label lblConnectionAlert;
 
-    private final java.util.Map<String, Parent> pageCache = new java.util.HashMap<>();
-    private final java.util.Map<String, Object> controllerCache = new java.util.HashMap<>();
+    private final Map<String, Parent> pageCache = new HashMap<>();
+    private final Map<String, Object> controllerCache = new HashMap<>();
 
     private Button activeButton;
+    private boolean sidebarCollapsed = false;
     private double x = 0;
     private double y = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Setup window dragging on the title bar
         if (titleBar != null) {
             titleBar.setOnMousePressed((MouseEvent event) -> {
                 x = event.getSceneX();
@@ -86,22 +125,21 @@ public class HomeController implements Initializable {
             });
         }
 
-        // Configure role-based UI access and route to initial authorized page
+        if (btnToggleSidebar != null) {
+            btnToggleSidebar.setTooltip(new Tooltip("Réduire le menu"));
+        }
+
         setupRoleBasedAccess();
 
-        // Start connection health monitor on client nodes
         if (AppConfig.isClient()) {
-            ConnectionMonitor.start(connected -> {
-                if (connectionAlertBanner != null) {
-                    connectionAlertBanner.setVisible(!connected);
-                    connectionAlertBanner.setManaged(!connected);
-                }
-            });
+            updateOfflineBannerState(!DatabaseConfig.isOfflineMode());
+            ConnectionMonitor.start(
+                    this::updateOfflineBannerState,
+                    this::handleOfflineSyncCompleted);
         }
     }
 
     private void setupRoleBasedAccess() {
-        // Populate profile indicator badge
         if (UserSession.isLoggedIn()) {
             if (lblUserFullName != null) {
                 lblUserFullName.setText(UserSession.getCurrentUser().getFullName());
@@ -117,15 +155,21 @@ public class HomeController implements Initializable {
             }
             if (lblUserInitial != null) {
                 String name = UserSession.getCurrentUser().getFullName();
-                lblUserInitial.setText(name != null && !name.trim().isEmpty() ? name.trim().substring(0, 1).toUpperCase() : "A");
+                lblUserInitial.setText(
+                        name != null && !name.trim().isEmpty() ? name.trim().substring(0, 1).toUpperCase() : "A");
             }
         } else {
-            if (lblUserFullName != null) lblUserFullName.setText("Administrateur");
-            if (lblUserRole != null) lblUserRole.setText("Compte admin");
-            if (lblUserInitial != null) lblUserInitial.setText("A");
+            if (lblUserFullName != null) {
+                lblUserFullName.setText("Administrateur");
+            }
+            if (lblUserRole != null) {
+                lblUserRole.setText("Compte admin");
+            }
+            if (lblUserInitial != null) {
+                lblUserInitial.setText("A");
+            }
         }
 
-        // Restrict "Sauvegardes" tab strictly to Admin running on the HOST workstation
         if (btnBackups != null) {
             boolean showBackups = UserSession.isAdmin() && AppConfig.isHost();
             btnBackups.setVisible(showBackups);
@@ -133,7 +177,6 @@ public class HomeController implements Initializable {
         }
 
         if (UserSession.isEmployee()) {
-            // Hide restricted buttons from employee
             if (btnAccueil != null) {
                 btnAccueil.setVisible(false);
                 btnAccueil.setManaged(false);
@@ -146,12 +189,171 @@ public class HomeController implements Initializable {
                 btnUsers.setVisible(false);
                 btnUsers.setManaged(false);
             }
-
-            // Default landing page for employees is Patients
             handleNavPatients(null);
         } else {
-            // Default landing page for Admin is Accueil (Dashboard)
             handleNavAccueil(null);
+        }
+    }
+
+    private void updateOfflineBannerState(boolean connected) {
+        if (connectionAlertBanner != null) {
+            if (!connected && lblConnectionAlert != null) {
+                lblConnectionAlert.setText(
+                        "Mode Hors-Ligne — Modifications sauvegardées localement");
+            }
+            connectionAlertBanner.setVisible(!connected);
+            connectionAlertBanner.setManaged(!connected);
+        }
+    }
+
+    private void handleOfflineSyncCompleted(OfflineSyncManager.SyncResult syncResult) {
+        for (Object ctrl : controllerCache.values()) {
+            if (ctrl instanceof Refreshable refreshable) {
+                try {
+                    refreshable.refresh();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        if (syncResult != null && syncResult.conflicts() != null && !syncResult.conflicts().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("La connexion au poste principal est rétablie et ");
+            sb.append(syncResult.flushedCount());
+            sb.append(" modification(s) hors-ligne ont été synchronisées.\n\n");
+            sb.append("Les éléments suivants ont été modifiés simultanément sur le poste principal (la version du serveur a été conservée) :\n\n");
+            for (OfflineSyncManager.SyncConflict conflict : syncResult.conflicts()) {
+                sb.append("• ");
+                sb.append(conflict.description());
+                sb.append("\n");
+            }
+
+            Alert conflictAlert = new Alert(Alert.AlertType.WARNING);
+            conflictAlert.setTitle("Synchronisation terminée avec conflits résolus");
+            conflictAlert.setHeaderText("Conflits de modification détectés (Priorité Serveur)");
+            conflictAlert.setContentText(sb.toString());
+            conflictAlert.showAndWait();
+        }
+    }
+
+    // Loads an FXML file into the central content area with view caching and
+    // instant tab switching. Keeps cached pages mounted in the Scene graph and toggles
+    // visibility to avoid expensive CSS StyleManager and Control Skin teardown/rebuild.
+    private void loadPage(String fxmlPath) {
+        try {
+            Parent page = pageCache.get(fxmlPath);
+            Object controller = controllerCache.get(fxmlPath);
+
+            if (page == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                page = loader.load();
+                controller = loader.getController();
+                pageCache.put(fxmlPath, page);
+                controllerCache.put(fxmlPath, controller);
+                contentArea.getChildren().add(page);
+            } else if (controller instanceof Refreshable refreshable) {
+                refreshable.refresh();
+            }
+
+            for (Node child : contentArea.getChildren()) {
+                boolean isTarget = (child == page);
+                if (child.isVisible() != isTarget) {
+                    child.setVisible(isTarget);
+                }
+                if (child.isManaged() != isTarget) {
+                    child.setManaged(isTarget);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Could not load page: " + fxmlPath);
+            e.printStackTrace();
+        }
+    }
+
+    private void setActiveButton(Button button) {
+        if (activeButton != null) {
+            activeButton.getStyleClass().remove("nav-btn-active");
+        }
+        activeButton = button;
+        if (activeButton != null) {
+            activeButton.getStyleClass().add("nav-btn-active");
+        }
+    }
+
+    @FXML
+    private void handleToggleSidebar(ActionEvent event) {
+        if (sidebar == null) {
+            return;
+        }
+        sidebarCollapsed = !sidebarCollapsed;
+        double targetWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
+
+        if (sidebarCollapsed) {
+            if (!sidebar.getStyleClass().contains("sidebar-collapsed")) {
+                sidebar.getStyleClass().add("sidebar-collapsed");
+            }
+            applySidebarContentState(true);
+        } else {
+            sidebar.getStyleClass().remove("sidebar-collapsed");
+        }
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(sidebar.minWidthProperty(), targetWidth, Interpolator.EASE_BOTH),
+                        new KeyValue(sidebar.prefWidthProperty(), targetWidth, Interpolator.EASE_BOTH),
+                        new KeyValue(sidebar.maxWidthProperty(), targetWidth, Interpolator.EASE_BOTH)));
+        timeline.setOnFinished(e -> {
+            if (!sidebarCollapsed) {
+                applySidebarContentState(false);
+            }
+        });
+        timeline.play();
+    }
+
+    private void applySidebarContentState(boolean collapsed) {
+        if (sidebarToggleContainer != null) {
+            sidebarToggleContainer.setAlignment(collapsed ? Pos.CENTER : Pos.CENTER_RIGHT);
+        }
+        if (toggleSidebarIcon != null) {
+            toggleSidebarIcon.setContent(collapsed ? ICON_EXPAND : ICON_COLLAPSE);
+        }
+        if (btnToggleSidebar != null) {
+            btnToggleSidebar.setTooltip(new Tooltip(collapsed ? "Déplier le menu" : "Réduire le menu"));
+        }
+
+        if (lblBrandTop != null) {
+            lblBrandTop.setVisible(!collapsed);
+            lblBrandTop.setManaged(!collapsed);
+        }
+        if (lblBrandBottom != null) {
+            lblBrandBottom.setVisible(!collapsed);
+            lblBrandBottom.setManaged(!collapsed);
+        }
+
+        List<Button> navButtons = List.of(
+                btnAccueil, btnPatients, btnRendezVous, btnSessions,
+                btnWorkers, btnBills, btnSolds, btnUsers, btnBackups, btnLogout);
+        for (Button btn : navButtons) {
+            if (btn == null) {
+                continue;
+            }
+            btn.setContentDisplay(collapsed ? ContentDisplay.GRAPHIC_ONLY : ContentDisplay.LEFT);
+            btn.setAlignment(collapsed ? Pos.CENTER : Pos.BASELINE_LEFT);
+            btn.setTooltip(collapsed ? new Tooltip(btn.getText()) : null);
+        }
+
+        if (userInfoBox != null) {
+            userInfoBox.setVisible(!collapsed);
+            userInfoBox.setManaged(!collapsed);
+        }
+        if (userProfileCard != null) {
+            userProfileCard.setAlignment(collapsed ? Pos.CENTER : Pos.CENTER_LEFT);
+            if (collapsed && lblUserFullName != null && lblUserRole != null) {
+                Tooltip.install(userProfileCard,
+                        new Tooltip(lblUserFullName.getText() + " (" + lblUserRole.getText() + ")"));
+            } else {
+                Tooltip.uninstall(userProfileCard, null);
+            }
         }
     }
 
@@ -217,7 +419,7 @@ public class HomeController implements Initializable {
     }
 
     @FXML
-    private void handleNavSolds(ActionEvent event){
+    private void handleNavSolds(ActionEvent event) {
         loadPage("/fxml/pages/sold.fxml");
         setActiveButton(btnSolds);
     }
@@ -252,22 +454,15 @@ public class HomeController implements Initializable {
         }
 
         try {
-            // Stop monitor
             ConnectionMonitor.stop();
-
-            // Clear page and controller cache
             pageCache.clear();
             controllerCache.clear();
-
-            // Clear session context
             UserSession.clear();
 
-            // Close the current dashboard window
             Node source = (Node) event.getSource();
             Stage currentStage = (Stage) source.getScene().getWindow();
             currentStage.close();
 
-            // Open the Login window
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
             Stage loginStage = new Stage();
             Scene scene = new Scene(root);
@@ -277,47 +472,8 @@ public class HomeController implements Initializable {
             loginStage.setResizable(false);
             loginStage.setScene(scene);
             loginStage.show();
-
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Loads an FXML file into the central content area with view caching and instant tab switching.
-     */
-    private void loadPage(String fxmlPath) {
-        try {
-            Parent page = pageCache.get(fxmlPath);
-            Object controller = controllerCache.get(fxmlPath);
-
-            if (page == null) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-                page = loader.load();
-                controller = loader.getController();
-                pageCache.put(fxmlPath, page);
-                controllerCache.put(fxmlPath, controller);
-            } else if (controller instanceof Refreshable refreshable) {
-                refreshable.refresh();
-            }
-
-            contentArea.getChildren().setAll(page);
-        } catch (IOException e) {
-            System.err.println("Could not load page: " + fxmlPath);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Updates the CSS class to visually indicate which menu item is active.
-     */
-    private void setActiveButton(Button button) {
-        if (activeButton != null) {
-            activeButton.getStyleClass().remove("nav-btn-active");
-        }
-        activeButton = button;
-        if (activeButton != null) {
-            activeButton.getStyleClass().add("nav-btn-active");
         }
     }
 }

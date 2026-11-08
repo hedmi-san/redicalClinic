@@ -7,12 +7,98 @@ import java.sql.Statement;
 
 public class DatabaseInitializer {
 
+    private static final String[] TRIGGER_TRACKED_TABLES = {
+            "worker", "paymentCheck", "bill", "billItem",
+            "patient", "therapyPlan", "session", "sold",
+            "payment", "appointment", "clinic_settings"
+    };
+
     public static void initializeDatabase() {
         // Create an automatic safety backup of existing clinic.db before performing any operations
         backupDatabaseIfExists();
 
         try (Connection conn = DatabaseConfig.getConnection();
                 Statement stmt = conn.createStatement()) {
+
+            createCoreTables(conn, stmt);
+
+            // ----------------------------------------------------------------
+            // 11. Check and execute legacy SQLite -> H2 migration if needed
+            // ----------------------------------------------------------------
+            String legacyDbPath = System.getProperty("user.home") + "/clinic/clinic.db";
+            if (DatabaseMigrator.shouldMigrate(legacyDbPath)) {
+                DatabaseMigrator.migrate(legacyDbPath, conn);
+            }
+
+            // Seed a default admin user if none exists yet, and migrate any legacy plaintext passwords
+            UserDAO.seedDefaultAdmin();
+            UserDAO.migratePlaintextPasswords(conn);
+
+            // Create performance indexes to ensure instant queries over LAN
+            createPerformanceIndexes(stmt);
+
+            // ----------------------------------------------------------------
+            // 12. Idempotent Backfill Migration of Legacy Payments into Ledger
+            // ----------------------------------------------------------------
+            try {
+                boolean migrationAlreadyDone = false;
+                try (var rs = stmt.executeQuery("SELECT COUNT(*) FROM payment WHERE createdBy = 'MIGRATION'")) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        migrationAlreadyDone = true;
+                    }
+                }
+
+                if (!migrationAlreadyDone) {
+                    // Backfill legacy standalone session payments
+                    stmt.execute("""
+                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
+                        SELECT s.patientId, s.id,
+                               CAST(SUBSTRING(s.sessionDate, 1, 10) AS DATE),
+                               CAST(SUBSTRING(s.sessionDate, 1, 10) || ' 12:00:00' AS TIMESTAMP),
+                               s.paidAmount, 'SESSION', 'Paiement initial séance #' || s.id, 'MIGRATION'
+                        FROM session s
+                        WHERE s.paidAmount > 0
+                          AND s.therapyPlanId IS NULL
+                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.sessionId = s.id);
+                    """);
+
+                    // Backfill legacy therapy plan payments
+                    stmt.execute("""
+                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
+                        SELECT tp.patientId, NULL,
+                               CAST(SUBSTRING(tp.date, 1, 10) AS DATE),
+                               CAST(SUBSTRING(tp.date, 1, 10) || ' 12:00:00' AS TIMESTAMP),
+                               tp.cost, 'THERAPY_PLAN', 'Forfait thérapie #' || tp.id, 'MIGRATION'
+                        FROM therapyPlan tp
+                        WHERE tp.cost > 0
+                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.paymentType = 'THERAPY_PLAN' AND p.reason = 'Forfait thérapie #' || tp.id);
+                    """);
+                }
+            } catch (SQLException e) {
+                System.err.println("⚠️ Warning during payment ledger backfill: " + e.getMessage());
+            }
+
+            // Ensure patient totalCost and totalPaid are accurate from all sessions, plans & payments
+            try {
+                stmt.execute("""
+                    UPDATE patient p
+                    SET totalCost = COALESCE((SELECT SUM(cost) FROM session s WHERE s.patientId = p.id AND s.therapyPlanId IS NULL), 0) +
+                                    COALESCE((SELECT SUM(cost) FROM therapyPlan tp WHERE tp.patientId = p.id), 0),
+                        totalPaid = COALESCE((SELECT SUM(amount) FROM payment pay WHERE pay.patientId = p.id), 0);
+                """);
+            } catch (SQLException ignored) {
+                // Table might be empty on fresh first boot
+            }
+
+            System.out.println("Database initialized successfully.");
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database initialization failed: " + e.getMessage());
+            throw new RuntimeException("Database initialization failed", e);
+        }
+    }
+
+    private static void createCoreTables(Connection conn, Statement stmt) throws SQLException {
 
             // Enable foreign-key enforcement if supported (SQLite)
             try {
@@ -209,93 +295,63 @@ public class DatabaseInitializer {
 
             // Normalize existing user records without a defined role to 'Admin'
             stmt.execute("UPDATE Users SET userType = 'Admin' WHERE userType IS NULL OR TRIM(userType) = '';");
+    }
 
-            // ----------------------------------------------------------------
-            // 11. Check and execute legacy SQLite -> H2 migration if needed
-            // ----------------------------------------------------------------
-            String legacyDbPath = System.getProperty("user.home") + "/clinic/clinic.db";
-            if (DatabaseMigrator.shouldMigrate(legacyDbPath)) {
-                DatabaseMigrator.migrate(legacyDbPath, conn);
-            }
+    private static void createPerformanceIndexes(Statement stmt) throws SQLException {
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_date ON session(sessionDate);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_patientId ON session(patientId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_therapyPlanId ON session(therapyPlanId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_therapyplan_patientId ON therapyPlan(patientId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_bill_date ON bill(billDate);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_billitem_billId ON billItem(billId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_paymentcheck_workerId ON paymentCheck(workerId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_sold_date ON sold(soldDate);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_patient_name ON patient(name);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_patientId ON payment(patientId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_date ON payment(paymentDate);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_sessionId ON payment(sessionId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_date ON appointment(date);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_patientId ON appointment(patientId);");
+        stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_sessionId ON appointment(sessionId);");
+    }
 
-            // Seed a default admin user if none exists yet
-            UserDAO.seedDefaultAdmin();
+    /**
+     * Initializes the local client replica database schema, offline change log, snapshot metadata,
+     * and H2 mutation triggers.
+     */
+    public static void initializeReplicaSchema(Connection conn) throws SQLException {
+        boolean prevCapture = OfflineChangeTrigger.isCaptureEnabled();
+        OfflineChangeTrigger.setCaptureEnabled(false);
+        try (Statement stmt = conn.createStatement()) {
+            createCoreTables(conn, stmt);
+            createPerformanceIndexes(stmt);
 
-            // Create performance indexes to ensure instant queries over LAN
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_date ON session(sessionDate);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_patientId ON session(patientId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_session_therapyPlanId ON session(therapyPlanId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_therapyplan_patientId ON therapyPlan(patientId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_bill_date ON bill(billDate);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_billitem_billId ON billItem(billId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_paymentcheck_workerId ON paymentCheck(workerId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_sold_date ON sold(soldDate);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_patient_name ON patient(name);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_patientId ON payment(patientId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_date ON payment(paymentDate);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_payment_sessionId ON payment(sessionId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_date ON appointment(date);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_patientId ON appointment(patientId);");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_appointment_sessionId ON appointment(sessionId);");
-
-            // ----------------------------------------------------------------
-            // 12. Idempotent Backfill Migration of Legacy Payments into Ledger
-            // ----------------------------------------------------------------
-            try {
-                boolean migrationAlreadyDone = false;
-                try (var rs = stmt.executeQuery("SELECT COUNT(*) FROM payment WHERE createdBy = 'MIGRATION'")) {
-                    if (rs.next() && rs.getInt(1) > 0) {
-                        migrationAlreadyDone = true;
-                    }
-                }
-
-                if (!migrationAlreadyDone) {
-                    // Backfill legacy standalone session payments
-                    stmt.execute("""
-                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
-                        SELECT s.patientId, s.id,
-                               CAST(SUBSTRING(s.sessionDate, 1, 10) AS DATE),
-                               CAST(SUBSTRING(s.sessionDate, 1, 10) || ' 12:00:00' AS TIMESTAMP),
-                               s.paidAmount, 'SESSION', 'Paiement initial séance #' || s.id, 'MIGRATION'
-                        FROM session s
-                        WHERE s.paidAmount > 0
-                          AND s.therapyPlanId IS NULL
-                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.sessionId = s.id);
+            stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS offline_change_log (
+                            seq_id      INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+                            table_name  VARCHAR(64) NOT NULL,
+                            op_type     VARCHAR(16) NOT NULL,
+                            row_id      VARCHAR(64) NOT NULL,
+                            before_json TEXT,
+                            after_json  TEXT,
+                            created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                        );
                     """);
 
-                    // Backfill legacy therapy plan payments
-                    stmt.execute("""
-                        INSERT INTO payment (patientId, sessionId, paymentDate, createdAt, amount, paymentType, reason, createdBy)
-                        SELECT tp.patientId, NULL,
-                               CAST(SUBSTRING(tp.date, 1, 10) AS DATE),
-                               CAST(SUBSTRING(tp.date, 1, 10) || ' 12:00:00' AS TIMESTAMP),
-                               tp.cost, 'THERAPY_PLAN', 'Forfait thérapie #' || tp.id, 'MIGRATION'
-                        FROM therapyPlan tp
-                        WHERE tp.cost > 0
-                          AND NOT EXISTS (SELECT 1 FROM payment p WHERE p.paymentType = 'THERAPY_PLAN' AND p.reason = 'Forfait thérapie #' || tp.id);
+            stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS offline_snapshot_meta (
+                            table_name  VARCHAR(64) PRIMARY KEY,
+                            max_id      INTEGER NOT NULL DEFAULT 0
+                        );
                     """);
-                }
-            } catch (SQLException e) {
-                System.err.println("⚠️ Warning during payment ledger backfill: " + e.getMessage());
+
+            for (String table : TRIGGER_TRACKED_TABLES) {
+                stmt.execute("CREATE TRIGGER IF NOT EXISTS trg_offline_" + table
+                        + " AFTER INSERT, UPDATE, DELETE ON " + table
+                        + " FOR EACH ROW CALL \"config.OfflineChangeTrigger\";");
             }
-
-            // Ensure patient totalCost and totalPaid are accurate from all sessions, plans & payments
-            try {
-                stmt.execute("""
-                    UPDATE patient p
-                    SET totalCost = COALESCE((SELECT SUM(cost) FROM session s WHERE s.patientId = p.id AND s.therapyPlanId IS NULL), 0) +
-                                    COALESCE((SELECT SUM(cost) FROM therapyPlan tp WHERE tp.patientId = p.id), 0),
-                        totalPaid = COALESCE((SELECT SUM(amount) FROM payment pay WHERE pay.patientId = p.id), 0);
-                """);
-            } catch (SQLException ignored) {
-                // Table might be empty on fresh first boot
-            }
-
-            System.out.println("Database initialized successfully.");
-
-        } catch (SQLException e) {
-            System.err.println("❌ Database initialization failed: " + e.getMessage());
-            throw new RuntimeException("Database initialization failed", e);
+        } finally {
+            OfflineChangeTrigger.setCaptureEnabled(prevCapture);
         }
     }
 

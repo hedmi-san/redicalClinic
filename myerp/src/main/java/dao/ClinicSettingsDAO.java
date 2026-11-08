@@ -6,11 +6,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ClinicSettingsDAO {
@@ -28,22 +31,45 @@ public class ClinicSettingsDAO {
     public static final int DEFAULT_MAX_CONCURRENT = 5;
 
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    private static volatile Map<String, String> settingsCache = null;
 
-    public String getSetting(String key, String defaultValue) {
-        String sql = "SELECT settingValue FROM clinic_settings WHERE settingKey = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, key);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    String val = rs.getString("settingValue");
-                    if (val != null && !val.trim().isEmpty()) {
-                        return val.trim();
+    public static void invalidateCache() {
+        settingsCache = null;
+    }
+
+    private Map<String, String> getOrLoadCache() {
+        Map<String, String> local = settingsCache;
+        if (local != null) {
+            return local;
+        }
+        synchronized (ClinicSettingsDAO.class) {
+            if (settingsCache != null) {
+                return settingsCache;
+            }
+            Map<String, String> loaded = new ConcurrentHashMap<>();
+            String sql = "SELECT settingKey, settingValue FROM clinic_settings";
+            try (Connection conn = DatabaseConfig.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    String k = rs.getString("settingKey");
+                    String v = rs.getString("settingValue");
+                    if (k != null && v != null) {
+                        loaded.put(k.trim(), v.trim());
                     }
                 }
+                settingsCache = loaded;
+            } catch (SQLException e) {
+                System.err.println("Error loading clinic settings cache: " + e.getMessage());
             }
-        } catch (SQLException e) {
-            System.err.println("Error reading clinic setting '" + key + "': " + e.getMessage());
+            return loaded;
+        }
+    }
+
+    public String getSetting(String key, String defaultValue) {
+        String val = getOrLoadCache().get(key);
+        if (val != null && !val.isEmpty()) {
+            return val;
         }
         return defaultValue;
     }
@@ -52,19 +78,31 @@ public class ClinicSettingsDAO {
         String updateSql = "UPDATE clinic_settings SET settingValue = ? WHERE settingKey = ?";
         String insertSql = "INSERT INTO clinic_settings (settingKey, settingValue) VALUES (?, ?)";
         try (Connection conn = DatabaseConfig.getConnection()) {
+            boolean saved = false;
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                 updateStmt.setString(1, value);
                 updateStmt.setString(2, key);
                 int updated = updateStmt.executeUpdate();
                 if (updated > 0) {
-                    return true;
+                    saved = true;
                 }
             }
-            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
-                insertStmt.setString(1, key);
-                insertStmt.setString(2, value);
-                return insertStmt.executeUpdate() > 0;
+            if (!saved) {
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                    insertStmt.setString(1, key);
+                    insertStmt.setString(2, value);
+                    saved = insertStmt.executeUpdate() > 0;
+                }
             }
+            if (saved) {
+                Map<String, String> local = settingsCache;
+                if (local != null && value != null) {
+                    local.put(key, value.trim());
+                } else {
+                    invalidateCache();
+                }
+            }
+            return saved;
         } catch (SQLException e) {
             System.err.println("Error saving clinic setting '" + key + "': " + e.getMessage());
             return false;
@@ -115,7 +153,9 @@ public class ClinicSettingsDAO {
     }
 
     public boolean setStartTime(LocalTime startTime) {
-        if (startTime == null) return false;
+        if (startTime == null) {
+            return false;
+        }
         return setSetting(KEY_START_TIME, startTime.format(TIME_FMT));
     }
 
@@ -129,7 +169,9 @@ public class ClinicSettingsDAO {
     }
 
     public boolean setEndTime(LocalTime endTime) {
-        if (endTime == null) return false;
+        if (endTime == null) {
+            return false;
+        }
         return setSetting(KEY_END_TIME, endTime.format(TIME_FMT));
     }
 
@@ -144,7 +186,9 @@ public class ClinicSettingsDAO {
     }
 
     public boolean setDefaultDurationMin(int durationMin) {
-        if (durationMin <= 0) return false;
+        if (durationMin <= 0) {
+            return false;
+        }
         return setSetting(KEY_DEFAULT_DURATION, String.valueOf(durationMin));
     }
 
@@ -159,12 +203,16 @@ public class ClinicSettingsDAO {
     }
 
     public boolean setMaxConcurrentAppointments(int maxConcurrent) {
-        if (maxConcurrent <= 0) return false;
+        if (maxConcurrent <= 0) {
+            return false;
+        }
         return setSetting(KEY_MAX_CONCURRENT, String.valueOf(maxConcurrent));
     }
 
     public static DayOfWeek parseDayToken(String token) {
-        if (token == null) return null;
+        if (token == null) {
+            return null;
+        }
         return switch (token.toUpperCase()) {
             case "MON", "MONDAY" -> DayOfWeek.MONDAY;
             case "TUE", "TUESDAY" -> DayOfWeek.TUESDAY;
@@ -189,4 +237,3 @@ public class ClinicSettingsDAO {
         };
     }
 }
-

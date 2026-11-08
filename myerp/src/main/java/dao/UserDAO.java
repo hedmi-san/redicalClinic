@@ -2,6 +2,7 @@ package dao;
 
 import config.DatabaseConfig;
 import model.User;
+import util.PasswordHasher;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,21 +11,36 @@ import java.util.List;
 public class UserDAO {
 
     /**
-     * Checks the database for a matching username + password.
-     * 
+     * Checks the database for a matching username + password using salted PBKDF2 verification.
+     * Transparently upgrades any legacy plaintext password upon successful authentication.
+     *
      * @return a User object if credentials are valid, null otherwise.
      */
     public static User login(String userName, String password) {
-        String sql = "SELECT * FROM Users WHERE userName = ? AND passWord = ?";
+        String sql = "SELECT * FROM Users WHERE userName = ?";
         try (Connection conn = DatabaseConfig.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, userName);
-            ps.setString(2, password);
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapResultSetToUser(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String storedPassword = rs.getString("passWord");
+                    if (PasswordHasher.verify(password, storedPassword)) {
+                        User user = mapResultSetToUser(rs);
+                        if (!PasswordHasher.isHashed(storedPassword)) {
+                            String hashed = PasswordHasher.hash(password);
+                            try (PreparedStatement up = conn.prepareStatement("UPDATE Users SET passWord = ? WHERE id = ?")) {
+                                up.setString(1, hashed);
+                                up.setInt(2, user.getId());
+                                up.executeUpdate();
+                                user.setPassWord(hashed);
+                            } catch (SQLException ignored) {
+                            }
+                        }
+                        return user;
+                    }
+                }
             }
         } catch (SQLException e) {
             System.err.println("Login error: " + e.getMessage());
@@ -34,7 +50,7 @@ public class UserDAO {
 
     /**
      * Inserts a default admin user if the Users table is empty.
-     * Default credentials: admin / admin123
+     * Default credentials: admin / admin123 (stored as a salted PBKDF2 hash).
      */
     public static void seedDefaultAdmin() {
         String checkSql = "SELECT COUNT(*) FROM Users";
@@ -48,13 +64,41 @@ public class UserDAO {
             if (rs.next() && rs.getInt(1) == 0) {
                 insertPs.setString(1, "Administrateur");
                 insertPs.setString(2, "admin");
-                insertPs.setString(3, "admin123");
+                insertPs.setString(3, PasswordHasher.hash("admin123"));
                 insertPs.setString(4, "Admin");
                 insertPs.executeUpdate();
                 System.out.println("   Default admin user seeded (admin / admin123)");
             }
         } catch (SQLException e) {
             System.err.println("Error seeding admin user: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Migrates any legacy plaintext user passwords in the database to salted PBKDF2 hashes.
+     */
+    public static void migratePlaintextPasswords(Connection conn) {
+        String selectSql = "SELECT id, passWord FROM Users";
+        String updateSql = "UPDATE Users SET passWord = ? WHERE id = ?";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(selectSql);
+             PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+            boolean anyUpdated = false;
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String stored = rs.getString("passWord");
+                if (stored != null && !PasswordHasher.isHashed(stored)) {
+                    updatePs.setString(1, PasswordHasher.hash(stored));
+                    updatePs.setInt(2, id);
+                    updatePs.addBatch();
+                    anyUpdated = true;
+                }
+            }
+            if (anyUpdated) {
+                updatePs.executeBatch();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error migrating plaintext passwords: " + e.getMessage());
         }
     }
 
@@ -114,7 +158,7 @@ public class UserDAO {
 
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getUserName());
-            ps.setString(3, user.getPassWord());
+            ps.setString(3, PasswordHasher.hash(user.getPassWord()));
             ps.setString(4, user.getUserType());
 
             int rows = ps.executeUpdate();
@@ -140,7 +184,7 @@ public class UserDAO {
             if (updatePassword) {
                 ps.setString(1, user.getFullName());
                 ps.setString(2, user.getUserName());
-                ps.setString(3, user.getPassWord());
+                ps.setString(3, PasswordHasher.hash(user.getPassWord()));
                 ps.setString(4, user.getUserType());
                 ps.setInt(5, user.getId());
             } else {

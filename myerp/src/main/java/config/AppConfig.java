@@ -114,6 +114,26 @@ public class AppConfig {
         save();
     }
 
+    public static synchronized boolean isReplicaInitialized() {
+        return "true".equalsIgnoreCase(properties.getProperty("replica.initialized", "false"));
+    }
+
+    public static synchronized void setReplicaInitialized(boolean initialized) {
+        properties.setProperty("replica.initialized", String.valueOf(initialized));
+        save();
+    }
+
+    public static synchronized String getReplicaLastSync() {
+        return properties.getProperty("replica.last_sync", "");
+    }
+
+    public static synchronized void setReplicaLastSync(String timestamp) {
+        if (timestamp != null) {
+            properties.setProperty("replica.last_sync", timestamp.trim());
+            save();
+        }
+    }
+
     public static String getClinicDir() {
         return CLINIC_DIR;
     }

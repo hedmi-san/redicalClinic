@@ -41,8 +41,43 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
 }
 
+.sidebar-toggle-bar {
+    -fx-padding: 10 12 0 12;
+}
+
+.sidebar-toggle-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 6px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-min-width: 28px;
+    -fx-pref-width: 28px;
+    -fx-max-width: 28px;
+    -fx-min-height: 28px;
+    -fx-pref-height: 28px;
+    -fx-max-height: 28px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.sidebar-toggle-btn:hover {
+    -fx-background-color: rgba(79, 209, 181, 0.18);
+    -fx-border-color: rgba(79, 209, 181, 0.4);
+}
+
+.sidebar-toggle-icon {
+    -fx-fill: #80d8cc;
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+}
+
+.sidebar-toggle-btn:hover .sidebar-toggle-icon {
+    -fx-fill: white;
+}
+
 .sidebar-brand {
-    -fx-padding: 30 15 40 15;
+    -fx-padding: 8 15 32 15;
     -fx-border-color: transparent transparent #004d4d transparent;
     -fx-border-width: 1px;
     -fx-margin-bottom: 20px;
@@ -184,6 +219,45 @@
 
 .logout-btn:hover .logout-icon {
     -fx-fill: #ffb3b3;
+}
+
+/* ---- Collapsed Sidebar (Rail Mode) ------------------------- */
+.sidebar-collapsed .sidebar-toggle-bar {
+    -fx-padding: 10 8 4 8;
+}
+
+.sidebar-collapsed .sidebar-brand {
+    -fx-padding: 8 8 16 8;
+}
+
+.sidebar-collapsed .nav-menu {
+    -fx-padding: 14 8 0 8;
+}
+
+.sidebar-collapsed .nav-btn {
+    -fx-padding: 10 0 10 0;
+    -fx-graphic-text-gap: 0;
+}
+
+.sidebar-collapsed .sidebar-divider-container {
+    -fx-padding: 0 10 10 10;
+}
+
+.sidebar-collapsed .user-profile-container {
+    -fx-padding: 0 8;
+}
+
+.sidebar-collapsed .user-profile-card {
+    -fx-padding: 6;
+}
+
+.sidebar-collapsed .logout-container {
+    -fx-padding: 8 8 16 8;
+}
+
+.sidebar-collapsed .logout-btn {
+    -fx-padding: 9 0 9 0;
+    -fx-graphic-text-gap: 0;
 }
 
 /* ---- Content Area ------------------------------------------ */

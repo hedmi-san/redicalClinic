@@ -17,9 +17,37 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -39,7 +67,17 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RendezVousController implements Initializable, Refreshable {
@@ -119,6 +157,7 @@ public class RendezVousController implements Initializable, Refreshable {
     private ViewMode currentMode = ViewMode.DAY;
     private LocalDate selectedDate = LocalDate.now();
     private boolean updatingDatePickerProgrammatically = false;
+    private boolean suppressFilterReload = false;
 
     private static final DateTimeFormatter ISO_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FRENCH_DAY_FMT = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH);
@@ -212,7 +251,11 @@ public class RendezVousController implements Initializable, Refreshable {
                 return null;
             }
         });
-        workerFilterCombo.valueProperty().addListener((obs, o, n) -> reloadSchedule());
+        workerFilterCombo.valueProperty().addListener((obs, o, n) -> {
+            if (!suppressFilterReload) {
+                reloadSchedule();
+            }
+        });
 
         statusFilterCombo.setItems(FXCollections.observableArrayList(
                 "TOUS",
@@ -225,7 +268,9 @@ public class RendezVousController implements Initializable, Refreshable {
         statusFilterCombo.setConverter(new StringConverter<>() {
             @Override
             public String toString(String s) {
-                if (s == null || "TOUS".equals(s)) return "Tous les statuts";
+                if (s == null || "TOUS".equals(s)) {
+                    return "Tous les statuts";
+                }
                 return Appointment.formatStatusLabel(s);
             }
 
@@ -234,25 +279,53 @@ public class RendezVousController implements Initializable, Refreshable {
                 return s;
             }
         });
+        suppressFilterReload = true;
         statusFilterCombo.setValue("TOUS");
-        statusFilterCombo.valueProperty().addListener((obs, o, n) -> reloadSchedule());
+        suppressFilterReload = false;
+        statusFilterCombo.valueProperty().addListener((obs, o, n) -> {
+            if (!suppressFilterReload) {
+                reloadSchedule();
+            }
+        });
     }
 
     private void reloadFilterWorkers() {
-        Worker current = workerFilterCombo.getValue();
-        List<Worker> items = new ArrayList<>();
-        items.add(null);
-        items.addAll(workerDAO.getAllWorkers());
-        workerFilterCombo.setItems(FXCollections.observableArrayList(items));
-        if (current != null) {
-            for (Worker w : items) {
-                if (w != null && w.getId() == current.getId()) {
-                    workerFilterCombo.setValue(w);
-                    return;
+        List<Worker> dbWorkers = workerDAO.getAllWorkers();
+        ObservableList<Worker> existingItems = workerFilterCombo.getItems();
+        if (existingItems != null && existingItems.size() == dbWorkers.size() + 1) {
+            boolean identical = true;
+            for (int i = 0; i < dbWorkers.size(); i++) {
+                Worker a = existingItems.get(i + 1);
+                Worker b = dbWorkers.get(i);
+                if (a == null || a.getId() != b.getId() || !Objects.equals(a.getName(), b.getName())) {
+                    identical = false;
+                    break;
                 }
             }
+            if (identical) {
+                return;
+            }
         }
-        workerFilterCombo.getSelectionModel().selectFirst();
+
+        suppressFilterReload = true;
+        try {
+            Worker selected = workerFilterCombo.getValue();
+            List<Worker> newItems = new ArrayList<>(dbWorkers.size() + 1);
+            newItems.add(null);
+            newItems.addAll(dbWorkers);
+            workerFilterCombo.setItems(FXCollections.observableArrayList(newItems));
+            if (selected != null) {
+                for (Worker workerItem : newItems) {
+                    if (workerItem != null && workerItem.getId() == selected.getId()) {
+                        workerFilterCombo.setValue(workerItem);
+                        return;
+                    }
+                }
+            }
+            workerFilterCombo.getSelectionModel().selectFirst();
+        } finally {
+            suppressFilterReload = false;
+        }
     }
 
     private List<Appointment> applyActiveFilters(List<Appointment> rawList) {
@@ -587,28 +660,32 @@ public class RendezVousController implements Initializable, Refreshable {
         String isoDate = selectedDate.format(ISO_DATE_FMT);
         List<Appointment> rawDayList = appointmentDAO.getAppointmentsByDate(isoDate);
 
-        // Compute overlapping appointment IDs for this date (real conflicts only: same practitioner, same patient, or exceeding clinic capacity)
         overlappingIdsOnCurrentDay.clear();
         int maxCap = settingsDAO.getMaxConcurrentAppointments();
 
         for (int i = 0; i < rawDayList.size(); i++) {
             Appointment a = rawDayList.get(i);
-            if (!a.isActiveForConflictCheck()) continue;
+            if (!a.isActiveForConflictCheck()) {
+                continue;
+            }
 
-            int concurrentCount = 1; // counts 'a' itself
+            int concurrentCount = 1;
             List<Appointment> concurrentWithA = new ArrayList<>();
 
             for (int j = 0; j < rawDayList.size(); j++) {
-                if (i == j) continue;
+                if (i == j) {
+                    continue;
+                }
                 Appointment b = rawDayList.get(j);
-                if (!b.isActiveForConflictCheck()) continue;
+                if (!b.isActiveForConflictCheck()) {
+                    continue;
+                }
 
                 if (a.getStartMinutesOfDay() < b.getEndMinutesOfDay()
                         && b.getStartMinutesOfDay() < a.getEndMinutesOfDay()) {
                     concurrentCount++;
                     concurrentWithA.add(b);
 
-                    // 1. Same practitioner double-booked
                     if (a.getWorkerId() != null && a.getWorkerId() > 0
                             && b.getWorkerId() != null
                             && a.getWorkerId().equals(b.getWorkerId())) {
@@ -616,7 +693,6 @@ public class RendezVousController implements Initializable, Refreshable {
                         overlappingIdsOnCurrentDay.add(b.getId());
                     }
 
-                    // 2. Same registered patient double-booked
                     if (a.getPatientId() != null && a.getPatientId() > 0
                             && b.getPatientId() != null
                             && a.getPatientId().equals(b.getPatientId())) {
@@ -626,7 +702,6 @@ public class RendezVousController implements Initializable, Refreshable {
                 }
             }
 
-            // 3. Exceeded clinic simultaneous capacity
             if (concurrentCount > maxCap) {
                 overlappingIdsOnCurrentDay.add(a.getId());
                 for (Appointment ov : concurrentWithA) {
@@ -689,7 +764,6 @@ public class RendezVousController implements Initializable, Refreshable {
             VBox colBox = new VBox(0);
             colBox.getStyleClass().add(isWorking ? "week-day-column" : "week-day-column-off");
 
-            // Day Header (Click jumps to Daily View for that day)
             VBox header = new VBox(2);
             header.getStyleClass().add("week-day-header");
             if (isToday) {
@@ -725,7 +799,6 @@ public class RendezVousController implements Initializable, Refreshable {
                 btnModeDay.setSelected(true);
             });
 
-            // Cards Container
             VBox cardsContainer = new VBox(8);
             cardsContainer.setPadding(new Insets(8));
             VBox.setVgrow(cardsContainer, Priority.ALWAYS);
@@ -740,7 +813,6 @@ public class RendezVousController implements Initializable, Refreshable {
                 }
             }
 
-            // Show "+ RDV" only on working days
             if (isWorking) {
                 Button addOnDayBtn = new Button("+ RDV");
                 addOnDayBtn.getStyleClass().add("btn-week-add");
@@ -820,7 +892,6 @@ public class RendezVousController implements Initializable, Refreshable {
         Map<String, List<Appointment>> byDate = monthAppointments.stream()
                 .collect(Collectors.groupingBy(Appointment::getDate));
 
-        // Header Row
         monthlyHeaderGrid.getChildren().clear();
         monthlyHeaderGrid.getColumnConstraints().clear();
         for (int c = 0; c < 7; c++) {
@@ -835,7 +906,6 @@ public class RendezVousController implements Initializable, Refreshable {
             monthlyHeaderGrid.add(hdr, c, 0);
         }
 
-        // Calendar Cells
         monthlyGrid.getChildren().clear();
         monthlyGrid.getColumnConstraints().clear();
         monthlyGrid.getRowConstraints().clear();
@@ -1040,7 +1110,6 @@ public class RendezVousController implements Initializable, Refreshable {
 
         Integer patientId = appointment.getPatientId();
         if (patientId == null || patientId <= 0) {
-            // Walk-in appointment: create/link the Patient record first
             Patient registered = promptCreatePatientFromGuest(appointment.getGuestName(), appointment.getGuestPhone());
             if (registered == null || registered.getId() <= 0) {
                 return;
@@ -1140,7 +1209,9 @@ public class RendezVousController implements Initializable, Refreshable {
             if (btn == saveBtnType) {
                 Set<DayOfWeek> selectedDays = EnumSet.noneOf(DayOfWeek.class);
                 dayChecks.forEach((d, cb) -> {
-                    if (cb.isSelected()) selectedDays.add(d);
+                    if (cb.isSelected()) {
+                        selectedDays.add(d);
+                    }
                 });
                 if (!selectedDays.isEmpty()) {
                     settingsDAO.setWorkingDays(selectedDays);
@@ -1155,16 +1226,24 @@ public class RendezVousController implements Initializable, Refreshable {
                 }
                 try {
                     String durStr = durationBox.getEditor().getText().trim();
-                    if (durStr.isEmpty() && durationBox.getValue() != null) durStr = durationBox.getValue();
+                    if (durStr.isEmpty() && durationBox.getValue() != null) {
+                        durStr = durationBox.getValue();
+                    }
                     int d = Integer.parseInt(durStr);
-                    if (d > 0) settingsDAO.setDefaultDurationMin(d);
+                    if (d > 0) {
+                        settingsDAO.setDefaultDurationMin(d);
+                    }
                 } catch (Exception ignored) {
                 }
                 try {
                     String capStr = capacityBox.getEditor().getText().trim();
-                    if (capStr.isEmpty() && capacityBox.getValue() != null) capStr = capacityBox.getValue();
+                    if (capStr.isEmpty() && capacityBox.getValue() != null) {
+                        capStr = capacityBox.getValue();
+                    }
                     int c = Integer.parseInt(capStr);
-                    if (c > 0) settingsDAO.setMaxConcurrentAppointments(c);
+                    if (c > 0) {
+                        settingsDAO.setMaxConcurrentAppointments(c);
+                    }
                 } catch (Exception ignored) {
                 }
                 return true;
@@ -1250,7 +1329,9 @@ public class RendezVousController implements Initializable, Refreshable {
     }
 
     private static String capitalize(String s) {
-        if (s == null || s.isEmpty()) return "";
+        if (s == null || s.isEmpty()) {
+            return "";
+        }
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 

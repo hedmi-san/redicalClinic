@@ -6,7 +6,7 @@
 .rendezvous-root {
     -fx-background-color: #f8fafc;
     -fx-padding: 20px 24px;
-    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Nunito", sans-serif;
+    -fx-font-family: "Segoe UI";
 }
 
 .rendezvous-card {
@@ -16,7 +16,6 @@
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1px;
     -fx-padding: 20px 24px 24px 24px;
-    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 8, 0, 0, 2);
 }
 
 /* --- 1. HEADER BAR --- */

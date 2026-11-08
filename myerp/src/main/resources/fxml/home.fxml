@@ -30,15 +30,24 @@
 
     <!-- LEFT SIDEBAR -->
     <left>
-        <VBox styleClass="sidebar" prefWidth="250.0" BorderPane.alignment="CENTER">
+        <VBox fx:id="sidebar" styleClass="sidebar" minWidth="250.0" prefWidth="250.0" maxWidth="250.0" BorderPane.alignment="CENTER">
             
+            <!-- Collapse / Expand Toggle Row -->
+            <HBox fx:id="sidebarToggleContainer" alignment="CENTER_RIGHT" styleClass="sidebar-toggle-bar">
+                <Button fx:id="btnToggleSidebar" onAction="#handleToggleSidebar" styleClass="sidebar-toggle-btn">
+                    <graphic>
+                        <SVGPath fx:id="toggleSidebarIcon" content="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" styleClass="sidebar-toggle-icon" />
+                    </graphic>
+                </Button>
+            </HBox>
+
             <!-- Branding Area -->
-            <VBox alignment="CENTER" spacing="6" styleClass="sidebar-brand">
+            <VBox fx:id="sidebarBrand" alignment="CENTER" spacing="6" styleClass="sidebar-brand">
                 <StackPane styleClass="brand-icon-box" minWidth="36" minHeight="36" alignment="CENTER">
                     <SVGPath content="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" styleClass="brand-icon" />
                 </StackPane>
-                <Label text="Cabinet" styleClass="brand-text-top"/>
-                <Label text="Nour El Islam" styleClass="brand-text-bottom"/>
+                <Label fx:id="lblBrandTop" text="Cabinet" styleClass="brand-text-top"/>
+                <Label fx:id="lblBrandBottom" text="Nour El Islam" styleClass="brand-text-bottom"/>
             </VBox>
 
             <!-- Navigation Buttons -->
@@ -117,11 +126,11 @@
 
             <!-- User Session Profile Badge -->
             <VBox styleClass="user-profile-container">
-                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="user-profile-card">
+                <HBox fx:id="userProfileCard" alignment="CENTER_LEFT" spacing="12" styleClass="user-profile-card">
                     <StackPane styleClass="avatar-circle" minWidth="36" prefWidth="36" maxWidth="36" minHeight="36" prefHeight="36" maxHeight="36">
                         <Label fx:id="lblUserInitial" text="A" styleClass="avatar-initial"/>
                     </StackPane>
-                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="userInfoBox" spacing="2" HBox.hgrow="ALWAYS">
                         <Label fx:id="lblUserFullName" text="Administrateur" styleClass="user-fullname-label"/>
                         <Label fx:id="lblUserRole" text="Compte admin" styleClass="user-role-badge"/>
                     </VBox>
@@ -145,12 +154,12 @@
     <!-- CENTER CONTENT AREA -->
     <center>
         <VBox BorderPane.alignment="CENTER">
-            <!-- Disconnection warning banner -->
+            <!-- Offline mode / disconnection status banner -->
             <HBox fx:id="connectionAlertBanner" alignment="CENTER_LEFT" spacing="10"
-                  style="-fx-background-color: #dc2626; -fx-padding: 8 16;"
+                  style="-fx-background-color: #ea580c; -fx-padding: 8 16;"
                   visible="false" managed="false">
-                <Label text="⚠️" style="-fx-font-size: 14px; -fx-text-fill: white;"/>
-                <Label fx:id="lblConnectionAlert" text="Connexion avec le poste principal perdue. Tentative de reconnexion en cours..."
+                <Label text="🟠" style="-fx-font-size: 14px; -fx-text-fill: white;"/>
+                <Label fx:id="lblConnectionAlert" text="Mode Hors-Ligne — Modifications sauvegardées localement (synchronisation automatique dès le retour du serveur)"
                        style="-fx-font-size: 12px; -fx-text-fill: white; -fx-font-weight: bold;"/>
             </HBox>
 

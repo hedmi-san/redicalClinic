@@ -44,6 +44,14 @@
                        style="-fx-font-size: 11px; -fx-padding: 3 8; -fx-background-radius: 4;"
                        visible="false" managed="false"/>
 
+                <Button fx:id="btnWorkOffline"
+                        text="🟠 Travailler hors-ligne"
+                        onAction="#handleWorkOffline"
+                        prefWidth="260"
+                        prefHeight="32"
+                        style="-fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-border-color: #fdba74; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;"
+                        visible="false" managed="false"/>
+
                 <!-- Username -->
                 <VBox spacing="6">
                     <Label text="Nom d'utilisateur" styleClass="field-label"/>
