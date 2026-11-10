@@ -13,10 +13,12 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,17 +75,19 @@ public class DatabaseMigrator {
             h2Conn.setAutoCommit(false);
 
             try {
-                // 2. Stream and insert data for each table
-                migrateAllCoreTables(sqliteConn, h2Conn);
+                // 2. Stream and insert data for each table (orphan rows are skipped and reported)
+                OrphanReport report = new OrphanReport();
+                migrateAllCoreTables(sqliteConn, h2Conn, report);
 
                 // 3. Reset identity sequences for all tables
                 resetSequences(h2Conn);
 
-                // 4. Strict row-count parity check
-                verifyParity(sqliteConn, h2Conn);
+                // 4. Strict row-count parity check (accounting for reported orphan rows)
+                verifyParity(sqliteConn, h2Conn, report);
 
                 // Commit transaction
                 h2Conn.commit();
+                report.writeLogIfNeeded();
                 AppConfig.setMigrationCompleted(true);
                 System.out.println("✅ Transactional SQLite -> H2 migration committed successfully! Parity verified across all tables.");
                 return true;
@@ -286,11 +290,12 @@ public class DatabaseMigrator {
                 }
 
                 // 2. Migrate all 9 core tables + payment table (if present in staging DB)
-                migrateAllCoreTables(sqliteConn, h2Conn);
-                migratePaymentsIfPresent(sqliteConn, h2Conn);
+                OrphanReport report = new OrphanReport();
+                migrateAllCoreTables(sqliteConn, h2Conn, report);
+                migratePaymentsIfPresent(sqliteConn, h2Conn, report);
 
                 // 3. Verify strict row-count parity on the 9 core tables before seeding fallback admin
-                verifyParity(sqliteConn, h2Conn);
+                verifyParity(sqliteConn, h2Conn, report);
 
                 // 4. Ensure at least one Admin user exists so login works after import
                 ensureAdminUserExists(h2Conn);
@@ -302,6 +307,7 @@ public class DatabaseMigrator {
                 resetAllSequences(h2Conn);
 
                 h2Conn.commit();
+                report.writeLogIfNeeded();
                 AppConfig.setMigrationCompleted(true);
                 System.out.println("✅ Clean-replace import into H2 completed and verified successfully.");
             } catch (Exception e) {
@@ -313,16 +319,94 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migrateAllCoreTables(Connection sqliteConn, Connection h2Conn) throws SQLException {
+    /**
+     * Legacy SQLite databases were used without foreign-key enforcement, so deleting a parent
+     * (bill, worker, patient, therapy plan) could leave child rows pointing at a missing id.
+     * H2 enforces these constraints, so such rows are migrated as if the H2 rules had always applied:
+     * rows whose owning parent is gone are skipped (ON DELETE CASCADE semantics) and optional
+     * references to missing rows are cleared (ON DELETE SET NULL semantics). Every skipped or
+     * detached row is recorded so it can be written to a log file after the migration.
+     */
+    static final class OrphanReport {
+        private final Map<String, Integer> skippedCounts = new LinkedHashMap<>();
+        private final List<String> entries = new ArrayList<>();
+        private Path logFile;
+
+        void skip(String table, int id, String details) {
+            skippedCounts.merge(table, 1, Integer::sum);
+            entries.add("SKIPPED  " + table + " #" + id + " — " + details);
+        }
+
+        void detach(String table, int id, String details) {
+            entries.add("DETACHED " + table + " #" + id + " — " + details);
+        }
+
+        int skipped(String table) {
+            return skippedCounts.getOrDefault(table, 0);
+        }
+
+        int totalEntries() {
+            return entries.size();
+        }
+
+        Path getLogFile() {
+            return logFile;
+        }
+
+        void writeLogIfNeeded() {
+            if (entries.isEmpty()) {
+                return;
+            }
+            System.out.println("⚠️ Migration ignored/detached " + entries.size()
+                    + " orphan row(s) from the legacy database: " + skippedCounts);
+            try {
+                Path logDir = Paths.get(AppConfig.getClinicDir(), "logs");
+                Files.createDirectories(logDir);
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                logFile = logDir.resolve("migration-orphans_" + timestamp + ".log");
+                List<String> lines = new ArrayList<>();
+                lines.add("Legacy SQLite -> H2 migration — orphan rows (" + LocalDateTime.now() + ")");
+                lines.add("These rows referenced records that no longer existed in the legacy database.");
+                lines.add("SKIPPED = row not imported; DETACHED = row imported with the broken link cleared.");
+                lines.add("The original data remains in clinic.db and in backups/clinic_pre_migration_*.db.");
+                lines.add("");
+                lines.addAll(entries);
+                Files.write(logFile, lines, StandardCharsets.UTF_8);
+                System.out.println("   Orphan report written to " + logFile);
+            } catch (Exception e) {
+                System.err.println("⚠️ Could not write orphan migration report: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void migrateAllCoreTables(Connection sqliteConn, Connection h2Conn, OrphanReport report) throws SQLException {
         migrateWorkers(sqliteConn, h2Conn);
-        migratePaymentChecks(sqliteConn, h2Conn);
+        migratePaymentChecks(sqliteConn, h2Conn, report);
         migrateBills(sqliteConn, h2Conn);
-        migrateBillItems(sqliteConn, h2Conn);
+        migrateBillItems(sqliteConn, h2Conn, report);
         migrateUsers(sqliteConn, h2Conn);
         migratePatients(sqliteConn, h2Conn);
-        migrateTherapyPlans(sqliteConn, h2Conn);
-        migrateSessions(sqliteConn, h2Conn);
+        migrateTherapyPlans(sqliteConn, h2Conn, report);
+        migrateSessions(sqliteConn, h2Conn, report);
         migrateSolds(sqliteConn, h2Conn);
+    }
+
+    /** Loads the ids already inserted into an H2 table (used to validate foreign keys before insert). */
+    private static Set<Integer> loadIds(Connection h2Conn, String table) throws SQLException {
+        Set<Integer> ids = new HashSet<>();
+        try (Statement s = h2Conn.createStatement();
+             ResultSet rs = s.executeQuery("SELECT id FROM " + table)) {
+            while (rs.next()) {
+                ids.add(rs.getInt(1));
+            }
+        }
+        return ids;
+    }
+
+    /** Reads a nullable integer column; returns null for SQL NULL. */
+    private static Integer getNullableInt(ResultSet rs, String column) throws SQLException {
+        int value = rs.getInt(column);
+        return rs.wasNull() ? null : value;
     }
 
     private static void widenH2ColumnsToText(Connection h2Conn) {
@@ -542,15 +626,23 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migratePaymentChecks(Connection src, Connection dest) throws SQLException {
+    private static void migratePaymentChecks(Connection src, Connection dest, OrphanReport report) throws SQLException {
+        Set<Integer> workerIds = loadIds(dest, "worker");
         String select = "SELECT id, workerId, paymentDate, paidAmount, note FROM paymentCheck";
         String insert = "INSERT INTO paymentCheck (id, workerId, paymentDate, paidAmount, note) VALUES (?, ?, ?, ?, ?)";
         try (Statement s = src.createStatement();
              ResultSet rs = s.executeQuery(select);
              PreparedStatement ps = dest.prepareStatement(insert)) {
             while (rs.next()) {
-                ps.setInt(1, rs.getInt("id"));
-                ps.setInt(2, rs.getInt("workerId"));
+                int id = rs.getInt("id");
+                Integer workerId = getNullableInt(rs, "workerId");
+                if (workerId == null || !workerIds.contains(workerId)) {
+                    report.skip("paymentCheck", id, "employé introuvable (workerId=" + workerId + "), date="
+                            + rs.getString("paymentDate") + ", montant=" + rs.getDouble("paidAmount"));
+                    continue;
+                }
+                ps.setInt(1, id);
+                ps.setInt(2, workerId);
                 ps.setString(3, rs.getString("paymentDate"));
                 ps.setDouble(4, rs.getDouble("paidAmount"));
                 ps.setString(5, rs.getString("note"));
@@ -576,15 +668,24 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migrateBillItems(Connection src, Connection dest) throws SQLException {
+    private static void migrateBillItems(Connection src, Connection dest, OrphanReport report) throws SQLException {
+        Set<Integer> billIds = loadIds(dest, "bill");
         String select = "SELECT id, billId, itemName, quantity, unitPrice FROM billItem";
         String insert = "INSERT INTO billItem (id, billId, itemName, quantity, unitPrice) VALUES (?, ?, ?, ?, ?)";
         try (Statement s = src.createStatement();
              ResultSet rs = s.executeQuery(select);
              PreparedStatement ps = dest.prepareStatement(insert)) {
             while (rs.next()) {
-                ps.setInt(1, rs.getInt("id"));
-                ps.setInt(2, rs.getInt("billId"));
+                int id = rs.getInt("id");
+                Integer billId = getNullableInt(rs, "billId");
+                if (billId == null || !billIds.contains(billId)) {
+                    report.skip("billItem", id, "facture introuvable (billId=" + billId + "), article="
+                            + rs.getString("itemName") + ", qté=" + rs.getInt("quantity")
+                            + ", prix=" + rs.getDouble("unitPrice"));
+                    continue;
+                }
+                ps.setInt(1, id);
+                ps.setInt(2, billId);
                 ps.setString(3, rs.getString("itemName"));
                 ps.setInt(4, rs.getInt("quantity"));
                 ps.setDouble(5, rs.getDouble("unitPrice"));
@@ -635,15 +736,27 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migrateTherapyPlans(Connection src, Connection dest) throws SQLException {
+    private static void migrateTherapyPlans(Connection src, Connection dest, OrphanReport report) throws SQLException {
+        Set<Integer> patientIds = loadIds(dest, "patient");
         String select = "SELECT id, patientId, date, cost FROM therapyPlan";
         String insert = "INSERT INTO therapyPlan (id, patientId, date, cost) VALUES (?, ?, ?, ?)";
         try (Statement s = src.createStatement();
              ResultSet rs = s.executeQuery(select);
              PreparedStatement ps = dest.prepareStatement(insert)) {
             while (rs.next()) {
-                ps.setInt(1, rs.getInt("id"));
-                ps.setInt(2, rs.getInt("patientId"));
+                int id = rs.getInt("id");
+                Integer patientId = getNullableInt(rs, "patientId");
+                if (patientId != null && !patientIds.contains(patientId)) {
+                    report.skip("therapyPlan", id, "patient introuvable (patientId=" + patientId + "), date="
+                            + rs.getString("date") + ", coût=" + rs.getDouble("cost"));
+                    continue;
+                }
+                ps.setInt(1, id);
+                if (patientId == null) {
+                    ps.setNull(2, Types.INTEGER);
+                } else {
+                    ps.setInt(2, patientId);
+                }
                 ps.setString(3, rs.getString("date"));
                 ps.setDouble(4, rs.getDouble("cost"));
                 ps.addBatch();
@@ -652,17 +765,39 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migrateSessions(Connection src, Connection dest) throws SQLException {
+    private static void migrateSessions(Connection src, Connection dest, OrphanReport report) throws SQLException {
+        Set<Integer> patientIds = loadIds(dest, "patient");
+        Set<Integer> planIds = loadIds(dest, "therapyPlan");
         String select = "SELECT id, patientId, therapyPlanId, sessionDate, treatment, paied, cost, paidAmount FROM session";
         String insert = "INSERT INTO session (id, patientId, therapyPlanId, sessionDate, treatment, paied, cost, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Statement s = src.createStatement();
              ResultSet rs = s.executeQuery(select);
              PreparedStatement ps = dest.prepareStatement(insert)) {
             while (rs.next()) {
-                ps.setInt(1, rs.getInt("id"));
-                ps.setInt(2, rs.getInt("patientId"));
-                int planId = rs.getInt("therapyPlanId");
-                if (rs.wasNull() || planId <= 0) {
+                int id = rs.getInt("id");
+                Integer patientId = getNullableInt(rs, "patientId");
+                Integer planId = getNullableInt(rs, "therapyPlanId");
+                if (planId != null && planId <= 0) {
+                    planId = null;
+                }
+                String details = "date=" + rs.getString("sessionDate") + ", coût=" + rs.getDouble("cost")
+                        + ", payé=" + rs.getDouble("paidAmount");
+                if (patientId != null && !patientIds.contains(patientId)) {
+                    report.skip("session", id, "patient introuvable (patientId=" + patientId + "), " + details);
+                    continue;
+                }
+                if (planId != null && !planIds.contains(planId)) {
+                    report.skip("session", id, "forfait introuvable (therapyPlanId=" + planId + "), patientId="
+                            + patientId + ", " + details);
+                    continue;
+                }
+                ps.setInt(1, id);
+                if (patientId == null) {
+                    ps.setNull(2, Types.INTEGER);
+                } else {
+                    ps.setInt(2, patientId);
+                }
+                if (planId == null) {
                     ps.setNull(3, Types.INTEGER);
                 } else {
                     ps.setInt(3, planId);
@@ -696,11 +831,15 @@ public class DatabaseMigrator {
         }
     }
 
-    private static void migratePaymentsIfPresent(Connection src, Connection dest) throws SQLException {
+    private static void migratePaymentsIfPresent(Connection src, Connection dest, OrphanReport report) throws SQLException {
         if (!tableExists(src, "payment")) {
             return;
         }
-        String select = "SELECT id, patientId, sessionId, paymentDate, createdAt, amount, paymentType, reversalOf, reason, createdBy FROM payment";
+        Set<Integer> patientIds = loadIds(dest, "patient");
+        Set<Integer> sessionIds = loadIds(dest, "session");
+        Set<Integer> insertedPaymentIds = new HashSet<>();
+        // Ordered by id so that a reversal's original payment is always inserted first
+        String select = "SELECT id, patientId, sessionId, paymentDate, createdAt, amount, paymentType, reversalOf, reason, createdBy FROM payment ORDER BY id";
         String insert = "INSERT INTO payment (id, patientId, sessionId, paymentDate, createdAt, amount, paymentType, reversalOf, reason, createdBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Statement s = src.createStatement();
              ResultSet rs = s.executeQuery(select);
@@ -708,10 +847,20 @@ public class DatabaseMigrator {
             while (rs.next()) {
                 double amount = rs.getDouble("amount");
                 if (Math.abs(amount) < 0.001) continue;
-                ps.setInt(1, rs.getInt("id"));
-                ps.setInt(2, rs.getInt("patientId"));
+                int id = rs.getInt("id");
+                Integer patientId = getNullableInt(rs, "patientId");
+                if (patientId == null || !patientIds.contains(patientId)) {
+                    report.skip("payment", id, "patient introuvable (patientId=" + patientId + "), date="
+                            + rs.getString("paymentDate") + ", montant=" + amount);
+                    continue;
+                }
+                ps.setInt(1, id);
+                ps.setInt(2, patientId);
                 int sessionId = rs.getInt("sessionId");
                 if (rs.wasNull() || sessionId <= 0) {
+                    ps.setNull(3, Types.INTEGER);
+                } else if (!sessionIds.contains(sessionId)) {
+                    report.detach("payment", id, "séance introuvable (sessionId=" + sessionId + ") — lien supprimé");
                     ps.setNull(3, Types.INTEGER);
                 } else {
                     ps.setInt(3, sessionId);
@@ -730,12 +879,16 @@ public class DatabaseMigrator {
                 int revOf = rs.getInt("reversalOf");
                 if (rs.wasNull() || revOf <= 0) {
                     ps.setNull(8, Types.INTEGER);
+                } else if (!insertedPaymentIds.contains(revOf)) {
+                    report.detach("payment", id, "paiement d'origine introuvable (reversalOf=" + revOf + ") — lien supprimé");
+                    ps.setNull(8, Types.INTEGER);
                 } else {
                     ps.setInt(8, revOf);
                 }
                 ps.setString(9, rs.getString("reason"));
                 ps.setString(10, rs.getString("createdBy") != null ? rs.getString("createdBy") : "MIGRATION");
                 ps.addBatch();
+                insertedPaymentIds.add(id);
             }
             ps.executeBatch();
         }
@@ -877,6 +1030,14 @@ public class DatabaseMigrator {
      * Verifies that table row counts between SQLite and H2 match exactly.
      */
     public static void verifyParity(Connection sqliteConn, Connection h2Conn) throws SQLException {
+        verifyParity(sqliteConn, h2Conn, new OrphanReport());
+    }
+
+    /**
+     * Verifies that H2 row counts equal the SQLite row counts minus the orphan rows
+     * that were deliberately skipped (and recorded) during migration.
+     */
+    static void verifyParity(Connection sqliteConn, Connection h2Conn, OrphanReport report) throws SQLException {
         Map<String, Integer> sqliteCounts = new LinkedHashMap<>();
         Map<String, Integer> h2Counts = new LinkedHashMap<>();
 
@@ -896,11 +1057,14 @@ public class DatabaseMigrator {
                 }
                 h2Counts.put(table, c2);
 
-                if (c1 != c2) {
+                int skipped = report.skipped(table);
+                if (c1 - skipped != c2) {
                     throw new IllegalStateException("Parity check failed for table [" + table +
-                            "]: SQLite has " + c1 + " records, but H2 has " + c2 + " records.");
+                            "]: SQLite has " + c1 + " records (" + skipped + " orphan(s) skipped), but H2 has "
+                            + c2 + " records.");
                 }
-                System.out.println("   ✔ Parity confirmed for " + table + ": " + c1 + " rows");
+                System.out.println("   ✔ Parity confirmed for " + table + ": " + c2 + " rows"
+                        + (skipped > 0 ? " (" + skipped + " orphan row(s) skipped)" : ""));
             }
         }
     }

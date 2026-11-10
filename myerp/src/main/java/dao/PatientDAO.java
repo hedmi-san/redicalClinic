@@ -1,6 +1,7 @@
 package dao;
 
 import config.DatabaseConfig;
+import model.BalanceFilter;
 import model.Patient;
 
 import java.sql.*;
@@ -10,32 +11,52 @@ import java.util.List;
 public class PatientDAO {
 
     public List<Patient> getAllPatients() {
-        List<Patient> patients = new ArrayList<>();
-        String query = "SELECT * FROM patient ORDER BY name ASC";
-
-        try (Connection conn = DatabaseConfig.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
-
-            while (rs.next()) {
-                patients.add(mapResultSetToPatient(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error fetching all patients: " + e.getMessage());
-        }
-        return patients;
+        return getPatients(null, BalanceFilter.ALL);
     }
 
     public List<Patient> searchPatients(String searchTerm) {
+        return getPatients(searchTerm, BalanceFilter.ALL);
+    }
+
+    public List<Patient> getPatients(String searchTerm, BalanceFilter filter) {
         List<Patient> patients = new ArrayList<>();
-        String query = "SELECT * FROM patient WHERE name LIKE ? OR phone LIKE ? ORDER BY name ASC";
+        StringBuilder query = new StringBuilder("SELECT * FROM patient WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            String term = "%" + searchTerm.trim() + "%";
+            String cleanDigits = "%" + searchTerm.replaceAll("\\s+", "") + "%";
+            query.append(" AND (LOWER(name) LIKE LOWER(?) OR phone LIKE ? OR REPLACE(phone, ' ', '') LIKE ?)");
+            params.add(term);
+            params.add(term);
+            params.add(cleanDigits);
+        }
+
+        if (filter != null) {
+            switch (filter) {
+                case DEBT:
+                    query.append(" AND (COALESCE(totalCost, 0.0) - COALESCE(totalPaid, 0.0)) > 0.01");
+                    break;
+                case ADVANCE:
+                    query.append(" AND (COALESCE(totalCost, 0.0) - COALESCE(totalPaid, 0.0)) < -0.01");
+                    break;
+                case SETTLED:
+                    query.append(" AND ABS(COALESCE(totalCost, 0.0) - COALESCE(totalPaid, 0.0)) <= 0.01");
+                    break;
+                case ALL:
+                default:
+                    break;
+            }
+        }
+
+        query.append(" ORDER BY name ASC");
 
         try (Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query.toString())) {
 
-            String likeTerm = "%" + searchTerm + "%";
-            pstmt.setString(1, likeTerm);
-            pstmt.setString(2, likeTerm);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -43,7 +64,7 @@ public class PatientDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error searching patients: " + e.getMessage());
+            System.err.println("Error fetching patients: " + e.getMessage());
         }
         return patients;
     }

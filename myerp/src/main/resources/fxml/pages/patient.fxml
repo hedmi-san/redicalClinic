@@ -11,8 +11,10 @@
         <URL value="@../../css/pages/patient.css" />
     </stylesheets>
 
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="Rechercher un patient..." prefWidth="300" />
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Rechercher par nom ou téléphone..." prefWidth="280" />
+        <ComboBox fx:id="balanceFilterCombo" prefWidth="170" promptText="Tous les soldes" styleClass="filter-combo" />
+        <Label fx:id="patientCountLabel" text="0 patient" styleClass="patient-count-label" />
         <Region HBox.hgrow="ALWAYS" />
         <Button text="Ajouter" styleClass="action-button, primary-button" onAction="#handleNewPatient" />
     </HBox>

@@ -7,11 +7,21 @@
 
 .PARAMETER OutputDir
     Directory to place the final installers.
+
+.PARAMETER Debug
+    Builds a diagnostic variant whose launcher opens a console window showing
+    the application's output and any startup stack trace (jpackage --win-console).
 #>
 param(
     [string]$Version = "1.8",
-    [string]$OutputDir = "C:\Users\LAPTOP SPIRIT\Documents\FeedbackHub"
+    [string]$OutputDir = "C:\Users\LAPTOP SPIRIT\Documents\FeedbackHub",
+    [switch]$Debug
 )
+
+$extraJpackageArgs = @()
+if ($Debug) {
+    $extraJpackageArgs += "--win-console"
+}
 
 $ErrorActionPreference = "Stop"
 
@@ -100,7 +110,9 @@ jpackage `
     --win-menu `
     --win-dir-chooser `
     --win-upgrade-uuid $upgradeUuid `
-    --dest $distDir
+    --dest $distDir `
+    @extraJpackageArgs
+if ($LASTEXITCODE -ne 0) { throw "jpackage failed with exit code $LASTEXITCODE" }
 
 # 5. Generate EXE package
 Write-Host "Generating EXE package (Version $Version)..." -ForegroundColor Yellow
@@ -115,7 +127,9 @@ jpackage `
     --win-menu `
     --win-dir-chooser `
     --win-upgrade-uuid $upgradeUuid `
-    --dest $distDir
+    --dest $distDir `
+    @extraJpackageArgs
+if ($LASTEXITCODE -ne 0) { throw "jpackage failed with exit code $LASTEXITCODE" }
 
 # 6. Copy to destination directory
 if (-not (Test-Path $OutputDir)) {
