@@ -361,3 +361,35 @@
 .btn-secondary-proforma:hover .proforma-icon {
     -fx-fill: #0f766e;
 }
+
+/* Refresh Button in Header */
+.btn-refresh {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 7 14;
+    -fx-font-family: 'Inter', 'Segoe UI', sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 6;
+}
+
+.btn-refresh .refresh-icon {
+    -fx-fill: #475569;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+.btn-refresh:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+    -fx-text-fill: #0f172a;
+}
+
+.btn-refresh:hover .refresh-icon {
+    -fx-fill: #0f172a;
+}

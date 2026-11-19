@@ -28,6 +28,8 @@ public class SessionController implements Initializable, Refreshable {
     @FXML
     private DatePicker datePicker;
     @FXML
+    private Button btnRefresh;
+    @FXML
     private TableView<Session> sessionTable;
     @FXML
     private TableColumn<Session, String> patientColumn;
@@ -70,6 +72,11 @@ public class SessionController implements Initializable, Refreshable {
     @Override
     public void refresh() {
         loadSessions();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        refresh();
     }
 
     private void setupTable() {
@@ -117,6 +124,9 @@ public class SessionController implements Initializable, Refreshable {
     }
 
     private void loadSessions() {
+        if (datePicker.getValue() == null) {
+            datePicker.setValue(LocalDate.now());
+        }
         String date = datePicker.getValue().format(DATE_FORMATTER);
         sessionList.setAll(sessionDAO.getSessionsByDate(date));
         updateSummaryCards();

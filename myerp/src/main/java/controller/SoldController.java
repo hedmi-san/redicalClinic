@@ -45,6 +45,7 @@ public class SoldController implements Initializable, Refreshable {
     @FXML private Label totalRevenueLabel;
 
     @FXML private VBox tableCard;
+    @FXML private Button btnRefresh;
     @FXML private Button btnEdit;
     @FXML private Button btnDelete;
 
@@ -89,6 +90,11 @@ public class SoldController implements Initializable, Refreshable {
     @Override
     public void refresh() {
         loadSolds();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        refresh();
     }
 
     private void setupCardClip() {

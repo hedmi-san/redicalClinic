@@ -40,6 +40,8 @@ public class BillController implements Initializable, Refreshable {
     private ComboBox<String> monthComboBox;
     @FXML
     private ComboBox<Integer> yearComboBox;
+    @FXML
+    private Button btnRefresh;
 
     private final String[] MONTHS_FR = {
             "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -60,6 +62,11 @@ public class BillController implements Initializable, Refreshable {
     @Override
     public void refresh() {
         loadBills();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        refresh();
     }
 
     private void setupFilters() {
