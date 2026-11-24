@@ -37,6 +37,8 @@ public class PatientController implements Initializable, Refreshable {
     @FXML
     private Label patientCountLabel;
     @FXML
+    private Button btnRefresh;
+    @FXML
     private TableView<Patient> patientTable;
     @FXML
     private TableColumn<Patient, String> nameColumn;
@@ -142,6 +144,11 @@ public class PatientController implements Initializable, Refreshable {
     @Override
     public void refresh() {
         loadPatients();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        refresh();
     }
 
     public void loadPatients() {

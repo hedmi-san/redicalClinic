@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.Patient;
 import model.Session;
+import util.PatientSearchHelper;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -283,13 +284,9 @@ public class SessionFormController {
             return;
         }
 
-        String cleanQuery = currentSearchQuery.replaceAll("\\s+", "").toLowerCase();
-        List<Patient> matches = allPatients.stream().filter(p -> {
-            if (p == null) return false;
-            String name = p.getName() != null ? p.getName().toLowerCase() : "";
-            String phone = p.getPhone() != null ? p.getPhone().replaceAll("\\s+", "") : "";
-            return name.contains(cleanQuery) || phone.contains(cleanQuery);
-        }).toList();
+        List<Patient> matches = allPatients.stream()
+                .filter(p -> PatientSearchHelper.matches(p, currentSearchQuery))
+                .toList();
 
         filteredPatients.setAll(matches);
 
@@ -779,36 +776,31 @@ public class SessionFormController {
             TextFlow flow = new TextFlow();
             if (name == null) return flow;
 
-            if (query == null || query.trim().isEmpty()) {
+            List<int[]> ranges = PatientSearchHelper.findHighlightRanges(name, query);
+            if (ranges.isEmpty()) {
                 Text t = new Text(name);
                 t.setStyle("-fx-fill: #0f172a; -fx-font-weight: 600; -fx-font-size: 13px;");
                 flow.getChildren().add(t);
                 return flow;
             }
 
-            String lowerName = name.toLowerCase();
-            String lowerQuery = query.trim().toLowerCase();
-            int idx = lowerName.indexOf(lowerQuery);
-
-            if (idx < 0) {
-                Text t = new Text(name);
-                t.setStyle("-fx-fill: #0f172a; -fx-font-weight: 600; -fx-font-size: 13px;");
-                flow.getChildren().add(t);
-                return flow;
+            int cursor = 0;
+            for (int[] range : ranges) {
+                int start = range[0];
+                int end = range[1];
+                if (start > cursor) {
+                    Text before = new Text(name.substring(cursor, start));
+                    before.setStyle("-fx-fill: #0f172a; -fx-font-weight: 600; -fx-font-size: 13px;");
+                    flow.getChildren().add(before);
+                }
+                Text match = new Text(name.substring(start, end));
+                match.setStyle("-fx-fill: #0f766e; -fx-font-weight: bold; -fx-font-size: 13px;");
+                flow.getChildren().add(match);
+                cursor = end;
             }
 
-            if (idx > 0) {
-                Text before = new Text(name.substring(0, idx));
-                before.setStyle("-fx-fill: #0f172a; -fx-font-weight: 600; -fx-font-size: 13px;");
-                flow.getChildren().add(before);
-            }
-
-            Text match = new Text(name.substring(idx, idx + lowerQuery.length()));
-            match.setStyle("-fx-fill: #0f766e; -fx-font-weight: bold; -fx-font-size: 13px;");
-            flow.getChildren().add(match);
-
-            if (idx + lowerQuery.length() < name.length()) {
-                Text after = new Text(name.substring(idx + lowerQuery.length()));
+            if (cursor < name.length()) {
+                Text after = new Text(name.substring(cursor));
                 after.setStyle("-fx-fill: #0f172a; -fx-font-weight: 600; -fx-font-size: 13px;");
                 flow.getChildren().add(after);
             }

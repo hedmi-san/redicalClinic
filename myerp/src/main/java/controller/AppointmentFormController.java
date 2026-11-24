@@ -27,6 +27,7 @@ import javafx.util.StringConverter;
 import model.Appointment;
 import model.Patient;
 import model.Worker;
+import util.PatientSearchHelper;
 import util.UserSession;
 
 import java.io.IOException;
@@ -366,13 +367,9 @@ public class AppointmentFormController {
             return;
         }
 
-        String cleanQuery = currentSearchQuery.replaceAll("\\s+", "").toLowerCase();
-        List<Patient> matches = allPatients.stream().filter(p -> {
-            if (p == null) return false;
-            String name = p.getName() != null ? p.getName().toLowerCase() : "";
-            String phone = p.getPhone() != null ? p.getPhone().replaceAll("\\s+", "") : "";
-            return name.contains(cleanQuery) || phone.contains(cleanQuery);
-        }).toList();
+        List<Patient> matches = allPatients.stream()
+                .filter(p -> PatientSearchHelper.matches(p, currentSearchQuery))
+                .toList();
 
         filteredPatients.setAll(matches);
         suggestionListView.setPrefWidth(patientSearchField.getWidth());

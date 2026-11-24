@@ -3,6 +3,7 @@ package dao;
 import config.DatabaseConfig;
 import model.BalanceFilter;
 import model.Patient;
+import util.PatientSearchHelper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,11 +24,23 @@ public class PatientDAO {
         StringBuilder query = new StringBuilder("SELECT * FROM patient WHERE 1=1");
         List<Object> params = new ArrayList<>();
 
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            String term = "%" + searchTerm.trim() + "%";
-            String cleanDigits = "%" + searchTerm.replaceAll("\\s+", "") + "%";
-            query.append(" AND (LOWER(name) LIKE LOWER(?) OR phone LIKE ? OR REPLACE(phone, ' ', '') LIKE ?)");
-            params.add(term);
+        List<String> tokens = PatientSearchHelper.tokenize(searchTerm);
+        if (!tokens.isEmpty()) {
+            StringBuilder nameMatchClause = new StringBuilder();
+            for (int i = 0; i < tokens.size(); i++) {
+                if (i > 0) {
+                    nameMatchClause.append(" AND ");
+                }
+                nameMatchClause.append("(LOWER(name) LIKE LOWER(?) ESCAPE '!' OR REPLACE(LOWER(name), ' ', '') LIKE LOWER(?) ESCAPE '!')");
+                String escapedToken = "%" + PatientSearchHelper.escapeLike(tokens.get(i)) + "%";
+                params.add(escapedToken);
+                params.add(escapedToken);
+            }
+            String term = "%" + PatientSearchHelper.escapeLike(searchTerm.trim()) + "%";
+            String cleanDigits = "%" + PatientSearchHelper.escapeLike(searchTerm.replaceAll("\\s+", "")) + "%";
+            query.append(" AND ((")
+                 .append(nameMatchClause)
+                 .append(") OR phone LIKE ? ESCAPE '!' OR REPLACE(phone, ' ', '') LIKE ? ESCAPE '!')");
             params.add(term);
             params.add(cleanDigits);
         }

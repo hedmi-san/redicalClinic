@@ -4,6 +4,7 @@ import config.AppConfig;
 import config.DatabaseConfig;
 import config.DatabaseInitializer;
 import controller.BillController;
+import controller.PatientController;
 import controller.SessionController;
 import controller.SoldController;
 import dao.BillDAO;
@@ -133,6 +134,32 @@ public class PageRefreshVerificationTest {
                 throw new AssertionError("Sold summary cards did not update: count=" + soldCountLabel.getText() + ", revenue=" + totalRevenueLabel.getText());
             }
             System.out.println("  ✓ Sold page refresh button updated table and summary cards.");
+
+            // 4. Verify Patient page refresh button
+            PatientController patientController = loadFxml("/fxml/pages/patient.fxml", PatientController.class);
+            TableView<?> patientTable = getField(patientController, "patientTable", TableView.class);
+            Button patientRefreshBtn = getField(patientController, "btnRefresh", Button.class);
+            Label patientCountLabel = getField(patientController, "patientCountLabel", Label.class);
+            assertNotNull(patientRefreshBtn, "Patient btnRefresh should be injected");
+            int initialPatients = patientTable.getItems().size();
+
+            Patient remotePatient = new Patient();
+            remotePatient.setName("Patient Remote Sync");
+            remotePatient.setGender("Female");
+            remotePatient.setPhone("0555000002");
+            patientDAO.addPatient(remotePatient);
+            if (remotePatient.getId() <= 0) {
+                throw new AssertionError("Failed to insert remote patient");
+            }
+
+            runOnFxAndWait(patientRefreshBtn::fire);
+            if (patientTable.getItems().size() != initialPatients + 1) {
+                throw new AssertionError("Expected patient table size " + (initialPatients + 1) + ", got " + patientTable.getItems().size());
+            }
+            if (!patientCountLabel.getText().contains(String.valueOf(initialPatients + 1))) {
+                throw new AssertionError("Patient count label did not update: " + patientCountLabel.getText());
+            }
+            System.out.println("  ✓ Patient page refresh button updated table and count label.");
 
             System.out.println("\n================================================================");
             System.out.println("   PAGE REFRESH BUTTON VERIFICATION PASSED! ✓                   ");
